@@ -499,12 +499,12 @@ const PointsDeVentePage = () => {
                 <MapPinned className="h-4 w-4 text-muted-foreground" />
                 Zone géographique
               </label>
-              <Select value={tempZone} onValueChange={setTempZone}>
+              <Select value={tempZone || "all"} onValueChange={(v) => setTempZone(v === "all" ? "" : v)}>
                 <SelectTrigger className="w-full bg-background">
                   <SelectValue placeholder="Toutes les zones" />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border">
-                  <SelectItem value="">Toutes les zones</SelectItem>
+                  <SelectItem value="all">Toutes les zones</SelectItem>
                   {zones.map((zone) => (
                     <SelectItem key={zone} value={zone}>
                       {zone}
@@ -520,12 +520,12 @@ const PointsDeVentePage = () => {
                 <Building2 className="h-4 w-4 text-muted-foreground" />
                 Type de point de vente
               </label>
-              <Select value={tempType} onValueChange={setTempType}>
+              <Select value={tempType || "all"} onValueChange={(v) => setTempType(v === "all" ? "" : v)}>
                 <SelectTrigger className="w-full bg-background">
                   <SelectValue placeholder="Tous les types" />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border">
-                  <SelectItem value="">Tous les types</SelectItem>
+                  <SelectItem value="all">Tous les types</SelectItem>
                   {types.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type}
@@ -541,12 +541,12 @@ const PointsDeVentePage = () => {
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 Ville
               </label>
-              <Select value={tempVille} onValueChange={setTempVille}>
+              <Select value={tempVille || "all"} onValueChange={(v) => setTempVille(v === "all" ? "" : v)}>
                 <SelectTrigger className="w-full bg-background">
                   <SelectValue placeholder="Toutes les villes" />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border">
-                  <SelectItem value="">Toutes les villes</SelectItem>
+                  <SelectItem value="all">Toutes les villes</SelectItem>
                   {villes.map((ville) => (
                     <SelectItem key={ville} value={ville}>
                       {ville}
@@ -562,12 +562,12 @@ const PointsDeVentePage = () => {
                 <Users className="h-4 w-4 text-muted-foreground" />
                 Statut
               </label>
-              <Select value={tempStatut} onValueChange={setTempStatut}>
+              <Select value={tempStatut || "all"} onValueChange={(v) => setTempStatut(v === "all" ? "" : v)}>
                 <SelectTrigger className="w-full bg-background">
                   <SelectValue placeholder="Tous les statuts" />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border">
-                  <SelectItem value="">Tous les statuts</SelectItem>
+                  <SelectItem value="all">Tous les statuts</SelectItem>
                   <SelectItem value="actif">Actif</SelectItem>
                   <SelectItem value="inactif">Inactif</SelectItem>
                 </SelectContent>
@@ -580,12 +580,12 @@ const PointsDeVentePage = () => {
                 <Wifi className="h-4 w-4 text-muted-foreground" />
                 Compte connecté
               </label>
-              <Select value={tempCompte} onValueChange={setTempCompte}>
+              <Select value={tempCompte || "all"} onValueChange={(v) => setTempCompte(v === "all" ? "" : v)}>
                 <SelectTrigger className="w-full bg-background">
                   <SelectValue placeholder="Tous" />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border">
-                  <SelectItem value="">Tous</SelectItem>
+                  <SelectItem value="all">Tous</SelectItem>
                   <SelectItem value="connecte">Connecté</SelectItem>
                   <SelectItem value="non_connecte">Non connecté</SelectItem>
                 </SelectContent>

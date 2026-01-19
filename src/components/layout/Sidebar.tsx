@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  Users,
-  MapPin,
-  BarChart2,
+  FileText,
+  Store,
+  TrendingUp,
   Briefcase,
   Settings,
-  UserCheck,
-  Building2,
+  Users,
+  User,
   ChevronDown,
   ChevronRight,
   PanelLeftClose,
@@ -100,9 +100,9 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemP
 };
 
 const navItems = [
-  { to: "/candidatures", icon: Users, label: "Candidatures", badge: 4 },
-  { to: "/points-de-vente", icon: MapPin, label: "Points de vente" },
-  { to: "/statistiques", icon: BarChart2, label: "Statistiques" },
+  { to: "/candidatures", icon: FileText, label: "Candidatures", badge: 4 },
+  { to: "/points-de-vente", icon: Store, label: "Points de vente" },
+  { to: "/statistiques", icon: TrendingUp, label: "Statistiques" },
   {
     to: "/offres-emploi",
     icon: Briefcase,
@@ -121,8 +121,8 @@ const navItems = [
 ];
 
 const secondaryNavItems = [
-  { to: "/employes", icon: UserCheck, label: "Employés" },
-  { to: "/utilisateurs", icon: Building2, label: "Utilisateurs" },
+  { to: "/employes", icon: Users, label: "Employés" },
+  { to: "/utilisateurs", icon: User, label: "Utilisateurs" },
 ];
 
 export const Sidebar = () => {

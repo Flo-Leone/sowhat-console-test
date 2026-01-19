@@ -207,73 +207,72 @@ const ConversionTagsEditor = ({
 }) => {
   const [open, setOpen] = useState(false);
 
-  const toggleTag = (tag: string) => {
-    if (tags.includes(tag)) {
-      onTagsChange(tags.filter((t) => t !== tag));
-    } else {
+  const removeTag = (tagToRemove: string) => {
+    onTagsChange(tags.filter((t) => t !== tagToRemove));
+  };
+
+  const addTag = (tag: string) => {
+    if (!tags.includes(tag)) {
       onTagsChange([...tags, tag]);
     }
   };
 
+  const availableTags = conversionTagOptions.filter((t) => !tags.includes(t));
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <button className="flex items-center gap-1.5 group">
-          {tags.map((tag) => (
-            <Badge 
-              key={tag} 
-              variant="secondary" 
-              className={cn(
-                "cursor-pointer hover:opacity-80 transition-opacity border",
-                tagColorMap[tag] || "bg-muted text-muted-foreground"
-              )}
-            >
-              {tag}
-            </Badge>
-          ))}
-          <div className="w-6 h-6 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center cursor-pointer transition-colors">
-            <Plus className="h-3.5 w-3.5 text-muted-foreground" />
-          </div>
-        </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-48 p-2" align="start">
-        <p className="text-xs font-medium text-muted-foreground mb-2">Tags de conversion</p>
-        <div className="space-y-1">
-          {conversionTagOptions.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => toggleTag(tag)}
-              className={cn(
-                "w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors",
-                tags.includes(tag)
-                  ? tagColorMap[tag]?.replace("/20", "/10") || "bg-primary/10"
-                  : "hover:bg-muted"
-              )}
-            >
-              <span className="flex items-center gap-2">
-                <span className={cn(
-                  "w-3 h-3 rounded-full",
-                  tag === "10H" && "bg-lavender",
-                  tag === "25H" && "bg-coral",
-                  tag === "48H" && "bg-primary"
-                )} />
-                {tag}
-              </span>
-              {tags.includes(tag) && <CheckCircle2 className="h-4 w-4" />}
-            </button>
-          ))}
-        </div>
-        {tags.length > 0 && (
+    <div className="flex items-center gap-1.5">
+      {tags.map((tag) => (
+        <Badge 
+          key={tag} 
+          variant="secondary" 
+          className={cn(
+            "border group/tag relative pr-6",
+            tagColorMap[tag] || "bg-muted text-muted-foreground"
+          )}
+        >
+          {tag}
           <button
-            onClick={() => onTagsChange([])}
-            className="w-full flex items-center gap-2 px-3 py-2 mt-1 rounded-md text-sm text-destructive hover:bg-destructive/10 transition-colors"
+            onClick={() => removeTag(tag)}
+            className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/tag:opacity-100 transition-opacity hover:text-destructive"
           >
-            <X className="h-4 w-4" />
-            Supprimer tous
+            <X className="h-3 w-3" />
           </button>
-        )}
-      </PopoverContent>
-    </Popover>
+        </Badge>
+      ))}
+      {availableTags.length > 0 && (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <button className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs text-muted-foreground hover:bg-muted transition-colors">
+              <Plus className="h-3 w-3" />
+              Ajouter un tag
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-48 p-2" align="start">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Tags de conversion</p>
+            <div className="space-y-1">
+              {availableTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => {
+                    addTag(tag);
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted"
+                >
+                  <span className={cn(
+                    "w-3 h-3 rounded-full",
+                    tag === "10H" && "bg-lavender",
+                    tag === "25H" && "bg-coral",
+                    tag === "48H" && "bg-primary"
+                  )} />
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      )}
+    </div>
   );
 };
 
@@ -404,10 +403,6 @@ const CandidatPage = () => {
             <Button variant="outline" className="gap-2" onClick={handleArchive}>
               <Archive className="h-4 w-4" />
               Archiver
-            </Button>
-            <Button className="btn-primary gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              Recruter
             </Button>
           </div>
         </div>

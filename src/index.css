@@ -202,6 +202,17 @@
     );
   }
 
+  /* Subtle coral gradient for main content area */
+  .bg-gradient-coral {
+    background: linear-gradient(
+      160deg,
+      hsl(40 39% 97%) 0%,
+      hsl(16 40% 96%) 35%,
+      hsl(40 39% 97%) 70%,
+      hsl(16 35% 97%) 100%
+    );
+  }
+
   .bg-gradient-brand {
     background: linear-gradient(
       135deg,

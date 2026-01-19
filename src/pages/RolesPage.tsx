@@ -12,7 +12,7 @@ import {
   Trash2,
   Edit,
   ChevronDown,
-  ChevronUp,
+  X,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { Button } from "@/components/ui/button";
@@ -32,10 +32,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface Role {
@@ -141,12 +143,22 @@ const mockRoles: Role[] = [
   },
 ];
 
+interface ActiveFilter {
+  type: "type" | "statut" | "nom";
+  value: string;
+  label: string;
+}
+
 const RolesPage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const [searchOpen, setSearchOpen] = useState(true);
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [statutFilter, setStatutFilter] = useState("all");
-  const [searchNom, setSearchNom] = useState("");
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter panel temporary state
+  const [tempType, setTempType] = useState("");
+  const [tempStatut, setTempStatut] = useState("");
+  const [tempNom, setTempNom] = useState("");
 
   const toggleSelectAll = () => {
     if (selectedRows.length === filteredRoles.length) {
@@ -162,11 +174,49 @@ const RolesPage = () => {
     );
   };
 
+  const removeFilter = (filterToRemove: ActiveFilter) => {
+    setActiveFilters((prev) =>
+      prev.filter(
+        (f) => !(f.type === filterToRemove.type && f.value === filterToRemove.value)
+      )
+    );
+  };
+
+  const resetAllFilters = () => {
+    setActiveFilters([]);
+    setTempType("");
+    setTempStatut("");
+    setTempNom("");
+  };
+
+  const applyFilters = () => {
+    const newFilters: ActiveFilter[] = [];
+    if (tempType) newFilters.push({ type: "type", value: tempType, label: `Type: ${tempType}` });
+    if (tempStatut) newFilters.push({ type: "statut", value: tempStatut, label: `Statut: ${tempStatut === "actif" ? "Actif" : "Inactif"}` });
+    if (tempNom) newFilters.push({ type: "nom", value: tempNom, label: `Nom: ${tempNom}` });
+    setActiveFilters(newFilters);
+    setFilterPanelOpen(false);
+  };
+
   const filteredRoles = mockRoles.filter((role) => {
-    const matchesType = typeFilter === "all" || role.type.toLowerCase() === typeFilter;
-    const matchesStatut = statutFilter === "all" || (statutFilter === "actif" ? role.actif : !role.actif);
-    const matchesNom = searchNom === "" || role.nom.toLowerCase().includes(searchNom.toLowerCase());
-    return matchesType && matchesStatut && matchesNom;
+    const matchesSearch =
+      searchQuery === "" ||
+      role.nom.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesFilters = activeFilters.every((filter) => {
+      switch (filter.type) {
+        case "type":
+          return role.type.toLowerCase() === filter.value.toLowerCase();
+        case "statut":
+          return filter.value === "actif" ? role.actif : !role.actif;
+        case "nom":
+          return role.nom.toLowerCase().includes(filter.value.toLowerCase());
+        default:
+          return true;
+      }
+    });
+
+    return matchesSearch && matchesFilters;
   });
 
   return (
@@ -180,73 +230,10 @@ const RolesPage = () => {
               Gérez les rôles et permissions
             </p>
           </div>
-        </div>
-
-        {/* Advanced Search */}
-        <Collapsible open={searchOpen} onOpenChange={setSearchOpen}>
-          <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
-            <CollapsibleTrigger asChild>
-              <button className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-muted/30 transition-colors">
-                <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">Recherche avancée</span>
-                </div>
-                {searchOpen ? (
-                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                )}
-              </button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="px-5 pb-5 border-t border-border pt-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Select value={statutFilter} onValueChange={setStatutFilter}>
-                    <SelectTrigger className="w-32 bg-background">
-                      <SelectValue placeholder="Statut" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      <SelectItem value="all">Actif</SelectItem>
-                      <SelectItem value="actif">Actif</SelectItem>
-                      <SelectItem value="inactif">Inactif</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger className="w-32 bg-background">
-                      <SelectValue placeholder="Type" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      <SelectItem value="all">Type</SelectItem>
-                      <SelectItem value="standard">Standard</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="exception">Exception</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="relative flex-1 min-w-[200px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input
-                      type="text"
-                      placeholder="Nom"
-                      value={searchNom}
-                      onChange={(e) => setSearchNom(e.target.value)}
-                      className="input-field pl-10 w-full"
-                    />
-                  </div>
-                </div>
-              </div>
-            </CollapsibleContent>
-          </div>
-        </Collapsible>
-
-        {/* Table Controls */}
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            Rôles
-          </div>
           {selectedRows.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="gap-2 bg-lavender hover:bg-lavender/90 text-white">
+                <Button className="gap-2 bg-lavender hover:bg-lavender/90 text-white self-start sm:self-auto">
                   Actions ({selectedRows.length})
                   <ChevronDown className="h-4 w-4" />
                 </Button>
@@ -270,6 +257,69 @@ const RolesPage = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          )}
+        </div>
+
+        {/* Search and Filters */}
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Rechercher par nom..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-field pl-10 w-full"
+              />
+            </div>
+
+            {/* Advanced Search Button */}
+            <Button
+              variant="outline"
+              className={cn(
+                "gap-2 shrink-0",
+                activeFilters.length > 0 && "border-primary bg-primary/5"
+              )}
+              onClick={() => setFilterPanelOpen(true)}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Recherche avancée
+              {activeFilters.length > 0 && (
+                <Badge variant="secondary" className="ml-1 bg-primary text-primary-foreground h-5 px-1.5 text-xs">
+                  {activeFilters.length}
+                </Badge>
+              )}
+            </Button>
+          </div>
+
+          {/* Active Filters Display */}
+          {activeFilters.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-muted-foreground">Filtres actifs:</span>
+              {activeFilters.map((filter, index) => (
+                <Badge
+                  key={`${filter.type}-${filter.value}-${index}`}
+                  variant="secondary"
+                  className="bg-lavender/20 text-lavender border border-lavender/30 gap-1.5 pr-1"
+                >
+                  {filter.label}
+                  <button
+                    onClick={() => removeFilter(filter)}
+                    className="hover:bg-lavender/30 rounded p-0.5 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+              <button
+                onClick={resetAllFilters}
+                className="text-sm text-muted-foreground hover:text-foreground underline"
+              >
+                Tout effacer
+              </button>
+            </div>
           )}
         </div>
 
@@ -382,6 +432,79 @@ const RolesPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Advanced Search Sheet */}
+      <Sheet open={filterPanelOpen} onOpenChange={setFilterPanelOpen}>
+        <SheetContent className="w-full sm:max-w-md bg-card border-border">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <SlidersHorizontal className="h-5 w-5" />
+              Recherche avancée
+            </SheetTitle>
+          </SheetHeader>
+          <div className="mt-6 space-y-6">
+            {/* Statut */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Statut</label>
+              <Select value={tempStatut || "all"} onValueChange={(v) => setTempStatut(v === "all" ? "" : v)}>
+                <SelectTrigger className="w-full bg-background">
+                  <SelectValue placeholder="Tous les statuts" />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="actif">Actif</SelectItem>
+                  <SelectItem value="inactif">Inactif</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Type */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Type</label>
+              <Select value={tempType || "all"} onValueChange={(v) => setTempType(v === "all" ? "" : v)}>
+                <SelectTrigger className="w-full bg-background">
+                  <SelectValue placeholder="Tous les types" />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="all">Tous les types</SelectItem>
+                  <SelectItem value="standard">Standard</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="exception">Exception</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Nom */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Nom</label>
+              <input
+                type="text"
+                placeholder="Rechercher par nom..."
+                value={tempNom}
+                onChange={(e) => setTempNom(e.target.value)}
+                className="input-field w-full"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={resetAllFilters}
+              >
+                Réinitialiser
+              </Button>
+              <Button
+                className="flex-1 btn-primary"
+                onClick={applyFilters}
+              >
+                Appliquer
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </ConsoleLayout>
   );
 };

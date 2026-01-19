@@ -10,7 +10,6 @@ import {
   Eye,
   SlidersHorizontal,
   ChevronDown,
-  ChevronUp,
   RefreshCw,
   Send,
   Archive,
@@ -21,6 +20,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Info,
+  X,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { Button } from "@/components/ui/button";
@@ -40,10 +40,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface Employe {
@@ -96,15 +98,26 @@ const statutLabels: Record<string, string> = {
   archive: "Archivé",
 };
 
+interface ActiveFilter {
+  type: "prenom" | "nom" | "magasin" | "statut" | "archived" | "imported";
+  value: string;
+  label: string;
+}
+
 const EmployesPage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const [searchPrenom, setSearchPrenom] = useState("");
-  const [searchNom, setSearchNom] = useState("");
-  const [searchMagasin, setSearchMagasin] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [searchOpen, setSearchOpen] = useState(true);
-  const [includeArchived, setIncludeArchived] = useState(false);
-  const [includeImported, setIncludeImported] = useState(false);
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [statusInfoOpen, setStatusInfoOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter panel temporary state
+  const [tempPrenom, setTempPrenom] = useState("");
+  const [tempNom, setTempNom] = useState("");
+  const [tempMagasin, setTempMagasin] = useState("");
+  const [tempStatut, setTempStatut] = useState("");
+  const [tempArchived, setTempArchived] = useState(false);
+  const [tempImported, setTempImported] = useState(false);
 
   const toggleSelectAll = () => {
     if (selectedRows.length === mockEmployes.length) {
@@ -120,12 +133,58 @@ const EmployesPage = () => {
     );
   };
 
+  const removeFilter = (filterToRemove: ActiveFilter) => {
+    setActiveFilters((prev) =>
+      prev.filter(
+        (f) => !(f.type === filterToRemove.type && f.value === filterToRemove.value)
+      )
+    );
+  };
+
+  const resetAllFilters = () => {
+    setActiveFilters([]);
+    setTempPrenom("");
+    setTempNom("");
+    setTempMagasin("");
+    setTempStatut("");
+    setTempArchived(false);
+    setTempImported(false);
+  };
+
+  const applyFilters = () => {
+    const newFilters: ActiveFilter[] = [];
+    if (tempPrenom) newFilters.push({ type: "prenom", value: tempPrenom, label: `Prénom: ${tempPrenom}` });
+    if (tempNom) newFilters.push({ type: "nom", value: tempNom, label: `Nom: ${tempNom}` });
+    if (tempMagasin) newFilters.push({ type: "magasin", value: tempMagasin, label: `Magasin: ${tempMagasin}` });
+    if (tempStatut) newFilters.push({ type: "statut", value: tempStatut, label: `Statut: ${statutLabels[tempStatut]}` });
+    if (tempArchived) newFilters.push({ type: "archived", value: "true", label: "Inclure archivés" });
+    if (tempImported) newFilters.push({ type: "imported", value: "true", label: "Importé" });
+    setActiveFilters(newFilters);
+    setFilterPanelOpen(false);
+  };
+
   const filteredEmployes = mockEmployes.filter((employe) => {
-    const matchesPrenom = searchPrenom === "" || employe.prenom.toLowerCase().includes(searchPrenom.toLowerCase());
-    const matchesNom = searchNom === "" || employe.nom.toLowerCase().includes(searchNom.toLowerCase());
-    const matchesMagasin = searchMagasin === "" || employe.magasin.toLowerCase().includes(searchMagasin.toLowerCase());
-    const matchesStatus = statusFilter === "all" || employe.statut === statusFilter;
-    return matchesPrenom && matchesNom && matchesMagasin && matchesStatus;
+    const matchesSearch =
+      searchQuery === "" ||
+      employe.prenom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      employe.nom.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesFilters = activeFilters.every((filter) => {
+      switch (filter.type) {
+        case "prenom":
+          return employe.prenom.toLowerCase().includes(filter.value.toLowerCase());
+        case "nom":
+          return employe.nom.toLowerCase().includes(filter.value.toLowerCase());
+        case "magasin":
+          return employe.magasin.toLowerCase().includes(filter.value.toLowerCase());
+        case "statut":
+          return employe.statut === filter.value;
+        default:
+          return true;
+      }
+    });
+
+    return matchesSearch && matchesFilters;
   });
 
   return (
@@ -133,11 +192,22 @@ const EmployesPage = () => {
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-foreground">Employés</h1>
-            <p className="text-muted-foreground mt-1">
-              Gérez vos {mockEmployes.length} employés recrutés
-            </p>
+          <div className="flex items-center gap-3">
+            <div>
+              <h1 className="text-foreground">Employés</h1>
+              <p className="text-muted-foreground mt-1">
+                Gérez vos {mockEmployes.length} employés recrutés
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground gap-1.5"
+              onClick={() => setStatusInfoOpen(true)}
+            >
+              <Info className="h-4 w-4" />
+              <span className="text-xs">Statuts</span>
+            </Button>
           </div>
           <div className="flex items-center gap-2 self-start sm:self-auto">
             {/* Actions Button - appears when rows are selected */}
@@ -180,104 +250,68 @@ const EmployesPage = () => {
           </div>
         </div>
 
-        {/* Advanced Search */}
-        <Collapsible open={searchOpen} onOpenChange={setSearchOpen}>
-          <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
-            <CollapsibleTrigger asChild>
-              <button className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-muted/30 transition-colors">
-                <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">Recherche avancée</span>
-                </div>
-                {searchOpen ? (
-                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                )}
-              </button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="px-5 pb-5 border-t border-border pt-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <input
-                    type="text"
-                    placeholder="Prénom"
-                    value={searchPrenom}
-                    onChange={(e) => setSearchPrenom(e.target.value)}
-                    className="input-field w-36"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Nom"
-                    value={searchNom}
-                    onChange={(e) => setSearchNom(e.target.value)}
-                    className="input-field w-36"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Nom point de vente"
-                    value={searchMagasin}
-                    onChange={(e) => setSearchMagasin(e.target.value)}
-                    className="input-field w-44"
-                  />
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-input bg-background">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Période d'embauche</span>
-                  </div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-32 bg-background">
-                      <SelectValue placeholder="Statut" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      <SelectItem value="all">Statut</SelectItem>
-                      <SelectItem value="accepte">Accepté</SelectItem>
-                      <SelectItem value="valide">Validé</SelectItem>
-                      <SelectItem value="embauche">Embauché</SelectItem>
-                      <SelectItem value="archive">Archivé</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <label className="flex items-center gap-2 text-sm">
-                    <Checkbox
-                      checked={includeArchived}
-                      onCheckedChange={(checked) => setIncludeArchived(!!checked)}
-                    />
-                    Inclure archivés
-                  </label>
-                  <label className="flex items-center gap-2 text-sm">
-                    <Checkbox
-                      checked={includeImported}
-                      onCheckedChange={(checked) => setIncludeImported(!!checked)}
-                    />
-                    Importé
-                  </label>
-                </div>
-              </div>
-            </CollapsibleContent>
-          </div>
-        </Collapsible>
+        {/* Search and Filters */}
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Rechercher par nom ou prénom..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-field pl-10 w-full"
+              />
+            </div>
 
-        {/* Status Info */}
-        <Collapsible>
-          <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
-            <CollapsibleTrigger asChild>
-              <button className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-muted/30 transition-colors">
-                <div className="flex items-center gap-2">
-                  <Info className="h-4 w-4 text-info" />
-                  <span className="font-medium">Statuts employés</span>
-                </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="px-5 pb-5 border-t border-border pt-4 space-y-2 text-sm">
-                <p><strong className="text-success">Accepté</strong>: Candidat accepté commençant le processus de préintégration (action manuelle par un recruteur)</p>
-                <p><strong className="text-info">Validé</strong>: Candidat dont les informations ont été mises à disposition de votre SIRH interne (action automatisée par SoWhat.ai)</p>
-                <p><strong className="text-primary">Embauché</strong>: Candidat ayant signé un contrat de travail et officiellement embauché (action manuelle d'un recruteur)</p>
-                <p><strong className="text-muted-foreground">Archivé</strong>: Candidat n'ayant pas fourni les documents et/ou ne s'étant jamais présenté</p>
-              </div>
-            </CollapsibleContent>
+            {/* Advanced Search Button */}
+            <Button
+              variant="outline"
+              className={cn(
+                "gap-2 shrink-0",
+                activeFilters.length > 0 && "border-primary bg-primary/5"
+              )}
+              onClick={() => setFilterPanelOpen(true)}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Recherche avancée
+              {activeFilters.length > 0 && (
+                <Badge variant="secondary" className="ml-1 bg-primary text-primary-foreground h-5 px-1.5 text-xs">
+                  {activeFilters.length}
+                </Badge>
+              )}
+            </Button>
           </div>
-        </Collapsible>
+
+          {/* Active Filters Display */}
+          {activeFilters.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-muted-foreground">Filtres actifs:</span>
+              {activeFilters.map((filter, index) => (
+                <Badge
+                  key={`${filter.type}-${filter.value}-${index}`}
+                  variant="secondary"
+                  className="bg-lavender/20 text-lavender border border-lavender/30 gap-1.5 pr-1"
+                >
+                  {filter.label}
+                  <button
+                    onClick={() => removeFilter(filter)}
+                    className="hover:bg-lavender/30 rounded p-0.5 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+              <button
+                onClick={resetAllFilters}
+                className="text-sm text-muted-foreground hover:text-foreground underline"
+              >
+                Tout effacer
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Data Table */}
         <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
@@ -437,6 +471,145 @@ const EmployesPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Advanced Search Sheet */}
+      <Sheet open={filterPanelOpen} onOpenChange={setFilterPanelOpen}>
+        <SheetContent className="w-full sm:max-w-md bg-card border-border">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <SlidersHorizontal className="h-5 w-5" />
+              Recherche avancée
+            </SheetTitle>
+          </SheetHeader>
+          <div className="mt-6 space-y-6">
+            {/* Prénom */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Prénom</label>
+              <input
+                type="text"
+                placeholder="Rechercher par prénom..."
+                value={tempPrenom}
+                onChange={(e) => setTempPrenom(e.target.value)}
+                className="input-field w-full"
+              />
+            </div>
+
+            {/* Nom */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Nom</label>
+              <input
+                type="text"
+                placeholder="Rechercher par nom..."
+                value={tempNom}
+                onChange={(e) => setTempNom(e.target.value)}
+                className="input-field w-full"
+              />
+            </div>
+
+            {/* Magasin */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Point de vente</label>
+              <input
+                type="text"
+                placeholder="Rechercher par point de vente..."
+                value={tempMagasin}
+                onChange={(e) => setTempMagasin(e.target.value)}
+                className="input-field w-full"
+              />
+            </div>
+
+            {/* Statut */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Statut</label>
+              <Select value={tempStatut || "all"} onValueChange={(v) => setTempStatut(v === "all" ? "" : v)}>
+                <SelectTrigger className="w-full bg-background">
+                  <SelectValue placeholder="Tous les statuts" />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="accepte">Accepté</SelectItem>
+                  <SelectItem value="valide">Validé</SelectItem>
+                  <SelectItem value="embauche">Embauché</SelectItem>
+                  <SelectItem value="archive">Archivé</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Options */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={tempArchived}
+                  onCheckedChange={(checked) => setTempArchived(!!checked)}
+                />
+                Inclure archivés
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={tempImported}
+                  onCheckedChange={(checked) => setTempImported(!!checked)}
+                />
+                Importé
+              </label>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={resetAllFilters}
+              >
+                Réinitialiser
+              </Button>
+              <Button
+                className="flex-1 btn-primary"
+                onClick={applyFilters}
+              >
+                Appliquer
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Status Info Sheet */}
+      <Sheet open={statusInfoOpen} onOpenChange={setStatusInfoOpen}>
+        <SheetContent className="w-full sm:max-w-md bg-card border-border">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5 text-info" />
+              Statuts employés
+            </SheetTitle>
+          </SheetHeader>
+          <div className="mt-6 space-y-4 text-sm">
+            <div className="p-4 rounded-lg bg-success/10 border border-success/20">
+              <p className="font-semibold text-success mb-1">Accepté</p>
+              <p className="text-muted-foreground">
+                Candidat accepté commençant le processus de préintégration (action manuelle par un recruteur)
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-info/10 border border-info/20">
+              <p className="font-semibold text-info mb-1">Validé</p>
+              <p className="text-muted-foreground">
+                Candidat dont les informations ont été mises à disposition de votre SIRH interne (action automatisée par SoWhat.ai)
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+              <p className="font-semibold text-primary mb-1">Embauché</p>
+              <p className="text-muted-foreground">
+                Candidat ayant signé un contrat de travail et officiellement embauché (action manuelle d'un recruteur)
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-muted border border-border">
+              <p className="font-semibold text-muted-foreground mb-1">Archivé</p>
+              <p className="text-muted-foreground">
+                Candidat n'ayant pas fourni les documents et/ou ne s'étant jamais présenté
+              </p>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </ConsoleLayout>
   );
 };

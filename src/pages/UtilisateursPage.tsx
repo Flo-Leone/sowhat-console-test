@@ -11,14 +11,13 @@ import {
   Eye,
   SlidersHorizontal,
   ChevronDown,
-  ChevronUp,
   RefreshCw,
   Send,
-  Archive,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  X,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { Button } from "@/components/ui/button";
@@ -38,10 +37,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface Utilisateur {
@@ -93,11 +94,22 @@ const roleColors = {
   recruteur: "bg-muted text-muted-foreground",
 };
 
+interface ActiveFilter {
+  type: "role" | "search" | "statut";
+  value: string;
+  label: string;
+}
+
 const UtilisateursPage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [searchOpen, setSearchOpen] = useState(true);
+
+  // Filter panel temporary state
+  const [tempRole, setTempRole] = useState("");
+  const [tempSearch, setTempSearch] = useState("");
+  const [tempStatut, setTempStatut] = useState("");
 
   const toggleSelectAll = () => {
     if (selectedRows.length === filteredUtilisateurs.length) {
@@ -113,13 +125,52 @@ const UtilisateursPage = () => {
     );
   };
 
+  const removeFilter = (filterToRemove: ActiveFilter) => {
+    setActiveFilters((prev) =>
+      prev.filter(
+        (f) => !(f.type === filterToRemove.type && f.value === filterToRemove.value)
+      )
+    );
+  };
+
+  const resetAllFilters = () => {
+    setActiveFilters([]);
+    setTempRole("");
+    setTempSearch("");
+    setTempStatut("");
+  };
+
+  const applyFilters = () => {
+    const newFilters: ActiveFilter[] = [];
+    if (tempRole) newFilters.push({ type: "role", value: tempRole, label: `Rôle: ${roleLabels[tempRole as keyof typeof roleLabels]}` });
+    if (tempSearch) newFilters.push({ type: "search", value: tempSearch, label: `Recherche: ${tempSearch}` });
+    if (tempStatut) newFilters.push({ type: "statut", value: tempStatut, label: `Statut: ${tempStatut === "actif" ? "Actif" : "Inactif"}` });
+    setActiveFilters(newFilters);
+    setFilterPanelOpen(false);
+  };
+
   const filteredUtilisateurs = mockUtilisateurs.filter((utilisateur) => {
     const matchesSearch = searchQuery === "" || 
       utilisateur.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       utilisateur.prenom.toLowerCase().includes(searchQuery.toLowerCase()) ||
       utilisateur.nom.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = roleFilter === "all" || utilisateur.role === roleFilter;
-    return matchesSearch && matchesRole;
+
+    const matchesFilters = activeFilters.every((filter) => {
+      switch (filter.type) {
+        case "role":
+          return utilisateur.role === filter.value;
+        case "search":
+          return utilisateur.email.toLowerCase().includes(filter.value.toLowerCase()) ||
+            utilisateur.prenom.toLowerCase().includes(filter.value.toLowerCase()) ||
+            utilisateur.nom.toLowerCase().includes(filter.value.toLowerCase());
+        case "statut":
+          return filter.value === "actif" ? utilisateur.actif : !utilisateur.actif;
+        default:
+          return true;
+      }
+    });
+
+    return matchesSearch && matchesFilters;
   });
 
   return (
@@ -170,51 +221,68 @@ const UtilisateursPage = () => {
           </div>
         </div>
 
-        {/* Advanced Search */}
-        <Collapsible open={searchOpen} onOpenChange={setSearchOpen}>
-          <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
-            <CollapsibleTrigger asChild>
-              <button className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-muted/30 transition-colors">
-                <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">Recherche avancée</span>
-                </div>
-                {searchOpen ? (
-                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                )}
-              </button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="px-5 pb-5 border-t border-border pt-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Select value={roleFilter} onValueChange={setRoleFilter}>
-                    <SelectTrigger className="w-36 bg-background">
-                      <SelectValue placeholder="Tous les rôles" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      <SelectItem value="all">Tous les rôles</SelectItem>
-                      <SelectItem value="admin">Administrateur</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="recruteur">Recruteur</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="relative flex-1 min-w-[200px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input
-                      type="text"
-                      placeholder="Rechercher par nom ou email..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="input-field pl-10 w-full"
-                    />
-                  </div>
-                </div>
-              </div>
-            </CollapsibleContent>
+        {/* Search and Filters */}
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Rechercher par nom ou email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-field pl-10 w-full"
+              />
+            </div>
+
+            {/* Advanced Search Button */}
+            <Button
+              variant="outline"
+              className={cn(
+                "gap-2 shrink-0",
+                activeFilters.length > 0 && "border-primary bg-primary/5"
+              )}
+              onClick={() => setFilterPanelOpen(true)}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Recherche avancée
+              {activeFilters.length > 0 && (
+                <Badge variant="secondary" className="ml-1 bg-primary text-primary-foreground h-5 px-1.5 text-xs">
+                  {activeFilters.length}
+                </Badge>
+              )}
+            </Button>
           </div>
-        </Collapsible>
+
+          {/* Active Filters Display */}
+          {activeFilters.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-muted-foreground">Filtres actifs:</span>
+              {activeFilters.map((filter, index) => (
+                <Badge
+                  key={`${filter.type}-${filter.value}-${index}`}
+                  variant="secondary"
+                  className="bg-lavender/20 text-lavender border border-lavender/30 gap-1.5 pr-1"
+                >
+                  {filter.label}
+                  <button
+                    onClick={() => removeFilter(filter)}
+                    className="hover:bg-lavender/30 rounded p-0.5 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+              <button
+                onClick={resetAllFilters}
+                className="text-sm text-muted-foreground hover:text-foreground underline"
+              >
+                Tout effacer
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Data Table */}
         <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
@@ -383,6 +451,79 @@ const UtilisateursPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Advanced Search Sheet */}
+      <Sheet open={filterPanelOpen} onOpenChange={setFilterPanelOpen}>
+        <SheetContent className="w-full sm:max-w-md bg-card border-border">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <SlidersHorizontal className="h-5 w-5" />
+              Recherche avancée
+            </SheetTitle>
+          </SheetHeader>
+          <div className="mt-6 space-y-6">
+            {/* Role */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Rôle</label>
+              <Select value={tempRole || "all"} onValueChange={(v) => setTempRole(v === "all" ? "" : v)}>
+                <SelectTrigger className="w-full bg-background">
+                  <SelectValue placeholder="Tous les rôles" />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="all">Tous les rôles</SelectItem>
+                  <SelectItem value="admin">Administrateur</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="recruteur">Recruteur</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Statut */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Statut</label>
+              <Select value={tempStatut || "all"} onValueChange={(v) => setTempStatut(v === "all" ? "" : v)}>
+                <SelectTrigger className="w-full bg-background">
+                  <SelectValue placeholder="Tous les statuts" />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="actif">Actif</SelectItem>
+                  <SelectItem value="inactif">Inactif</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Search */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Recherche</label>
+              <input
+                type="text"
+                placeholder="Nom, prénom ou email..."
+                value={tempSearch}
+                onChange={(e) => setTempSearch(e.target.value)}
+                className="input-field w-full"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={resetAllFilters}
+              >
+                Réinitialiser
+              </Button>
+              <Button
+                className="flex-1 btn-primary"
+                onClick={applyFilters}
+              >
+                Appliquer
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </ConsoleLayout>
   );
 };

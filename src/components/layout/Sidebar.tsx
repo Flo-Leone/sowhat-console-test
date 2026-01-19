@@ -197,7 +197,7 @@ export const Sidebar = () => {
             <span className="text-xs text-muted-foreground">
               Powered by
             </span>
-            <img src={sowhatAiLogo} alt="SoWhat AI" className="h-4" />
+            <img src={sowhatAiLogo} alt="SoWhat AI" className="h-3.5" />
           </div>
         )}
       </div>

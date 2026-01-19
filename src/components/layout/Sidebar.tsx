@@ -14,6 +14,7 @@ import {
   PanelLeft,
 } from "lucide-react";
 import sowhatAiLogo from "@/assets/sowhat-ai-logo.png";
+import sowhatBubble from "@/assets/sowhat-bubble.png";
 import { cn } from "@/lib/utils";
 
 interface NavItemProps {
@@ -190,8 +191,8 @@ export const Sidebar = () => {
         "p-4 border-t border-sidebar-border",
         collapsed ? "flex justify-center" : ""
       )}>
-        {collapsed ? (
-          <img src={sowhatAiLogo} alt="SoWhat AI" className="h-5 opacity-60" />
+      {collapsed ? (
+          <img src={sowhatBubble} alt="SoWhat" className="h-6 opacity-60" />
         ) : (
           <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
             <span className="text-xs text-muted-foreground">

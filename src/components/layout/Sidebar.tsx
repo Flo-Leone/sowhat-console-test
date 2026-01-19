@@ -65,11 +65,12 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemP
               <NavLink
                 key={child.to}
                 to={child.to}
+                end={child.to === "/utilisateurs"}
                 className={({ isActive }) =>
                   cn(
                     "block py-2 px-3 rounded-md text-sm transition-colors",
                     isActive
-                      ? "text-foreground font-medium bg-sidebar-accent"
+                      ? "nav-item-submenu-active"
                       : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50"
                   )
                 }

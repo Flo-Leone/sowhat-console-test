@@ -301,6 +301,12 @@
     box-shadow: 0 2px 8px rgba(255, 210, 85, 0.3);
   }
 
+  /* Submenu active state */
+  .nav-item-submenu-active {
+    @apply bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] font-medium;
+    box-shadow: 0 2px 6px rgba(255, 210, 85, 0.25);
+  }
+
   /* Score indicators */
   .score-bar {
     @apply h-1.5 rounded-full bg-muted overflow-hidden;

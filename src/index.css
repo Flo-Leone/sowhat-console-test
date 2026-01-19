@@ -72,14 +72,14 @@
 
     --radius: 0.625rem;
 
-    /* Sidebar - Coral Doux */
-    --sidebar-background: 15 58% 60%;
+    /* Sidebar - Coral Vif #FF8C61 */
+    --sidebar-background: 16 100% 69%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 15 58% 50%;
-    --sidebar-accent: 15 58% 52%;
+    --sidebar-primary-foreground: 16 100% 55%;
+    --sidebar-accent: 16 100% 62%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 15 50% 55%;
+    --sidebar-border: 16 80% 60%;
     --sidebar-ring: 0 0% 100%;
 
     /* Top Bar - Warm white */

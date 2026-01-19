@@ -161,7 +161,7 @@ const OffresEmploiPage = () => {
           </TabsList>
 
           <TabsContent value="en-cours" className="mt-6">
-            <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
+            <div className="bg-card/50 rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="data-table">
                   <thead>

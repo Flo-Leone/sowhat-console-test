@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -13,30 +14,59 @@ import {
   Send,
   History,
   CheckCircle2,
-  Edit,
   Download,
+  Archive,
+  RefreshCw,
+  ChevronDown,
+  X,
+  Plus,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
-import { StatusBadge } from "@/components/candidates/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+
+// Status types and config
+type CandidateStatus =
+  | "nouveau"
+  | "vivier"
+  | "rejete_cv"
+  | "appel_attente"
+  | "appel_confirme"
+  | "rejete_appel"
+  | "invite_entretien"
+  | "rejete_entretien"
+  | "recrute"
+  | "recrute_autre";
+
+const statusConfig: Record<CandidateStatus, { label: string; className: string }> = {
+  nouveau: { label: "Nouveau", className: "status-new" },
+  vivier: { label: "Vivier", className: "status-vivier" },
+  rejete_cv: { label: "Rejeté après CV", className: "status-rejected" },
+  appel_attente: { label: "Appel en attente", className: "status-invited" },
+  appel_confirme: { label: "Appel confirmé", className: "status-invited" },
+  rejete_appel: { label: "Rejeté après appel", className: "status-rejected" },
+  invite_entretien: { label: "Invité pour entretien", className: "status-invited" },
+  rejete_entretien: { label: "Rejeté après entretien", className: "status-rejected" },
+  recrute: { label: "Recruté", className: "status-recruited" },
+  recrute_autre: { label: "Recruté ailleurs", className: "bg-muted text-muted-foreground" },
+};
+
+// Conversion tags options
+const conversionTagOptions = ["10H", "25H", "48H"];
 
 // Mock data for candidate
 const candidateData = {
@@ -45,13 +75,14 @@ const candidateData = {
   lastName: "Selle",
   email: "jean-philippe@gallika.fr",
   phone: "+33 6 12 34 56 78",
-  status: "invite_entretien" as const,
+  status: "invite_entretien" as CandidateStatus,
   titreOffre: "Equipier polyvalent",
   applicationDate: "Monday, October 13, 2025",
   phoneCallDate: "Nov 12, 2025, 10:50:36 AM",
   interviewDate: "Oct 15, 2025, 2:30:00 PM",
-  tags: ["10H"],
+  conversionTags: ["10H"] as string[],
   preferredStore: "Point de vente Paris Carrousel Du Louvre",
+  assignedStore: null as string | null,
   preferredContract: "CDI",
   cvUrl: "#",
   availabilities: {
@@ -83,16 +114,25 @@ const candidateData = {
     },
   ],
   history: [
-    { date: "Jan 19, 2026", action: "Consulted by", user: "Florian Guerrier" },
-    { date: "Nov 12, 2025", action: "Field Phone call date changed from to Nov 12, 2025 by", user: "Stephane Boussely" },
-    { date: "Nov 12, 2025", action: "Consulted by", user: "Stephane Boussely" },
-    { date: "Oct 29, 2025", action: "Consulted by", user: "Admin SW.AI" },
-    { date: "Oct 28, 2025", action: "Consulted by", user: "Admin SW.AI" },
-    { date: "Oct 13, 2025", action: "Field Tags changed from to 10h by", user: "Admin SW.AI" },
-    { date: "Oct 13, 2025", action: "Field Interview date changed from to Oct 15, 2025 by", user: "Admin SW.AI" },
-    { date: "Oct 13, 2025", action: "Field Status changed from Pending to Invited for interview by", user: "Admin SW.AI" },
+    { date: "Jan 19, 2026", action: "Consulted by", user: "Florian Guerrier", type: "internal" as const },
+    { date: "Nov 12, 2025", action: "Field Phone call date changed from to Nov 12, 2025 by", user: "Stephane Boussely", type: "internal" as const },
+    { date: "Nov 12, 2025", action: "Consulted by", user: "Stephane Boussely", type: "internal" as const },
+    { date: "Oct 29, 2025", action: "Candidature soumise", user: "", type: "candidate" as const },
+    { date: "Oct 28, 2025", action: "Consulted by", user: "Admin SW.AI", type: "internal" as const },
+    { date: "Oct 13, 2025", action: "Field Tags changed from to 10h by", user: "Admin SW.AI", type: "internal" as const },
+    { date: "Oct 13, 2025", action: "Field Interview date changed from to Oct 15, 2025 by", user: "Admin SW.AI", type: "internal" as const },
+    { date: "Oct 13, 2025", action: "CV téléchargé", user: "", type: "candidate" as const },
+    { date: "Oct 13, 2025", action: "Field Status changed from Pending to Invited for interview by", user: "Admin SW.AI", type: "internal" as const },
   ],
 };
+
+const allStores = [
+  "Paris Carrousel Du Louvre",
+  "Paris Rivoli",
+  "Paris Opéra",
+  "Lyon Part-Dieu",
+  "Marseille Vieux-Port",
+];
 
 const dayLabels: Record<string, string> = {
   monday: "Lundi",
@@ -104,10 +144,192 @@ const dayLabels: Record<string, string> = {
   sunday: "Dimanche",
 };
 
+// Status Dropdown Component
+const StatusDropdown = ({
+  status,
+  onStatusChange,
+}: {
+  status: CandidateStatus;
+  onStatusChange: (status: CandidateStatus) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const config = statusConfig[status];
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button className={cn("status-badge cursor-pointer hover:opacity-80 transition-opacity", config.className)}>
+          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+          {config.label}
+          <ChevronDown className="h-3 w-3 ml-1" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-1" align="start">
+        <div className="space-y-0.5">
+          {Object.entries(statusConfig).map(([key, value]) => (
+            <button
+              key={key}
+              onClick={() => {
+                onStatusChange(key as CandidateStatus);
+                setOpen(false);
+              }}
+              className={cn(
+                "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted",
+                status === key && "bg-muted"
+              )}
+            >
+              <span className={cn("status-badge text-xs", statusConfig[key as CandidateStatus].className)}>
+                <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                {value.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+// Conversion Tags Editor Component
+const ConversionTagsEditor = ({
+  tags,
+  onTagsChange,
+}: {
+  tags: string[];
+  onTagsChange: (tags: string[]) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+
+  const toggleTag = (tag: string) => {
+    if (tags.includes(tag)) {
+      onTagsChange(tags.filter((t) => t !== tag));
+    } else {
+      onTagsChange([...tags, tag]);
+    }
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button className="flex items-center gap-1 group">
+          {tags.length > 0 ? (
+            tags.map((tag) => (
+              <Badge 
+                key={tag} 
+                variant="secondary" 
+                className="bg-primary/10 text-primary border-primary/20 cursor-pointer hover:bg-primary/20"
+              >
+                {tag}
+              </Badge>
+            ))
+          ) : (
+            <Badge 
+              variant="outline" 
+              className="cursor-pointer border-dashed hover:bg-muted"
+            >
+              <Plus className="h-3 w-3 mr-1" />
+              Tag
+            </Badge>
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-48 p-2" align="start">
+        <p className="text-xs font-medium text-muted-foreground mb-2">Tags de conversion</p>
+        <div className="space-y-1">
+          {conversionTagOptions.map((tag) => (
+            <button
+              key={tag}
+              onClick={() => toggleTag(tag)}
+              className={cn(
+                "w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors",
+                tags.includes(tag)
+                  ? "bg-primary/10 text-primary"
+                  : "hover:bg-muted"
+              )}
+            >
+              <span>{tag}</span>
+              {tags.includes(tag) && <CheckCircle2 className="h-4 w-4" />}
+            </button>
+          ))}
+        </div>
+        {tags.length > 0 && (
+          <button
+            onClick={() => onTagsChange([])}
+            className="w-full flex items-center gap-2 px-3 py-2 mt-1 rounded-md text-sm text-destructive hover:bg-destructive/10 transition-colors"
+          >
+            <X className="h-4 w-4" />
+            Supprimer tous
+          </button>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+// Reassign Store Component
+const ReassignStoreDropdown = ({
+  currentStore,
+  onStoreChange,
+}: {
+  currentStore: string | null;
+  onStoreChange: (store: string) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="gap-2">
+          <RefreshCw className="h-4 w-4" />
+          Réassigner
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-2" align="end">
+        <p className="text-xs font-medium text-muted-foreground mb-2 px-2">Assigner à un point de vente</p>
+        <div className="space-y-0.5">
+          {allStores.map((store) => (
+            <button
+              key={store}
+              onClick={() => {
+                onStoreChange(store);
+                setOpen(false);
+              }}
+              className={cn(
+                "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted text-left",
+                currentStore === store && "bg-muted"
+              )}
+            >
+              <MapPin className="h-4 w-4 text-coral shrink-0" />
+              <span className="truncate">{store}</span>
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
 const CandidatPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const candidate = candidateData;
+  const [candidate, setCandidate] = useState(candidateData);
+
+  const handleStatusChange = (newStatus: CandidateStatus) => {
+    setCandidate((prev) => ({ ...prev, status: newStatus }));
+  };
+
+  const handleTagsChange = (newTags: string[]) => {
+    setCandidate((prev) => ({ ...prev, conversionTags: newTags }));
+  };
+
+  const handleStoreChange = (newStore: string) => {
+    setCandidate((prev) => ({ ...prev, assignedStore: newStore }));
+  };
+
+  const handleArchive = () => {
+    // Archive logic would go here
+    console.log("Archiving candidate", id);
+  };
 
   return (
     <ConsoleLayout>
@@ -132,29 +354,25 @@ const CandidatPage = () => {
                 <h1 className="text-foreground">
                   {candidate.firstName} {candidate.lastName}
                 </h1>
-                {candidate.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="bg-primary/10 text-primary-foreground border-primary/20">
-                    {tag}
-                  </Badge>
-                ))}
+                <ConversionTagsEditor
+                  tags={candidate.conversionTags}
+                  onTagsChange={handleTagsChange}
+                />
               </div>
               <p className="text-muted-foreground mt-1">
                 Candidature pour: <span className="text-foreground font-medium">{candidate.titreOffre}</span>
               </p>
+              {candidate.assignedStore && (
+                <p className="text-sm text-coral mt-1 flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5" />
+                  Assigné à: {candidate.assignedStore}
+                </p>
+              )}
               <div className="flex items-center gap-4 mt-3">
-                <StatusBadge status={candidate.status} />
-                <Select defaultValue={candidate.status}>
-                  <SelectTrigger className="w-[200px] h-8 text-sm">
-                    <SelectValue placeholder="Changer le statut" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="nouveau">Nouveau</SelectItem>
-                    <SelectItem value="vivier">Vivier</SelectItem>
-                    <SelectItem value="invite_entretien">Invité pour entretien</SelectItem>
-                    <SelectItem value="recrute">Recruté</SelectItem>
-                    <SelectItem value="rejete">Rejeté</SelectItem>
-                  </SelectContent>
-                </Select>
+                <StatusDropdown
+                  status={candidate.status}
+                  onStatusChange={handleStatusChange}
+                />
               </div>
             </div>
           </div>
@@ -167,6 +385,14 @@ const CandidatPage = () => {
             <Button variant="outline" className="gap-2">
               <Calendar className="h-4 w-4" />
               Planifier entretien
+            </Button>
+            <ReassignStoreDropdown
+              currentStore={candidate.assignedStore}
+              onStoreChange={handleStoreChange}
+            />
+            <Button variant="outline" className="gap-2" onClick={handleArchive}>
+              <Archive className="h-4 w-4" />
+              Archiver
             </Button>
             <Button className="btn-primary gap-2">
               <CheckCircle2 className="h-4 w-4" />
@@ -248,26 +474,69 @@ const CandidatPage = () => {
               </CardContent>
             </Card>
 
-            {/* Preferences */}
+            {/* Preferences & Matching Combined */}
             <Card className="shadow-card">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-display">Préférences du candidat</CardTitle>
+                <CardTitle className="text-lg font-display">Préférences & Matching</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 text-coral mt-0.5" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Point de vente préféré</p>
-                      <p className="text-sm font-medium">{candidate.preferredStore}</p>
+              <CardContent className="space-y-6">
+                {/* Preferences Section */}
+                <div>
+                  <h4 className="text-sm font-semibold text-muted-foreground mb-3">Préférences du candidat</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-coral/5 border border-coral/10">
+                      <MapPin className="h-5 w-5 text-coral mt-0.5" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">Point de vente préféré</p>
+                        <p className="text-sm font-medium">{candidate.preferredStore}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-info/5 border border-info/10">
+                      <FileText className="h-5 w-5 text-info mt-0.5" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">Contrat préféré</p>
+                        <p className="text-sm font-medium">{candidate.preferredContract}</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <FileText className="h-5 w-5 text-info mt-0.5" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Contrat préféré</p>
-                      <p className="text-sm font-medium">{candidate.preferredContract}</p>
-                    </div>
+                </div>
+
+                <Separator />
+
+                {/* Matching Section */}
+                <div>
+                  <h4 className="text-sm font-semibold text-muted-foreground mb-3">Matching dynamique des points de vente</h4>
+                  <div className="space-y-3">
+                    {candidate.storesMatching.map((store, index) => (
+                      <div key={store.name} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                        <div className="flex items-center gap-3">
+                          <div className={cn(
+                            "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold",
+                            index === 0 ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
+                          )}>
+                            {index + 1}
+                          </div>
+                          <span className="font-medium">{store.name}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
+                            <div
+                              className={cn(
+                                "h-full rounded-full transition-all",
+                                store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-destructive"
+                              )}
+                              style={{ width: `${store.score}%` }}
+                            />
+                          </div>
+                          <span className={cn(
+                            "text-sm font-semibold min-w-[40px] text-right",
+                            store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive"
+                          )}>
+                            {store.score}%
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </CardContent>
@@ -328,47 +597,6 @@ const CandidatPage = () => {
               </CardContent>
             </Card>
 
-            {/* Stores Dynamic Matching */}
-            <Card className="shadow-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-display">Matching dynamique des points de vente</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {candidate.storesMatching.map((store, index) => (
-                    <div key={store.name} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                      <div className="flex items-center gap-3">
-                        <div className={cn(
-                          "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold",
-                          index === 0 ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
-                        )}>
-                          {index + 1}
-                        </div>
-                        <span className="font-medium">{store.name}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
-                          <div
-                            className={cn(
-                              "h-full rounded-full transition-all",
-                              store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-destructive"
-                            )}
-                            style={{ width: `${store.score}%` }}
-                          />
-                        </div>
-                        <span className={cn(
-                          "text-sm font-semibold min-w-[40px] text-right",
-                          store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive"
-                        )}>
-                          {store.score}%
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Open Questions */}
             <Card className="shadow-card">
               <CardHeader className="pb-4">
@@ -423,13 +651,23 @@ const CandidatPage = () => {
               </CardContent>
             </Card>
 
-            {/* Action History */}
+            {/* Action History with color coding */}
             <Card className="shadow-card">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-display flex items-center gap-2">
                   <History className="h-5 w-5 text-coral" />
                   Historique des actions
                 </CardTitle>
+                <div className="flex gap-4 mt-2">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <div className="w-3 h-3 rounded-full bg-lavender/50 border-2 border-lavender" />
+                    <span>Interne</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <div className="w-3 h-3 rounded-full bg-coral/50 border-2 border-coral" />
+                    <span>Candidat</span>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="relative">
@@ -437,11 +675,21 @@ const CandidatPage = () => {
                   <div className="space-y-4">
                     {candidate.history.map((event, index) => (
                       <div key={index} className="flex gap-4 relative">
-                        <div className="w-4 h-4 rounded-full bg-coral/20 border-2 border-coral flex-shrink-0 mt-0.5 z-10" />
+                        <div
+                          className={cn(
+                            "w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 z-10",
+                            event.type === "internal"
+                              ? "bg-lavender/20 border-lavender"
+                              : "bg-coral/20 border-coral"
+                          )}
+                        />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-muted-foreground">{event.date}</p>
                           <p className="text-sm mt-0.5">
-                            {event.action} <span className="font-medium text-foreground">{event.user}</span>
+                            {event.action}
+                            {event.user && (
+                              <span className="font-medium text-foreground"> {event.user}</span>
+                            )}
                           </p>
                         </div>
                       </div>

@@ -190,6 +190,13 @@ const StatusDropdown = ({
   );
 };
 
+// Tag color mapping using secondary SoWhat colors
+const tagColorMap: Record<string, string> = {
+  "10H": "bg-lavender/20 text-lavender border-lavender/30",
+  "25H": "bg-coral/20 text-coral border-coral/30",
+  "48H": "bg-primary/20 text-primary border-primary/30",
+};
+
 // Conversion Tags Editor Component
 const ConversionTagsEditor = ({
   tags,
@@ -211,26 +218,22 @@ const ConversionTagsEditor = ({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="flex items-center gap-1 group">
-          {tags.length > 0 ? (
-            tags.map((tag) => (
-              <Badge 
-                key={tag} 
-                variant="secondary" 
-                className="bg-primary/10 text-primary border-primary/20 cursor-pointer hover:bg-primary/20"
-              >
-                {tag}
-              </Badge>
-            ))
-          ) : (
+        <button className="flex items-center gap-1.5 group">
+          {tags.map((tag) => (
             <Badge 
-              variant="outline" 
-              className="cursor-pointer border-dashed hover:bg-muted"
+              key={tag} 
+              variant="secondary" 
+              className={cn(
+                "cursor-pointer hover:opacity-80 transition-opacity border",
+                tagColorMap[tag] || "bg-muted text-muted-foreground"
+              )}
             >
-              <Plus className="h-3 w-3 mr-1" />
-              Tag
+              {tag}
             </Badge>
-          )}
+          ))}
+          <div className="w-6 h-6 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center cursor-pointer transition-colors">
+            <Plus className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-48 p-2" align="start">
@@ -243,11 +246,19 @@ const ConversionTagsEditor = ({
               className={cn(
                 "w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors",
                 tags.includes(tag)
-                  ? "bg-primary/10 text-primary"
+                  ? tagColorMap[tag]?.replace("/20", "/10") || "bg-primary/10"
                   : "hover:bg-muted"
               )}
             >
-              <span>{tag}</span>
+              <span className="flex items-center gap-2">
+                <span className={cn(
+                  "w-3 h-3 rounded-full",
+                  tag === "10H" && "bg-lavender",
+                  tag === "25H" && "bg-coral",
+                  tag === "48H" && "bg-primary"
+                )} />
+                {tag}
+              </span>
               {tags.includes(tag) && <CheckCircle2 className="h-4 w-4" />}
             </button>
           ))}

@@ -8,9 +8,14 @@ import {
   Trash2,
   Eye,
   ChevronRight,
+  ChevronDown,
+  RefreshCw,
+  Send,
+  Archive,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -77,6 +82,21 @@ const mockModeles = [
 
 const OffresEmploiPage = () => {
   const [activeTab, setActiveTab] = useState("en-cours");
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+
+  const toggleSelectAll = () => {
+    if (selectedRows.length === mockOffres.length) {
+      setSelectedRows([]);
+    } else {
+      setSelectedRows(mockOffres.map((o) => o.id));
+    }
+  };
+
+  const toggleRow = (id: string) => {
+    setSelectedRows((prev) =>
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+    );
+  };
 
   return (
     <ConsoleLayout>
@@ -89,38 +109,40 @@ const OffresEmploiPage = () => {
               Gérez vos offres et modèles
             </p>
           </div>
-          <Button className="btn-primary gap-2 self-start sm:self-auto">
-            <Plus className="h-4 w-4" />
-            Créer une offre
-          </Button>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Offres en cours
-            </p>
-            <p className="text-2xl font-display font-bold mt-1">2</p>
-          </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Demandes en attente
-            </p>
-            <p className="text-2xl font-display font-bold mt-1 text-warning">0</p>
-          </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Modèles disponibles
-            </p>
-            <p className="text-2xl font-display font-bold mt-1">2</p>
-          </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Candidatures reçues
-            </p>
-            <p className="text-2xl font-display font-bold mt-1 text-success">247</p>
-            <p className="text-xs text-muted-foreground mt-1">Ce mois</p>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {/* Actions Button - appears when rows are selected */}
+            {selectedRows.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="gap-2 bg-lavender hover:bg-lavender/90 text-white">
+                    Actions ({selectedRows.length})
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-card border-border shadow-elevated"
+                >
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <RefreshCw className="h-4 w-4" />
+                    Mettre à jour
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Send className="h-4 w-4" />
+                    Dupliquer
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="gap-3 py-2.5 text-muted-foreground">
+                    <Archive className="h-4 w-4" />
+                    Archiver
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            <Button className="btn-primary gap-2">
+              <Plus className="h-4 w-4" />
+              Créer une offre
+            </Button>
           </div>
         </div>
 
@@ -144,6 +166,12 @@ const OffresEmploiPage = () => {
                 <table className="data-table">
                   <thead>
                     <tr>
+                      <th className="w-12">
+                        <Checkbox
+                          checked={selectedRows.length === mockOffres.length}
+                          onCheckedChange={toggleSelectAll}
+                        />
+                      </th>
                       <th>Date de création</th>
                       <th>Référence</th>
                       <th>Point de vente</th>
@@ -155,7 +183,19 @@ const OffresEmploiPage = () => {
                   </thead>
                   <tbody>
                     {mockOffres.map((offre, index) => (
-                      <tr key={offre.id} style={{ animationDelay: `${index * 50}ms` }}>
+                      <tr 
+                        key={offre.id} 
+                        style={{ animationDelay: `${index * 50}ms` }}
+                        className={cn(
+                          selectedRows.includes(offre.id) && "bg-primary/5"
+                        )}
+                      >
+                        <td onClick={(e) => e.stopPropagation()}>
+                          <Checkbox
+                            checked={selectedRows.includes(offre.id)}
+                            onCheckedChange={() => toggleRow(offre.id)}
+                          />
+                        </td>
                         <td>
                           <span className="text-sm text-muted-foreground">
                             {offre.dateCreation}

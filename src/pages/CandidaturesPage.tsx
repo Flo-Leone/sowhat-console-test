@@ -249,8 +249,8 @@ const CandidaturesPage = () => {
             {selectedRows.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
-                    Actions
+                  <Button className="gap-2 bg-lavender hover:bg-lavender/90 text-white">
+                    Actions ({selectedRows.length})
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>

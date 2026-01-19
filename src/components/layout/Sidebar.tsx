@@ -96,7 +96,10 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemP
         <>
           <span className="flex-1">{label}</span>
           {badge !== undefined && badge > 0 && (
-            <span className="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-2xs font-semibold">
+            <span className={cn(
+              "flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-2xs font-semibold",
+              isActive ? "bg-white text-[hsl(var(--carbon-black))]" : "bg-primary text-primary-foreground"
+            )}>
               {badge > 99 ? "99+" : badge}
             </span>
           )}

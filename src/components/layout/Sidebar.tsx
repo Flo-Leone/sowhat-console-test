@@ -13,7 +13,7 @@ import {
   PanelLeftClose,
   PanelLeft,
 } from "lucide-react";
-import sowhatAiLogo from "@/assets/sowhat-ai-logo.png";
+import sowhatLogoDark from "@/assets/sowhat-logo-dark.png";
 import sowhatBubble from "@/assets/sowhat-bubble.png";
 import { cn } from "@/lib/utils";
 
@@ -194,11 +194,11 @@ export const Sidebar = () => {
       {collapsed ? (
           <img src={sowhatBubble} alt="SoWhat" className="h-6 opacity-60" />
         ) : (
-          <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
-            <span className="text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 opacity-70 hover:opacity-100 transition-opacity">
+            <span className="text-xs text-sidebar-foreground">
               Powered by
             </span>
-            <img src={sowhatAiLogo} alt="SoWhat AI" className="h-3.5" />
+            <img src={sowhatLogoDark} alt="SoWhat AI" className="h-3.5" />
           </div>
         )}
       </div>

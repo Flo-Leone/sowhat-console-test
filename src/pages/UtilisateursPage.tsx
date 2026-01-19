@@ -9,6 +9,16 @@ import {
   Edit,
   Trash2,
   Eye,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp,
+  RefreshCw,
+  Send,
+  Archive,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { Button } from "@/components/ui/button";
@@ -27,6 +37,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
 interface Utilisateur {
@@ -82,12 +97,13 @@ const UtilisateursPage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [searchOpen, setSearchOpen] = useState(true);
 
   const toggleSelectAll = () => {
-    if (selectedRows.length === mockUtilisateurs.length) {
+    if (selectedRows.length === filteredUtilisateurs.length) {
       setSelectedRows([]);
     } else {
-      setSelectedRows(mockUtilisateurs.map((u) => u.id));
+      setSelectedRows(filteredUtilisateurs.map((u) => u.id));
     }
   };
 
@@ -97,83 +113,108 @@ const UtilisateursPage = () => {
     );
   };
 
+  const filteredUtilisateurs = mockUtilisateurs.filter((utilisateur) => {
+    const matchesSearch = searchQuery === "" || 
+      utilisateur.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      utilisateur.prenom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      utilisateur.nom.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRole = roleFilter === "all" || utilisateur.role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
+
   return (
     <ConsoleLayout>
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-foreground">Utilisateurs</h1>
+            <h1 className="text-foreground">Liste d'utilisateurs</h1>
             <p className="text-muted-foreground mt-1">
               Gérez les accès à votre console
             </p>
           </div>
-          <Button className="btn-primary gap-2 self-start sm:self-auto">
-            <Plus className="h-4 w-4" />
-            Inviter un utilisateur
-          </Button>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Total utilisateurs
-            </p>
-            <p className="text-2xl font-display font-bold mt-1">{mockUtilisateurs.length}</p>
-          </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Administrateurs
-            </p>
-            <p className="text-2xl font-display font-bold mt-1 text-destructive">
-              {mockUtilisateurs.filter((u) => u.role === "admin").length}
-            </p>
-          </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Managers
-            </p>
-            <p className="text-2xl font-display font-bold mt-1 text-info">
-              {mockUtilisateurs.filter((u) => u.role === "manager").length}
-            </p>
-          </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Actifs
-            </p>
-            <p className="text-2xl font-display font-bold mt-1 text-success">
-              {mockUtilisateurs.filter((u) => u.actif).length}
-            </p>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {/* Actions Button - appears when rows are selected */}
+            {selectedRows.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="gap-2 bg-lavender hover:bg-lavender/90 text-white">
+                    Actions ({selectedRows.length})
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-card border-border shadow-elevated"
+                >
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <RefreshCw className="h-4 w-4" />
+                    Modifier les droits
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Send className="h-4 w-4" />
+                    Renvoyer invitation
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="gap-3 py-2.5 text-destructive">
+                    <Trash2 className="h-4 w-4" />
+                    Supprimer
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            <Button className="btn-primary gap-2">
+              <Plus className="h-4 w-4" />
+              Inviter un utilisateur
+            </Button>
           </div>
         </div>
 
-        {/* Table Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-2 flex-1">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Rechercher par nom ou email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-field pl-10"
-              />
-            </div>
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-36 bg-background">
-                <SelectValue placeholder="Rôle" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                <SelectItem value="all">Tous les rôles</SelectItem>
-                <SelectItem value="admin">Administrateur</SelectItem>
-                <SelectItem value="manager">Manager</SelectItem>
-                <SelectItem value="recruteur">Recruteur</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Advanced Search */}
+        <Collapsible open={searchOpen} onOpenChange={setSearchOpen}>
+          <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
+            <CollapsibleTrigger asChild>
+              <button className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-muted/30 transition-colors">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Recherche avancée</span>
+                </div>
+                {searchOpen ? (
+                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                )}
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-5 pb-5 border-t border-border pt-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Select value={roleFilter} onValueChange={setRoleFilter}>
+                    <SelectTrigger className="w-36 bg-background">
+                      <SelectValue placeholder="Tous les rôles" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border">
+                      <SelectItem value="all">Tous les rôles</SelectItem>
+                      <SelectItem value="admin">Administrateur</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="recruteur">Recruteur</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="relative flex-1 min-w-[200px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Rechercher par nom ou email..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="input-field pl-10 w-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CollapsibleContent>
           </div>
-        </div>
+        </Collapsible>
 
         {/* Data Table */}
         <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
@@ -183,7 +224,7 @@ const UtilisateursPage = () => {
                 <tr>
                   <th className="w-12">
                     <Checkbox
-                      checked={selectedRows.length === mockUtilisateurs.length}
+                      checked={selectedRows.length === filteredUtilisateurs.length && filteredUtilisateurs.length > 0}
                       onCheckedChange={toggleSelectAll}
                     />
                   </th>
@@ -196,7 +237,7 @@ const UtilisateursPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {mockUtilisateurs.map((utilisateur, index) => (
+                {filteredUtilisateurs.map((utilisateur, index) => (
                   <tr
                     key={utilisateur.id}
                     className={cn(
@@ -306,11 +347,39 @@ const UtilisateursPage = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">
-            <span className="text-sm text-muted-foreground">
-              {mockUtilisateurs.length} utilisateur{mockUtilisateurs.length > 1 ? "s" : ""}
-            </span>
-            <span className="text-sm text-muted-foreground">1 - 2 / 2</span>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 border-t border-border bg-muted/30">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Résultats par page</span>
+              <Select defaultValue="10">
+                <SelectTrigger className="w-16 h-8 bg-background">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground">
+                1 - {filteredUtilisateurs.length} / {filteredUtilisateurs.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                  <ChevronsLeft className="h-4 w-4" />
+                </button>
+                <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+                <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                  <ChevronsRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -31,6 +31,11 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemP
   const isActive = location.pathname === to || location.pathname.startsWith(to + "/");
   const hasChildren = children && children.length > 0;
 
+  // Auto-open if child is active
+  const childIsActive = children?.some(
+    (child) => location.pathname === child.to || location.pathname.startsWith(child.to + "/")
+  );
+
   if (hasChildren) {
     return (
       <div>
@@ -38,7 +43,7 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemP
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
             "nav-item w-full justify-between",
-            isActive && "bg-sidebar-accent"
+            (isActive || childIsActive) && "bg-sidebar-accent"
           )}
         >
           <span className="flex items-center gap-3">
@@ -46,14 +51,14 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemP
             {!collapsed && <span>{label}</span>}
           </span>
           {!collapsed && (
-            isOpen ? (
+            isOpen || childIsActive ? (
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             ) : (
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             )
           )}
         </button>
-        {isOpen && !collapsed && (
+        {(isOpen || childIsActive) && !collapsed && (
           <div className="ml-7 mt-1 space-y-0.5 border-l border-border pl-3">
             {children.map((child) => (
               <NavLink
@@ -122,7 +127,15 @@ const navItems = [
 
 const secondaryNavItems = [
   { to: "/employes", icon: Users, label: "Employés" },
-  { to: "/utilisateurs", icon: User, label: "Utilisateurs" },
+  { 
+    to: "/utilisateurs", 
+    icon: User, 
+    label: "Utilisateurs",
+    children: [
+      { to: "/utilisateurs", label: "Liste d'utilisateurs" },
+      { to: "/utilisateurs/roles", label: "Rôles" },
+    ],
+  },
 ];
 
 export const Sidebar = () => {
@@ -181,10 +194,10 @@ export const Sidebar = () => {
           <img src={sowhatLogo} alt="SoWhat.ai" className="h-6 w-6 opacity-60" />
         ) : (
           <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
-            <img src={sowhatLogo} alt="SoWhat.ai" className="h-5 w-5" />
             <span className="text-xs text-muted-foreground">
-              Powered by <span className="font-semibold">SoWhat.ai</span>
+              Powered by
             </span>
+            <img src={sowhatLogo} alt="SoWhat.ai" className="h-5" />
           </div>
         )}
       </div>

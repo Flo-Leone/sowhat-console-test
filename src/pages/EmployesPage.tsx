@@ -8,6 +8,19 @@ import {
   FileText,
   Edit,
   Eye,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp,
+  RefreshCw,
+  Send,
+  Archive,
+  Calendar,
+  Store,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Info,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { Button } from "@/components/ui/button";
@@ -26,19 +39,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
 interface Employe {
   id: string;
   prenom: string;
   nom: string;
+  nomExtrait: string;
   dateEmbauche: string;
   magasin: string;
   rappels: { envoyes: number; total: number };
   dernierRappel: string | null;
-  documentsEnvoyes: boolean;
+  documentsEnvoyes: { envoyes: number; total: number };
   dateEnvoiDocuments: string | null;
-  statut: "accepte" | "en_attente" | "refuse";
+  statut: "accepte" | "valide" | "embauche" | "archive";
 }
 
 const mockEmployes: Employe[] = [
@@ -46,32 +65,46 @@ const mockEmployes: Employe[] = [
     id: "1",
     prenom: "Stephane",
     nom: "Boussely",
+    nomExtrait: "",
     dateEmbauche: "29 oct. 2025",
-    magasin: "Paris Rivoli",
-    rappels: { envoyes: 3, total: 3 },
-    dernierRappel: "15/11/2025",
-    documentsEnvoyes: true,
-    dateEnvoiDocuments: "30/10/2025",
+    magasin: "",
+    rappels: { envoyes: 0, total: 0 },
+    dernierRappel: null,
+    documentsEnvoyes: { envoyes: 3, total: 3 },
+    dateEnvoiDocuments: null,
     statut: "accepte",
   },
   {
     id: "2",
     prenom: "Bob",
     nom: "Dupont",
+    nomExtrait: "",
     dateEmbauche: "1 nov. 2025",
-    magasin: "Paris Alesia",
-    rappels: { envoyes: 0, total: 3 },
+    magasin: "",
+    rappels: { envoyes: 0, total: 0 },
     dernierRappel: null,
-    documentsEnvoyes: false,
+    documentsEnvoyes: { envoyes: 0, total: 3 },
     dateEnvoiDocuments: null,
     statut: "accepte",
   },
 ];
 
+const statutLabels: Record<string, string> = {
+  accepte: "Accepté",
+  valide: "Validé",
+  embauche: "Embauché",
+  archive: "Archivé",
+};
+
 const EmployesPage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchPrenom, setSearchPrenom] = useState("");
+  const [searchNom, setSearchNom] = useState("");
+  const [searchMagasin, setSearchMagasin] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [searchOpen, setSearchOpen] = useState(true);
+  const [includeArchived, setIncludeArchived] = useState(false);
+  const [includeImported, setIncludeImported] = useState(false);
 
   const toggleSelectAll = () => {
     if (selectedRows.length === mockEmployes.length) {
@@ -87,6 +120,14 @@ const EmployesPage = () => {
     );
   };
 
+  const filteredEmployes = mockEmployes.filter((employe) => {
+    const matchesPrenom = searchPrenom === "" || employe.prenom.toLowerCase().includes(searchPrenom.toLowerCase());
+    const matchesNom = searchNom === "" || employe.nom.toLowerCase().includes(searchNom.toLowerCase());
+    const matchesMagasin = searchMagasin === "" || employe.magasin.toLowerCase().includes(searchMagasin.toLowerCase());
+    const matchesStatus = statusFilter === "all" || employe.statut === statusFilter;
+    return matchesPrenom && matchesNom && matchesMagasin && matchesStatus;
+  });
+
   return (
     <ConsoleLayout>
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -98,73 +139,145 @@ const EmployesPage = () => {
               Gérez vos {mockEmployes.length} employés recrutés
             </p>
           </div>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {/* Actions Button - appears when rows are selected */}
+            {selectedRows.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="gap-2 bg-lavender hover:bg-lavender/90 text-white">
+                    Actions ({selectedRows.length})
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-card border-border shadow-elevated"
+                >
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <RefreshCw className="h-4 w-4" />
+                    Mettre à jour le statut
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Send className="h-4 w-4" />
+                    Envoyer rappel
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Mail className="h-4 w-4" />
+                    Envoyer documents
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="gap-3 py-2.5 text-muted-foreground">
+                    <Archive className="h-4 w-4" />
+                    Archiver
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            <Button variant="outline" className="gap-2">
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Exporter</span>
+            </Button>
+          </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Total employés
-            </p>
-            <p className="text-2xl font-display font-bold mt-1">{mockEmployes.length}</p>
+        {/* Advanced Search */}
+        <Collapsible open={searchOpen} onOpenChange={setSearchOpen}>
+          <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
+            <CollapsibleTrigger asChild>
+              <button className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-muted/30 transition-colors">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Recherche avancée</span>
+                </div>
+                {searchOpen ? (
+                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                )}
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-5 pb-5 border-t border-border pt-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <input
+                    type="text"
+                    placeholder="Prénom"
+                    value={searchPrenom}
+                    onChange={(e) => setSearchPrenom(e.target.value)}
+                    className="input-field w-36"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Nom"
+                    value={searchNom}
+                    onChange={(e) => setSearchNom(e.target.value)}
+                    className="input-field w-36"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Nom point de vente"
+                    value={searchMagasin}
+                    onChange={(e) => setSearchMagasin(e.target.value)}
+                    className="input-field w-44"
+                  />
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-input bg-background">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Période d'embauche</span>
+                  </div>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-32 bg-background">
+                      <SelectValue placeholder="Statut" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border">
+                      <SelectItem value="all">Statut</SelectItem>
+                      <SelectItem value="accepte">Accepté</SelectItem>
+                      <SelectItem value="valide">Validé</SelectItem>
+                      <SelectItem value="embauche">Embauché</SelectItem>
+                      <SelectItem value="archive">Archivé</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <label className="flex items-center gap-2 text-sm">
+                    <Checkbox
+                      checked={includeArchived}
+                      onCheckedChange={(checked) => setIncludeArchived(!!checked)}
+                    />
+                    Inclure archivés
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <Checkbox
+                      checked={includeImported}
+                      onCheckedChange={(checked) => setIncludeImported(!!checked)}
+                    />
+                    Importé
+                  </label>
+                </div>
+              </div>
+            </CollapsibleContent>
           </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Acceptés
-            </p>
-            <p className="text-2xl font-display font-bold mt-1 text-success">
-              {mockEmployes.filter((e) => e.statut === "accepte").length}
-            </p>
-          </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Documents envoyés
-            </p>
-            <p className="text-2xl font-display font-bold mt-1">
-              {mockEmployes.filter((e) => e.documentsEnvoyes).length}
-            </p>
-          </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Rappels en attente
-            </p>
-            <p className="text-2xl font-display font-bold mt-1 text-warning">
-              {mockEmployes.reduce((acc, e) => acc + (e.rappels.total - e.rappels.envoyes), 0)}
-            </p>
-          </div>
-        </div>
+        </Collapsible>
 
-        {/* Table Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-2 flex-1">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Rechercher un employé..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-field pl-10"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-32 bg-background">
-                <SelectValue placeholder="Statut" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                <SelectItem value="all">Tous</SelectItem>
-                <SelectItem value="accepte">Accepté</SelectItem>
-                <SelectItem value="en_attente">En attente</SelectItem>
-                <SelectItem value="refuse">Refusé</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Status Info */}
+        <Collapsible>
+          <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
+            <CollapsibleTrigger asChild>
+              <button className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-muted/30 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Info className="h-4 w-4 text-info" />
+                  <span className="font-medium">Statuts employés</span>
+                </div>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-5 pb-5 border-t border-border pt-4 space-y-2 text-sm">
+                <p><strong className="text-success">Accepté</strong>: Candidat accepté commençant le processus de préintégration (action manuelle par un recruteur)</p>
+                <p><strong className="text-info">Validé</strong>: Candidat dont les informations ont été mises à disposition de votre SIRH interne (action automatisée par SoWhat.ai)</p>
+                <p><strong className="text-primary">Embauché</strong>: Candidat ayant signé un contrat de travail et officiellement embauché (action manuelle d'un recruteur)</p>
+                <p><strong className="text-muted-foreground">Archivé</strong>: Candidat n'ayant pas fourni les documents et/ou ne s'étant jamais présenté</p>
+              </div>
+            </CollapsibleContent>
           </div>
-
-          <Button variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">Exporter</span>
-          </Button>
-        </div>
+        </Collapsible>
 
         {/* Data Table */}
         <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
@@ -174,21 +287,25 @@ const EmployesPage = () => {
                 <tr>
                   <th className="w-12">
                     <Checkbox
-                      checked={selectedRows.length === mockEmployes.length}
+                      checked={selectedRows.length === filteredEmployes.length && filteredEmployes.length > 0}
                       onCheckedChange={toggleSelectAll}
                     />
                   </th>
                   <th>Statut</th>
-                  <th>Employé</th>
+                  <th>Prénom</th>
+                  <th>Nom de famille</th>
+                  <th>Nom extrait</th>
                   <th>Date d'embauche</th>
                   <th>Magasin</th>
-                  <th>Rappels</th>
-                  <th>Documents</th>
-                  <th className="w-12"></th>
+                  <th># rappels</th>
+                  <th>Dernier rappel</th>
+                  <th>Documents envoyés</th>
+                  <th>Date envoi documents</th>
+                  <th className="w-24">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {mockEmployes.map((employe, index) => (
+                {filteredEmployes.map((employe, index) => (
                   <tr
                     key={employe.id}
                     className={cn(
@@ -206,98 +323,76 @@ const EmployesPage = () => {
                       <span
                         className={cn(
                           "status-badge",
-                          employe.statut === "accepte"
-                            ? "status-recruited"
-                            : employe.statut === "en_attente"
-                            ? "status-invited"
-                            : "status-rejected"
+                          employe.statut === "accepte" && "status-recruited",
+                          employe.statut === "valide" && "status-new",
+                          employe.statut === "embauche" && "status-invited",
+                          employe.statut === "archive" && "bg-muted text-muted-foreground"
                         )}
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                        {employe.statut === "accepte"
-                          ? "Accepté"
-                          : employe.statut === "en_attente"
-                          ? "En attente"
-                          : "Refusé"}
+                        {statutLabels[employe.statut]}
                       </span>
                     </td>
                     <td>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center">
-                          <UserCheck className="h-4 w-4 text-success" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">
-                            {employe.prenom} {employe.nom}
-                          </p>
-                        </div>
-                      </div>
+                      <span className="text-sm">{employe.prenom}</span>
+                    </td>
+                    <td>
+                      <span className="text-sm font-medium">{employe.nom}</span>
+                    </td>
+                    <td>
+                      <span className="text-sm text-muted-foreground">
+                        {employe.nomExtrait || "—"}
+                      </span>
                     </td>
                     <td>
                       <span className="text-sm">{employe.dateEmbauche}</span>
                     </td>
                     <td>
-                      <span className="text-sm">{employe.magasin}</span>
+                      <span className="text-sm">{employe.magasin || "—"}</span>
                     </td>
                     <td>
-                      <div className="flex items-center gap-2">
-                        <span className={cn(
-                          "text-sm font-medium",
-                          employe.rappels.envoyes === employe.rappels.total
-                            ? "text-success"
-                            : "text-warning"
-                        )}>
-                          {employe.rappels.envoyes}/{employe.rappels.total}
-                        </span>
-                        {employe.dernierRappel && (
-                          <span className="text-2xs text-muted-foreground">
-                            ({employe.dernierRappel})
-                          </span>
-                        )}
+                      <span className="text-sm text-muted-foreground">
+                        {employe.rappels.total > 0 
+                          ? `${employe.rappels.envoyes}/${employe.rappels.total}`
+                          : "—"
+                        }
+                      </span>
+                    </td>
+                    <td>
+                      <span className="text-sm text-muted-foreground">
+                        {employe.dernierRappel || "—"}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={cn(
+                        "text-sm font-medium",
+                        employe.documentsEnvoyes.envoyes === employe.documentsEnvoyes.total
+                          ? "text-success"
+                          : "text-warning"
+                      )}>
+                        {employe.documentsEnvoyes.envoyes}/{employe.documentsEnvoyes.total}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="text-sm text-muted-foreground">
+                        {employe.dateEnvoiDocuments || "—"}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                        <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                        <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
+                          <Info className="h-4 w-4 text-info" />
+                        </button>
+                        <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
+                          <Edit className="h-4 w-4 text-muted-foreground" />
+                        </button>
                       </div>
-                    </td>
-                    <td>
-                      {employe.documentsEnvoyes ? (
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-success" />
-                          <span className="text-sm text-success">Envoyés</span>
-                        </div>
-                      ) : (
-                        <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5">
-                          <Mail className="h-3.5 w-3.5" />
-                          Envoyer
-                        </Button>
-                      )}
-                    </td>
-                    <td>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
-                            <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="bg-card border-border shadow-elevated"
-                        >
-                          <DropdownMenuItem>
-                            <Eye className="h-4 w-4 mr-2" />
-                            Voir le profil
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Modifier
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Mail className="h-4 w-4 mr-2" />
-                            Envoyer rappel
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive">
-                            Désactiver
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </td>
                   </tr>
                 ))}
@@ -306,11 +401,39 @@ const EmployesPage = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">
-            <span className="text-sm text-muted-foreground">
-              {mockEmployes.length} employé{mockEmployes.length > 1 ? "s" : ""}
-            </span>
-            <span className="text-sm text-muted-foreground">1 - 2 / 2</span>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 border-t border-border bg-muted/30">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Résultats par page</span>
+              <Select defaultValue="10">
+                <SelectTrigger className="w-16 h-8 bg-background">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground">
+                1 - {filteredEmployes.length} / {filteredEmployes.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                  <ChevronsLeft className="h-4 w-4" />
+                </button>
+                <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+                <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                  <ChevronsRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

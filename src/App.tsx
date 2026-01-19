@@ -10,6 +10,7 @@ import StatistiquesPage from "./pages/StatistiquesPage";
 import OffresEmploiPage from "./pages/OffresEmploiPage";
 import EmployesPage from "./pages/EmployesPage";
 import UtilisateursPage from "./pages/UtilisateursPage";
+import RolesPage from "./pages/RolesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/parametres" element={<CandidaturesPage />} />
           <Route path="/employes" element={<EmployesPage />} />
           <Route path="/utilisateurs" element={<UtilisateursPage />} />
+          <Route path="/utilisateurs/roles" element={<RolesPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

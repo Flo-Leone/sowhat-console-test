@@ -8,13 +8,11 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  LayoutGrid,
-  List,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { CandidateStatus } from "@/components/candidates/StatusBadge";
 import { FilterPanel } from "@/components/candidates/FilterPanel";
-import { CandidateCard } from "@/components/candidates/CandidateCard";
+import { CandidateRow } from "@/components/candidates/CandidateRow";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -160,7 +158,7 @@ const CandidaturesPage = () => {
   const [activeFilters, setActiveFilters] = useState(0);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [pageSize, setPageSize] = useState("50");
-  const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
+  
   const toggleSelectAll = () => {
     if (selectedRows.length === mockCandidates.length) {
       setSelectedRows([]);
@@ -222,40 +220,18 @@ const CandidaturesPage = () => {
               <Download className="h-4 w-4" />
               <span className="hidden sm:inline">Télécharger CSV</span>
             </Button>
-            
-            {/* View Toggle */}
-            <div className="flex items-center border border-border rounded-lg p-0.5 bg-muted/30">
-              <button
-                onClick={() => setViewMode("cards")}
-                className={cn(
-                  "p-1.5 rounded-md transition-colors",
-                  viewMode === "cards" ? "bg-background shadow-sm" : "hover:bg-muted"
-                )}
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={cn(
-                  "p-1.5 rounded-md transition-colors",
-                  viewMode === "list" ? "bg-background shadow-sm" : "hover:bg-muted"
-                )}
-              >
-                <List className="h-4 w-4" />
-              </button>
-            </div>
           </div>
         </div>
 
-        {/* Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Accordion List */}
+        <div className="space-y-2">
           {mockCandidates.map((candidate, index) => (
             <div 
               key={candidate.id} 
               className="animate-fade-in"
-              style={{ animationDelay: `${index * 50}ms` }}
+              style={{ animationDelay: `${index * 30}ms` }}
             >
-              <CandidateCard
+              <CandidateRow
                 candidate={candidate}
                 isSelected={selectedRows.includes(candidate.id)}
                 onSelect={() => toggleRow(candidate.id)}

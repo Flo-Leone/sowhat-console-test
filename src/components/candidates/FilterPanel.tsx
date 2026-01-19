@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { X, ChevronDown, Check } from "lucide-react";
+import { X, ChevronDown, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -11,6 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface FilterPanelProps {
   isOpen: boolean;
@@ -20,17 +29,26 @@ interface FilterPanelProps {
   onApply: () => void;
 }
 
+const pointsDeVente = [
+  { id: "paris-rivoli", label: "Paris Rivoli" },
+  { id: "paris-louvre", label: "Paris Carrousel Du Louvre" },
+  { id: "lyon", label: "Lyon Part-Dieu" },
+  { id: "marseille", label: "Marseille Vieux-Port" },
+  { id: "bordeaux", label: "Bordeaux Sainte-Catherine" },
+  { id: "toulouse", label: "Toulouse Capitole" },
+];
+
 const statuses = [
-  { id: "nouveau", label: "Nouveau" },
-  { id: "vivier", label: "Vivier" },
-  { id: "rejete_cv", label: "Rejeté après chat ou CV" },
-  { id: "appel_attente", label: "Appel Tel. - confirmation en attente" },
-  { id: "appel_confirme", label: "Appel Tel. - confirmé" },
-  { id: "rejete_appel", label: "Rejeté après appel" },
-  { id: "invite_entretien", label: "Invité pour entretien" },
-  { id: "rejete_entretien", label: "Rejeté après entretien" },
-  { id: "recrute", label: "Recruté" },
-  { id: "recrute_autre", label: "Recruté par un autre employeur" },
+  { id: "nouveau", label: "Nouveau", color: "bg-info" },
+  { id: "vivier", label: "Vivier", color: "bg-lavender" },
+  { id: "rejete_cv", label: "Rejeté après chat ou CV", color: "bg-destructive" },
+  { id: "appel_attente", label: "Appel Tel. - confirmation en attente", color: "bg-warning" },
+  { id: "appel_confirme", label: "Appel Tel. - confirmé", color: "bg-info" },
+  { id: "rejete_appel", label: "Rejeté après appel", color: "bg-destructive" },
+  { id: "invite_entretien", label: "Invité pour entretien", color: "bg-accent" },
+  { id: "rejete_entretien", label: "Rejeté après entretien", color: "bg-destructive" },
+  { id: "recrute", label: "Recruté", color: "bg-success" },
+  { id: "recrute_autre", label: "A été recruté par un autre employeur", color: "bg-muted-foreground" },
 ];
 
 const contractTypes = [
@@ -60,11 +78,26 @@ export const FilterPanel = ({
   onReset,
   onApply,
 }: FilterPanelProps) => {
+  const [selectedPointsVente, setSelectedPointsVente] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedContracts, setSelectedContracts] = useState<string[]>([]);
   const [selectedAdditional, setSelectedAdditional] = useState<string[]>([]);
   const [experienceRange, setExperienceRange] = useState([0, 100]);
   const [hoursRange, setHoursRange] = useState([20, 45]);
+  const [tagsCondition, setTagsCondition] = useState("all");
+  const [dateDebut, setDateDebut] = useState("");
+  const [dateFin, setDateFin] = useState("");
+  const [prenomFiltre, setPrenomFiltre] = useState("");
+  const [nomFiltre, setNomFiltre] = useState("");
+  const [professionFiltre, setProfessionFiltre] = useState("");
+  const [titreOffreFiltre, setTitreOffreFiltre] = useState("");
+  const [referenceOffreFiltre, setReferenceOffreFiltre] = useState("");
+
+  const togglePointVente = (id: string) => {
+    setSelectedPointsVente((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+    );
+  };
 
   const toggleStatus = (id: string) => {
     setSelectedStatuses((prev) =>
@@ -84,6 +117,28 @@ export const FilterPanel = ({
     );
   };
 
+  const selectAllStatuses = () => {
+    setSelectedStatuses(statuses.map((s) => s.id));
+  };
+
+  const resetAll = () => {
+    setSelectedPointsVente([]);
+    setSelectedStatuses([]);
+    setSelectedContracts([]);
+    setSelectedAdditional([]);
+    setExperienceRange([0, 100]);
+    setHoursRange([20, 45]);
+    setTagsCondition("all");
+    setDateDebut("");
+    setDateFin("");
+    setPrenomFiltre("");
+    setNomFiltre("");
+    setProfessionFiltre("");
+    setTitreOffreFiltre("");
+    setReferenceOffreFiltre("");
+    onReset();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -95,9 +150,9 @@ export const FilterPanel = ({
       />
 
       {/* Panel */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-card shadow-elevated z-50 flex flex-col animate-slide-in">
+      <div className="fixed right-0 top-0 h-full w-full max-w-lg bg-card shadow-elevated z-50 flex flex-col animate-slide-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-lavender/5">
           <div>
             <h2 className="font-display font-semibold text-lg">Filtres</h2>
             {activeFilters > 0 && (
@@ -116,145 +171,355 @@ export const FilterPanel = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Point de vente */}
-          <div className="filter-section">
-            <label className="filter-label">Point de vente / Zone</label>
-            <Select>
-              <SelectTrigger className="w-full bg-background">
-                <SelectValue placeholder="Tous les points de vente" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border shadow-elevated">
-                <SelectItem value="all">Tous les points de vente</SelectItem>
-                <SelectItem value="paris">Paris</SelectItem>
-                <SelectItem value="lyon">Lyon</SelectItem>
-                <SelectItem value="marseille">Marseille</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Statut */}
-          <div className="filter-section">
-            <label className="filter-label">Statut de candidature</label>
-            <div className="grid grid-cols-1 gap-2 mt-2">
-              {statuses.map((status) => (
-                <label
-                  key={status.id}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors",
-                    "border border-transparent hover:bg-muted",
-                    selectedStatuses.includes(status.id) &&
-                      "bg-primary/5 border-primary/20"
+        <div className="flex-1 overflow-y-auto p-6">
+          <Accordion type="multiple" defaultValue={["pdv", "statut", "candidat"]} className="space-y-2">
+            {/* Point de vente / Zone */}
+            <AccordionItem value="pdv" className="border border-border rounded-lg px-4 bg-background/50">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Point de vente / Zone</span>
+                  {selectedPointsVente.length > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-info/10 text-info text-xs font-medium">
+                      {selectedPointsVente.length}
+                    </span>
                   )}
-                >
-                  <Checkbox
-                    checked={selectedStatuses.includes(status.id)}
-                    onCheckedChange={() => toggleStatus(status.id)}
-                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                  />
-                  <span className="text-sm">{status.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="space-y-2">
+                  {pointsDeVente.map((pdv) => (
+                    <label
+                      key={pdv.id}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
+                        "border border-transparent hover:bg-muted",
+                        selectedPointsVente.includes(pdv.id) &&
+                          "bg-info/5 border-info/20"
+                      )}
+                    >
+                      <Checkbox
+                        checked={selectedPointsVente.includes(pdv.id)}
+                        onCheckedChange={() => togglePointVente(pdv.id)}
+                        className="data-[state=checked]:bg-info data-[state=checked]:border-info"
+                      />
+                      <span className="text-sm">{pdv.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* Score expérience */}
-          <div className="filter-section">
-            <label className="filter-label">Score expérience</label>
-            <div className="mt-4 px-2">
-              <Slider
-                value={experienceRange}
-                onValueChange={setExperienceRange}
-                min={0}
-                max={100}
-                step={5}
-                className="w-full"
-              />
-              <div className="flex justify-between mt-2 text-sm text-muted-foreground">
-                <span>{experienceRange[0]}%</span>
-                <span>{experienceRange[1]}%</span>
-              </div>
-            </div>
-          </div>
+            {/* Dates de conversation */}
+            <AccordionItem value="dates" className="border border-border rounded-lg px-4 bg-background/50">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <span className="font-medium">Dates de candidature</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">De</Label>
+                    <Input
+                      type="date"
+                      value={dateDebut}
+                      onChange={(e) => setDateDebut(e.target.value)}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">À</Label>
+                    <Input
+                      type="date"
+                      value={dateFin}
+                      onChange={(e) => setDateFin(e.target.value)}
+                      className="bg-background"
+                    />
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* Type de contrat */}
-          <div className="filter-section">
-            <label className="filter-label">Type de contrat</label>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {contractTypes.map((type) => (
-                <button
-                  key={type.id}
-                  onClick={() => toggleContract(type.id)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
-                    selectedContracts.includes(type.id)
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+            {/* Tags */}
+            <AccordionItem value="tags" className="border border-border rounded-lg px-4 bg-background/50">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <span className="font-medium">Tags</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <RadioGroup value={tagsCondition} onValueChange={setTagsCondition} className="space-y-2">
+                  <div className="flex items-center space-x-3">
+                    <RadioGroupItem value="all" id="tags-all" />
+                    <Label htmlFor="tags-all" className="text-sm cursor-pointer">Réunit toutes les conditions</Label>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <RadioGroupItem value="any" id="tags-any" />
+                    <Label htmlFor="tags-any" className="text-sm cursor-pointer">Au moins une des conditions</Label>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <RadioGroupItem value="none" id="tags-none" />
+                    <Label htmlFor="tags-none" className="text-sm cursor-pointer">Aucune des conditions</Label>
+                  </div>
+                </RadioGroup>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Statut */}
+            <AccordionItem value="statut" className="border border-border rounded-lg px-4 bg-background/50">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Statut</span>
+                  {selectedStatuses.length > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-lavender/10 text-lavender text-xs font-medium">
+                      {selectedStatuses.length}
+                    </span>
                   )}
-                >
-                  {type.label}
-                </button>
-              ))}
-            </div>
-          </div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="flex gap-2 mb-3">
+                  <button
+                    onClick={selectAllStatuses}
+                    className="text-xs text-info hover:underline"
+                  >
+                    Tout sélectionner
+                  </button>
+                  <span className="text-muted-foreground">·</span>
+                  <button
+                    onClick={() => setSelectedStatuses([])}
+                    className="text-xs text-muted-foreground hover:underline"
+                  >
+                    Réinitialiser
+                  </button>
+                </div>
+                <div className="space-y-1">
+                  {statuses.map((status) => (
+                    <label
+                      key={status.id}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
+                        "hover:bg-muted",
+                        selectedStatuses.includes(status.id) && "bg-lavender/5"
+                      )}
+                    >
+                      <Checkbox
+                        checked={selectedStatuses.includes(status.id)}
+                        onCheckedChange={() => toggleStatus(status.id)}
+                        className="data-[state=checked]:bg-lavender data-[state=checked]:border-lavender"
+                      />
+                      <div className={cn("w-2 h-2 rounded-full", status.color)} />
+                      <span className="text-sm">{status.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* Heures hebdomadaires */}
-          <div className="filter-section">
-            <label className="filter-label">Heures hebdomadaires</label>
-            <div className="mt-4 px-2">
-              <Slider
-                value={hoursRange}
-                onValueChange={setHoursRange}
-                min={0}
-                max={50}
-                step={5}
-                className="w-full"
-              />
-              <div className="flex justify-between mt-2 text-sm text-muted-foreground">
-                <span>{hoursRange[0]}h</span>
-                <span>{hoursRange[1]}h</span>
-              </div>
-            </div>
-          </div>
+            {/* Candidat */}
+            <AccordionItem value="candidat" className="border border-border rounded-lg px-4 bg-background/50">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <span className="font-medium">Candidat</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Prénom</Label>
+                    <Input
+                      placeholder="Filtrer par prénom"
+                      value={prenomFiltre}
+                      onChange={(e) => setPrenomFiltre(e.target.value)}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Nom</Label>
+                    <Input
+                      placeholder="Filtrer par nom"
+                      value={nomFiltre}
+                      onChange={(e) => setNomFiltre(e.target.value)}
+                      className="bg-background"
+                    />
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* Filtres supplémentaires */}
-          <div className="filter-section">
-            <label className="filter-label">Filtres supplémentaires</label>
-            <div className="grid grid-cols-1 gap-1 mt-2">
-              {additionalFilters.map((filter) => (
-                <label
-                  key={filter.id}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-muted transition-colors"
-                >
-                  <Checkbox
-                    checked={selectedAdditional.includes(filter.id)}
-                    onCheckedChange={() => toggleAdditional(filter.id)}
-                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+            {/* Offre */}
+            <AccordionItem value="offre" className="border border-border rounded-lg px-4 bg-background/50">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <span className="font-medium">Offre d'emploi</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Profession</Label>
+                    <Input
+                      placeholder="Filtrer par profession"
+                      value={professionFiltre}
+                      onChange={(e) => setProfessionFiltre(e.target.value)}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Titre de l'offre</Label>
+                    <Input
+                      placeholder="Filtrer par titre"
+                      value={titreOffreFiltre}
+                      onChange={(e) => setTitreOffreFiltre(e.target.value)}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Référence de l'offre</Label>
+                    <Input
+                      placeholder="Ex: EQP-042"
+                      value={referenceOffreFiltre}
+                      onChange={(e) => setReferenceOffreFiltre(e.target.value)}
+                      className="bg-background"
+                    />
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Score expérience */}
+            <AccordionItem value="score" className="border border-border rounded-lg px-4 bg-background/50">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <span className="font-medium">Score expérience</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="px-2">
+                  <Slider
+                    value={experienceRange}
+                    onValueChange={setExperienceRange}
+                    min={0}
+                    max={100}
+                    step={5}
+                    className="w-full"
                   />
-                  <span className="text-sm">{filter.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+                  <div className="flex justify-between mt-3 text-sm">
+                    <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{experienceRange[0]}%</span>
+                    <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{experienceRange[1]}%</span>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Type de contrat */}
+            <AccordionItem value="contrat" className="border border-border rounded-lg px-4 bg-background/50">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Type de contrat</span>
+                  {selectedContracts.length > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">
+                      {selectedContracts.length}
+                    </span>
+                  )}
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="flex flex-wrap gap-2">
+                  {contractTypes.map((type) => (
+                    <button
+                      key={type.id}
+                      onClick={() => toggleContract(type.id)}
+                      className={cn(
+                        "px-4 py-2 rounded-lg text-sm font-medium transition-all border",
+                        selectedContracts.includes(type.id)
+                          ? "bg-success text-success-foreground border-success"
+                          : "bg-background text-muted-foreground border-border hover:border-success/50"
+                      )}
+                    >
+                      {type.label}
+                    </button>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Dates de contrat */}
+            <AccordionItem value="dates-contrat" className="border border-border rounded-lg px-4 bg-background/50">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <span className="font-medium">Dates de contrat</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">De</Label>
+                    <Input type="date" className="bg-background" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">À</Label>
+                    <Input type="date" className="bg-background" />
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Heures hebdomadaires */}
+            <AccordionItem value="heures" className="border border-border rounded-lg px-4 bg-background/50">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <span className="font-medium">Heures hebdomadaires</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="px-2">
+                  <Slider
+                    value={hoursRange}
+                    onValueChange={setHoursRange}
+                    min={0}
+                    max={50}
+                    step={5}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between mt-3 text-sm">
+                    <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{hoursRange[0]}h</span>
+                    <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{hoursRange[1]}h</span>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Filtres supplémentaires */}
+            <AccordionItem value="additional" className="border border-border rounded-lg px-4 bg-background/50">
+              <AccordionTrigger className="hover:no-underline py-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Filtres supplémentaires</span>
+                  {selectedAdditional.length > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-warning/10 text-warning text-xs font-medium">
+                      {selectedAdditional.length}
+                    </span>
+                  )}
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="grid grid-cols-1 gap-1">
+                  {additionalFilters.map((filter) => (
+                    <label
+                      key={filter.id}
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-muted transition-colors"
+                    >
+                      <Checkbox
+                        checked={selectedAdditional.includes(filter.id)}
+                        onCheckedChange={() => toggleAdditional(filter.id)}
+                        className="data-[state=checked]:bg-warning data-[state=checked]:border-warning"
+                      />
+                      <span className="text-sm">{filter.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-border bg-muted/30">
           <Button
             variant="ghost"
-            onClick={() => {
-              setSelectedStatuses([]);
-              setSelectedContracts([]);
-              setSelectedAdditional([]);
-              setExperienceRange([0, 100]);
-              setHoursRange([20, 45]);
-              onReset();
-            }}
-            className="text-muted-foreground"
+            onClick={resetAll}
+            className="text-muted-foreground gap-2"
           >
+            <RotateCcw className="h-4 w-4" />
             Réinitialiser
           </Button>
-          <Button onClick={onApply} className="btn-primary">
+          <Button onClick={onApply} className="btn-primary px-6">
             Appliquer les filtres
           </Button>
         </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Filter,
   Download,
@@ -12,6 +13,10 @@ import {
   Phone,
   Calendar,
   Eye,
+  Clock,
+  Monitor,
+  Smartphone,
+  ArrowUpDown,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { StatusBadge, CandidateStatus } from "@/components/candidates/StatusBadge";
@@ -38,6 +43,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 interface Candidate {
@@ -45,18 +51,25 @@ interface Candidate {
   firstName: string;
   lastName: string;
   profession: string;
+  titreOffre: string;
+  referenceOffre: string;
   dateCandidat: string;
   status: CandidateStatus;
   scoreExperience: number | null;
+  scoreProfession: number | null;
   scoreDisponibilite: number | null;
   pointVente: string;
   pointVenteAssigne: string | null;
   appelDate: string | null;
   entretienDate: string | null;
   prochainEvenement: string | null;
+  dernierRappel: string | null;
+  prochainRappel: string | null;
   tags: string[];
   recruteur: string;
   plateforme: "Desktop" | "Mobile";
+  vues: number;
+  derniereVue: string | null;
 }
 
 const mockCandidates: Candidate[] = [
@@ -65,78 +78,107 @@ const mockCandidates: Candidate[] = [
     firstName: "Marie",
     lastName: "Dupont",
     profession: "Manager",
+    titreOffre: "Manager",
+    referenceOffre: "MGR-001",
     dateCandidat: "28/10/2025",
     status: "recrute",
     scoreExperience: null,
+    scoreProfession: null,
     scoreDisponibilite: null,
     pointVente: "Paris Rivoli",
     pointVenteAssigne: null,
     appelDate: "30/10/2025",
     entretienDate: null,
     prochainEvenement: null,
+    dernierRappel: null,
+    prochainRappel: null,
     tags: [],
     recruteur: "Stephane Boussely",
     plateforme: "Desktop",
+    vues: 5,
+    derniereVue: "19/01/2026",
   },
   {
     id: "2",
     firstName: "Jean-Philippe",
     lastName: "Selle",
     profession: "Equipier polyvalent",
+    titreOffre: "Equipier polyvalent",
+    referenceOffre: "EQP-042",
     dateCandidat: "13/10/2025",
     status: "invite_entretien",
     scoreExperience: 100,
+    scoreProfession: 88,
     scoreDisponibilite: 88,
     pointVente: "Paris Carrousel Du Louvre",
     pointVenteAssigne: "Paris Carrousel Du Louvre",
     appelDate: "12/11/2025",
     entretienDate: "15/10/2025",
     prochainEvenement: "15/10/2025",
-    tags: ["Urgent", "Prioritaire"],
-    recruteur: "Jean-Philippe Selle",
+    dernierRappel: null,
+    prochainRappel: null,
+    tags: ["10H"],
+    recruteur: "Admin SW.AI",
     plateforme: "Desktop",
+    vues: 12,
+    derniereVue: "19/01/2026",
   },
   {
     id: "3",
     firstName: "Julien",
     lastName: "Gantheret",
     profession: "Equipier polyvalent",
+    titreOffre: "Equipier polyvalent",
+    referenceOffre: "EQP-042",
     dateCandidat: "13/10/2025",
     status: "invite_entretien",
     scoreExperience: 100,
+    scoreProfession: 37,
     scoreDisponibilite: 37,
     pointVente: "Paris Rivoli",
     pointVenteAssigne: "Paris Rivoli",
     appelDate: "12/11/2025",
     entretienDate: "15/10/2025",
     prochainEvenement: "15/10/2025",
+    dernierRappel: null,
+    prochainRappel: null,
     tags: [],
     recruteur: "Julien Gantheret",
     plateforme: "Desktop",
+    vues: 8,
+    derniereVue: "18/01/2026",
   },
   {
     id: "4",
     firstName: "Bob",
     lastName: "Dupont",
     profession: "Equipier polyvalent",
+    titreOffre: "Equipier polyvalent",
+    referenceOffre: "EQP-043",
     dateCandidat: "13/10/2025",
     status: "recrute",
     scoreExperience: 0,
+    scoreProfession: null,
     scoreDisponibilite: null,
     pointVente: "Paris Rivoli",
     pointVenteAssigne: null,
     appelDate: null,
     entretienDate: null,
     prochainEvenement: null,
+    dernierRappel: null,
+    prochainRappel: null,
     tags: [],
     recruteur: "Bob Dupont",
     plateforme: "Desktop",
+    vues: 3,
+    derniereVue: "15/01/2026",
   },
 ];
 
 const CandidaturesPage = () => {
+  const navigate = useNavigate();
   const [filterOpen, setFilterOpen] = useState(false);
-  const [activeFilters, setActiveFilters] = useState(3);
+  const [activeFilters, setActiveFilters] = useState(0);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [pageSize, setPageSize] = useState("50");
 
@@ -154,6 +196,10 @@ const CandidaturesPage = () => {
     );
   };
 
+  const handleRowClick = (candidateId: string) => {
+    navigate(`/candidatures/${candidateId}`);
+  };
+
   return (
     <ConsoleLayout>
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -169,38 +215,6 @@ const CandidaturesPage = () => {
             <Plus className="h-4 w-4" />
             Ajouter un candidat
           </Button>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Total candidatures
-            </p>
-            <p className="text-2xl font-display font-bold mt-1">247</p>
-            <p className="text-xs text-success mt-1">+12% ce mois</p>
-          </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              À traiter
-            </p>
-            <p className="text-2xl font-display font-bold mt-1">24</p>
-            <p className="text-xs text-warning mt-1">8 urgentes</p>
-          </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Entretiens prévus
-            </p>
-            <p className="text-2xl font-display font-bold mt-1">12</p>
-            <p className="text-xs text-muted-foreground mt-1">Cette semaine</p>
-          </div>
-          <div className="metric-card">
-            <p className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-              Recrutés
-            </p>
-            <p className="text-2xl font-display font-bold mt-1">89</p>
-            <p className="text-xs text-success mt-1">36% taux de conversion</p>
-          </div>
         </div>
 
         {/* Table Controls */}
@@ -236,109 +250,208 @@ const CandidaturesPage = () => {
           </div>
         </div>
 
-        {/* Data Table */}
+        {/* Data Table with horizontal scroll */}
         <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th className="w-12">
-                    <Checkbox
-                      checked={selectedRows.length === mockCandidates.length}
-                      onCheckedChange={toggleSelectAll}
-                    />
-                  </th>
-                  <th>Date</th>
-                  <th>Candidat</th>
-                  <th>Profession</th>
-                  <th>Statut</th>
-                  <th>Score Exp.</th>
-                  <th>Score Dispo.</th>
-                  <th>Point de vente</th>
-                  <th>Prochain évènement</th>
-                  <th className="w-12"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockCandidates.map((candidate, index) => (
-                  <tr
-                    key={candidate.id}
-                    className={cn(
-                      selectedRows.includes(candidate.id) && "bg-primary/5"
-                    )}
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <td>
+          <ScrollArea className="w-full">
+            <div className="min-w-[1400px]">
+              <table className="data-table w-full">
+                <thead>
+                  <tr>
+                    <th className="w-12 sticky left-0 bg-[hsl(var(--table-header))] z-10">
                       <Checkbox
-                        checked={selectedRows.includes(candidate.id)}
-                        onCheckedChange={() => toggleRow(candidate.id)}
+                        checked={selectedRows.length === mockCandidates.length}
+                        onCheckedChange={toggleSelectAll}
                       />
-                    </td>
-                    <td>
-                      <span className="text-muted-foreground text-sm">
-                        {candidate.dateCandidat}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-golden/20 flex items-center justify-center text-sm font-semibold text-golden-700">
-                          {candidate.firstName[0]}
-                          {candidate.lastName[0]}
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">
-                            {candidate.firstName} {candidate.lastName}
-                          </p>
-                          <p className="text-2xs text-muted-foreground">
-                            {candidate.recruteur}
-                          </p>
-                        </div>
+                    </th>
+                    <th className="sticky left-12 bg-[hsl(var(--table-header))] z-10 min-w-[180px]">
+                      <div className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
+                        Candidat
+                        <ArrowUpDown className="h-3 w-3" />
                       </div>
-                    </td>
-                    <td>
-                      <span className="text-sm">{candidate.profession}</span>
-                    </td>
-                    <td>
-                      <StatusBadge status={candidate.status} />
-                    </td>
-                    <td>
-                      <ScoreBar value={candidate.scoreExperience} />
-                    </td>
-                    <td>
-                      <ScoreBar value={candidate.scoreDisponibilite} />
-                    </td>
-                    <td>
-                      <div className="max-w-[180px]">
-                        <p className="text-sm truncate">{candidate.pointVente}</p>
-                        {candidate.pointVenteAssigne && (
-                          <p className="text-2xs text-muted-foreground truncate">
-                            Assigné: {candidate.pointVenteAssigne}
-                          </p>
-                        )}
+                    </th>
+                    <th className="min-w-[100px]">
+                      <div className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
+                        Date
+                        <ArrowUpDown className="h-3 w-3" />
                       </div>
-                    </td>
-                    <td>
-                      {candidate.prochainEvenement ? (
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span className="text-sm">
-                            {candidate.prochainEvenement}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground text-sm">—</span>
+                    </th>
+                    <th className="min-w-[130px]">Statut</th>
+                    <th className="min-w-[150px]">Titre offre</th>
+                    <th className="min-w-[90px]">Référence</th>
+                    <th className="min-w-[150px]">Point de vente</th>
+                    <th className="min-w-[90px]">
+                      <Tooltip>
+                        <TooltipTrigger className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
+                          Score Exp.
+                          <ArrowUpDown className="h-3 w-3" />
+                        </TooltipTrigger>
+                        <TooltipContent>Score d'expérience</TooltipContent>
+                      </Tooltip>
+                    </th>
+                    <th className="min-w-[90px]">
+                      <Tooltip>
+                        <TooltipTrigger className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
+                          Score Prof.
+                          <ArrowUpDown className="h-3 w-3" />
+                        </TooltipTrigger>
+                        <TooltipContent>Score de profession</TooltipContent>
+                      </Tooltip>
+                    </th>
+                    <th className="min-w-[90px]">
+                      <Tooltip>
+                        <TooltipTrigger className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
+                          Score Dispo.
+                          <ArrowUpDown className="h-3 w-3" />
+                        </TooltipTrigger>
+                        <TooltipContent>Score de disponibilité</TooltipContent>
+                      </Tooltip>
+                    </th>
+                    <th className="min-w-[100px]">Appel</th>
+                    <th className="min-w-[100px]">Entretien</th>
+                    <th className="min-w-[110px]">Prochain évt.</th>
+                    <th className="min-w-[100px]">Dernier rappel</th>
+                    <th className="min-w-[130px]">Recruteur</th>
+                    <th className="min-w-[80px]">Plateforme</th>
+                    <th className="min-w-[60px]">Vues</th>
+                    <th className="min-w-[100px]">Dernière vue</th>
+                    <th className="w-12"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mockCandidates.map((candidate, index) => (
+                    <tr
+                      key={candidate.id}
+                      className={cn(
+                        "cursor-pointer",
+                        selectedRows.includes(candidate.id) && "bg-primary/5"
                       )}
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-1">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
-                              <Eye className="h-4 w-4 text-muted-foreground" />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>Voir le profil</TooltipContent>
-                        </Tooltip>
+                      style={{ animationDelay: `${index * 50}ms` }}
+                      onClick={() => handleRowClick(candidate.id)}
+                    >
+                      <td 
+                        className="sticky left-0 bg-card z-10"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox
+                          checked={selectedRows.includes(candidate.id)}
+                          onCheckedChange={() => toggleRow(candidate.id)}
+                        />
+                      </td>
+                      <td className="sticky left-12 bg-card z-10">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-lavender/20 flex items-center justify-center text-sm font-semibold text-lavender">
+                            {candidate.firstName[0]}
+                            {candidate.lastName[0]}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">
+                              {candidate.firstName} {candidate.lastName}
+                            </p>
+                            {candidate.tags.length > 0 && (
+                              <div className="flex gap-1 mt-0.5">
+                                {candidate.tags.map((tag) => (
+                                  <span key={tag} className="tag tag-primary text-2xs">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="text-muted-foreground text-sm">
+                          {candidate.dateCandidat}
+                        </span>
+                      </td>
+                      <td>
+                        <StatusBadge status={candidate.status} />
+                      </td>
+                      <td>
+                        <span className="text-sm">{candidate.titreOffre}</span>
+                      </td>
+                      <td>
+                        <span className="text-sm text-muted-foreground font-mono">
+                          {candidate.referenceOffre}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="max-w-[150px]">
+                          <p className="text-sm truncate">{candidate.pointVente}</p>
+                        </div>
+                      </td>
+                      <td>
+                        <ScoreBar value={candidate.scoreExperience} />
+                      </td>
+                      <td>
+                        <ScoreBar value={candidate.scoreProfession} />
+                      </td>
+                      <td>
+                        <ScoreBar value={candidate.scoreDisponibilite} />
+                      </td>
+                      <td>
+                        {candidate.appelDate ? (
+                          <div className="flex items-center gap-1.5">
+                            <Phone className="h-3.5 w-3.5 text-info" />
+                            <span className="text-sm">{candidate.appelDate}</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">—</span>
+                        )}
+                      </td>
+                      <td>
+                        {candidate.entretienDate ? (
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5 text-success" />
+                            <span className="text-sm">{candidate.entretienDate}</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">—</span>
+                        )}
+                      </td>
+                      <td>
+                        {candidate.prochainEvenement ? (
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="h-3.5 w-3.5 text-warning" />
+                            <span className="text-sm">{candidate.prochainEvenement}</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">—</span>
+                        )}
+                      </td>
+                      <td>
+                        {candidate.dernierRappel ? (
+                          <span className="text-sm">{candidate.dernierRappel}</span>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">—</span>
+                        )}
+                      </td>
+                      <td>
+                        <span className="text-sm truncate block max-w-[120px]">
+                          {candidate.recruteur}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-1.5">
+                          {candidate.plateforme === "Desktop" ? (
+                            <Monitor className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <Smartphone className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-1.5">
+                          <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="text-sm">{candidate.vues}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="text-sm text-muted-foreground">
+                          {candidate.derniereVue || "—"}
+                        </span>
+                      </td>
+                      <td onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
@@ -349,7 +462,7 @@ const CandidaturesPage = () => {
                             align="end"
                             className="bg-card border-border shadow-elevated"
                           >
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleRowClick(candidate.id)}>
                               <Eye className="h-4 w-4 mr-2" />
                               Voir le profil
                             </DropdownMenuItem>
@@ -367,13 +480,14 @@ const CandidaturesPage = () => {
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 border-t border-border bg-muted/30">

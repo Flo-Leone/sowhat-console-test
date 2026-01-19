@@ -3,17 +3,27 @@ import { useNavigate } from "react-router-dom";
 import {
   Filter,
   Download,
+  Columns3,
   Plus,
+  MoreHorizontal,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Phone,
+  Calendar,
+  Eye,
+  Clock,
+  Monitor,
+  Smartphone,
+  ArrowUpDown,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
-import { CandidateStatus } from "@/components/candidates/StatusBadge";
+import { StatusBadge, CandidateStatus } from "@/components/candidates/StatusBadge";
+import { ScoreBar } from "@/components/candidates/ScoreBar";
 import { FilterPanel } from "@/components/candidates/FilterPanel";
-import { CandidateRow } from "@/components/candidates/CandidateRow";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -21,6 +31,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 interface Candidate {
@@ -158,7 +181,7 @@ const CandidaturesPage = () => {
   const [activeFilters, setActiveFilters] = useState(0);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [pageSize, setPageSize] = useState("50");
-  
+
   const toggleSelectAll = () => {
     if (selectedRows.length === mockCandidates.length) {
       setSelectedRows([]);
@@ -194,7 +217,7 @@ const CandidaturesPage = () => {
           </Button>
         </div>
 
-        {/* Controls */}
+        {/* Table Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-2">
             <Button
@@ -220,60 +243,286 @@ const CandidaturesPage = () => {
               <Download className="h-4 w-4" />
               <span className="hidden sm:inline">Télécharger CSV</span>
             </Button>
+            <Button variant="outline" className="gap-2">
+              <Columns3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Colonnes</span>
+            </Button>
           </div>
         </div>
 
-        {/* Accordion List */}
-        <div className="space-y-2">
-          {mockCandidates.map((candidate, index) => (
-            <div 
-              key={candidate.id} 
-              className="animate-fade-in"
-              style={{ animationDelay: `${index * 30}ms` }}
-            >
-              <CandidateRow
-                candidate={candidate}
-                isSelected={selectedRows.includes(candidate.id)}
-                onSelect={() => toggleRow(candidate.id)}
-                onClick={() => handleRowClick(candidate.id)}
-              />
+        {/* Data Table with horizontal scroll */}
+        <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
+          <ScrollArea className="w-full">
+            <div className="min-w-[1400px]">
+              <table className="data-table w-full">
+                <thead>
+                  <tr>
+                    <th className="w-12 sticky left-0 bg-[hsl(var(--table-header))] z-10">
+                      <Checkbox
+                        checked={selectedRows.length === mockCandidates.length}
+                        onCheckedChange={toggleSelectAll}
+                      />
+                    </th>
+                    <th className="sticky left-12 bg-[hsl(var(--table-header))] z-10 min-w-[180px]">
+                      <div className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
+                        Candidat
+                        <ArrowUpDown className="h-3 w-3" />
+                      </div>
+                    </th>
+                    <th className="min-w-[100px]">
+                      <div className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
+                        Date
+                        <ArrowUpDown className="h-3 w-3" />
+                      </div>
+                    </th>
+                    <th className="min-w-[130px]">Statut</th>
+                    <th className="min-w-[150px]">Titre offre</th>
+                    <th className="min-w-[90px]">Référence</th>
+                    <th className="min-w-[150px]">Point de vente</th>
+                    <th className="min-w-[90px]">
+                      <Tooltip>
+                        <TooltipTrigger className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
+                          Score Exp.
+                          <ArrowUpDown className="h-3 w-3" />
+                        </TooltipTrigger>
+                        <TooltipContent>Score d'expérience</TooltipContent>
+                      </Tooltip>
+                    </th>
+                    <th className="min-w-[90px]">
+                      <Tooltip>
+                        <TooltipTrigger className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
+                          Score Prof.
+                          <ArrowUpDown className="h-3 w-3" />
+                        </TooltipTrigger>
+                        <TooltipContent>Score de profession</TooltipContent>
+                      </Tooltip>
+                    </th>
+                    <th className="min-w-[90px]">
+                      <Tooltip>
+                        <TooltipTrigger className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
+                          Score Dispo.
+                          <ArrowUpDown className="h-3 w-3" />
+                        </TooltipTrigger>
+                        <TooltipContent>Score de disponibilité</TooltipContent>
+                      </Tooltip>
+                    </th>
+                    <th className="min-w-[100px]">Appel</th>
+                    <th className="min-w-[100px]">Entretien</th>
+                    <th className="min-w-[110px]">Prochain évt.</th>
+                    <th className="min-w-[100px]">Dernier rappel</th>
+                    <th className="min-w-[130px]">Recruteur</th>
+                    <th className="min-w-[80px]">Plateforme</th>
+                    <th className="min-w-[60px]">Vues</th>
+                    <th className="min-w-[100px]">Dernière vue</th>
+                    <th className="w-12"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mockCandidates.map((candidate, index) => (
+                    <tr
+                      key={candidate.id}
+                      className={cn(
+                        "cursor-pointer",
+                        selectedRows.includes(candidate.id) && "bg-primary/5"
+                      )}
+                      style={{ animationDelay: `${index * 50}ms` }}
+                      onClick={() => handleRowClick(candidate.id)}
+                    >
+                      <td 
+                        className="sticky left-0 bg-card z-10"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox
+                          checked={selectedRows.includes(candidate.id)}
+                          onCheckedChange={() => toggleRow(candidate.id)}
+                        />
+                      </td>
+                      <td className="sticky left-12 bg-card z-10">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-lavender/20 flex items-center justify-center text-sm font-semibold text-lavender">
+                            {candidate.firstName[0]}
+                            {candidate.lastName[0]}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">
+                              {candidate.firstName} {candidate.lastName}
+                            </p>
+                            {candidate.tags.length > 0 && (
+                              <div className="flex gap-1 mt-0.5">
+                                {candidate.tags.map((tag) => (
+                                  <span key={tag} className="tag tag-primary text-2xs">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="text-muted-foreground text-sm">
+                          {candidate.dateCandidat}
+                        </span>
+                      </td>
+                      <td>
+                        <StatusBadge status={candidate.status} />
+                      </td>
+                      <td>
+                        <span className="text-sm">{candidate.titreOffre}</span>
+                      </td>
+                      <td>
+                        <span className="text-sm text-muted-foreground font-mono">
+                          {candidate.referenceOffre}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="max-w-[150px]">
+                          <p className="text-sm truncate">{candidate.pointVente}</p>
+                        </div>
+                      </td>
+                      <td>
+                        <ScoreBar value={candidate.scoreExperience} />
+                      </td>
+                      <td>
+                        <ScoreBar value={candidate.scoreProfession} />
+                      </td>
+                      <td>
+                        <ScoreBar value={candidate.scoreDisponibilite} />
+                      </td>
+                      <td>
+                        {candidate.appelDate ? (
+                          <div className="flex items-center gap-1.5">
+                            <Phone className="h-3.5 w-3.5 text-info" />
+                            <span className="text-sm">{candidate.appelDate}</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">—</span>
+                        )}
+                      </td>
+                      <td>
+                        {candidate.entretienDate ? (
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5 text-success" />
+                            <span className="text-sm">{candidate.entretienDate}</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">—</span>
+                        )}
+                      </td>
+                      <td>
+                        {candidate.prochainEvenement ? (
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="h-3.5 w-3.5 text-warning" />
+                            <span className="text-sm">{candidate.prochainEvenement}</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">—</span>
+                        )}
+                      </td>
+                      <td>
+                        {candidate.dernierRappel ? (
+                          <span className="text-sm">{candidate.dernierRappel}</span>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">—</span>
+                        )}
+                      </td>
+                      <td>
+                        <span className="text-sm truncate block max-w-[120px]">
+                          {candidate.recruteur}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-1.5">
+                          {candidate.plateforme === "Desktop" ? (
+                            <Monitor className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <Smartphone className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-1.5">
+                          <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="text-sm">{candidate.vues}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="text-sm text-muted-foreground">
+                          {candidate.derniereVue || "—"}
+                        </span>
+                      </td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
+                              <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="bg-card border-border shadow-elevated"
+                          >
+                            <DropdownMenuItem onClick={() => handleRowClick(candidate.id)}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Voir le profil
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Phone className="h-4 w-4 mr-2" />
+                              Programmer un appel
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Calendar className="h-4 w-4 mr-2" />
+                              Planifier entretien
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive">
+                              Rejeter
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
-        </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
 
-        {/* Pagination */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 bg-card border border-border rounded-xl">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Résultats par page</span>
-            <Select value={pageSize} onValueChange={setPageSize}>
-              <SelectTrigger className="w-16 h-8 bg-background">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Pagination */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 border-t border-border bg-muted/30">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Résultats par page</span>
+              <Select value={pageSize} onValueChange={setPageSize}>
+                <SelectTrigger className="w-16 h-8 bg-background">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="flex items-center gap-1">
-            <span className="text-sm text-muted-foreground mr-4">
-              1 - 4 / 4
-            </span>
-            <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
-              <ChevronsLeft className="h-4 w-4" />
-            </button>
-            <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
-              <ChevronsRight className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-muted-foreground mr-4">
+                1 - 4 / 4
+              </span>
+              <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                <ChevronsLeft className="h-4 w-4" />
+              </button>
+              <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                <ChevronRight className="h-4 w-4" />
+              </button>
+              <button className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50">
+                <ChevronsRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -22,7 +22,7 @@
     
     /* Secondary Colors */
     --jungle-green: 150 60% 41%;       /* #2AA96E - Success */
-    --coral-glow: 18 100% 69%;         /* #FF8C61 - Warning */
+    --coral-glow: 18 100% 69%;         /* #FF8C61 - Warning/Coral */
     --blue-bell: 205 52% 55%;          /* #519BC9 - Info */
     --soft-lavender: 241 54% 74%;      /* #9391E6 - Accent */
     --coral-peach: 2 100% 87%;         /* #FFCOBE - Light coral */
@@ -60,6 +60,10 @@
     
     --info: 205 52% 55%;
     --info-foreground: 0 0% 100%;
+
+    /* Secondary brand colors for UI accents */
+    --lavender: 241 54% 74%;
+    --coral: 18 100% 69%;
 
     --border: 40 15% 90%;
     --input: 40 15% 88%;

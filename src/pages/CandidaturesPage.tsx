@@ -17,6 +17,12 @@ import {
   Monitor,
   Smartphone,
   ArrowUpDown,
+  ChevronDown,
+  RefreshCw,
+  Send,
+  Tag,
+  Bell,
+  Archive,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { StatusBadge, CandidateStatus } from "@/components/candidates/StatusBadge";
@@ -239,6 +245,44 @@ const CandidaturesPage = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Actions Button - appears when rows are selected */}
+            {selectedRows.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Actions
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-64 bg-card border-border shadow-elevated"
+                >
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <RefreshCw className="h-4 w-4" />
+                    Mettre statut à jour
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Send className="h-4 w-4" />
+                    Transmettre les candidatures sélectionnées
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Tag className="h-4 w-4" />
+                    Modifier tags
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Bell className="h-4 w-4" />
+                    Envoyer rappel candidat
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="gap-3 py-2.5 text-muted-foreground">
+                    <Archive className="h-4 w-4" />
+                    Archiver
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
             <Button variant="outline" className="gap-2">
               <Download className="h-4 w-4" />
               <span className="hidden sm:inline">Télécharger CSV</span>

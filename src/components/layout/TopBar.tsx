@@ -1,4 +1,5 @@
 import { Bell, Search, ChevronDown, HelpCircle } from "lucide-react";
+import areasLogo from "@/assets/areas-logo.png";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -19,13 +20,7 @@ export const TopBar = ({ clientLogo, clientName = "GALLIKA" }: TopBarProps) => {
       {/* Left: Client Logo */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
-          {clientLogo ? (
-            <img src={clientLogo} alt={clientName} className="h-7" />
-          ) : (
-            <span className="text-topbar-foreground font-display font-bold text-lg tracking-wide">
-              {clientName}
-            </span>
-          )}
+          <img src={areasLogo} alt="Areas" className="h-8" />
           <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-2xs font-medium bg-coral/15 text-coral uppercase tracking-wider">
             Demo Mode
           </span>

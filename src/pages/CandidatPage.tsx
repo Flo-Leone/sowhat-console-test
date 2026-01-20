@@ -618,15 +618,13 @@ const CandidatPage = () => {
             {/* Internal Comments */}
             <Card className="shadow-card">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-display flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5 text-lavender" />
-                    Commentaires internes
-                  </span>
-                  <span className="text-xs font-normal text-muted-foreground">
-                    {candidate.comments.length} commentaires
-                  </span>
+                <CardTitle className="text-lg font-display flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-lavender" />
+                  Commentaires internes
                 </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {candidate.comments.length} commentaires
+                </p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ScrollArea className="h-[300px] pr-4">

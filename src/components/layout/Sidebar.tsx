@@ -113,21 +113,8 @@ const navItems = [
   { to: "/candidatures", icon: FileText, label: "Candidatures", badge: 4 },
   { to: "/points-de-vente", icon: Store, label: "Points de vente" },
   { to: "/statistiques", icon: TrendingUp, label: "Statistiques" },
-  {
-    to: "/offres-emploi",
-    icon: Briefcase,
-    label: "Offres d'emploi",
-    children: [
-      { to: "/offres-emploi/en-cours", label: "Offres en cours" },
-      { to: "/offres-emploi/demandes", label: "Demandes d'offres" },
-      { to: "/offres-emploi/modeles", label: "Modèles d'offres" },
-    ],
-  },
-  {
-    to: "/parametres",
-    icon: Settings,
-    label: "Paramètres",
-  },
+  { to: "/offres-emploi", icon: Briefcase, label: "Offres d'emploi" },
+  { to: "/parametres", icon: Settings, label: "Paramètres" },
 ];
 
 const secondaryNavItems = [

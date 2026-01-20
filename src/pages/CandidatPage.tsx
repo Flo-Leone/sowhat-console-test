@@ -359,7 +359,7 @@ const CandidatPage = () => {
             <div className="w-16 h-16 rounded-full bg-lavender/20 flex items-center justify-center text-2xl font-bold text-lavender">
               {candidate.firstName[0]}{candidate.lastName[0]}
             </div>
-            <div>
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 flex-wrap">
                 <h1 className="text-foreground">
                   {candidate.firstName} {candidate.lastName}
@@ -378,6 +378,27 @@ const CandidatPage = () => {
                   Assigné à: {candidate.assignedStore}
                 </p>
               )}
+              
+              {/* Compact profile info */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm">
+                <a href={`mailto:${candidate.email}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                  <Mail className="h-4 w-4 text-info" />
+                  <span>{candidate.email}</span>
+                </a>
+                <a href={`tel:${candidate.phone}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                  <Phone className="h-4 w-4 text-success" />
+                  <span>{candidate.phone}</span>
+                </a>
+                <span className="flex items-center gap-1.5 text-muted-foreground">
+                  <Calendar className="h-4 w-4 text-warning" />
+                  <span>{candidate.applicationDate}</span>
+                </span>
+                <Button variant="link" className="h-auto p-0 text-sm text-lavender hover:text-lavender/80">
+                  <Download className="h-3.5 w-3.5 mr-1" />
+                  Télécharger CV
+                </Button>
+              </div>
+
               <div className="flex items-center gap-4 mt-3">
                 <StatusDropdown
                   status={candidate.status}
@@ -411,70 +432,26 @@ const CandidatPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Main Info */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Profile Card */}
+            {/* Dates Card - compact version */}
             <Card className="shadow-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-display">Profil candidat</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg font-display">Dates clés</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <div className="w-10 h-10 rounded-lg bg-info/10 flex items-center justify-center">
-                      <Mail className="h-5 w-5 text-info" />
-                    </div>
+                    <Phone className="h-5 w-5 text-info" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Email</p>
-                      <p className="text-sm font-medium">{candidate.email}</p>
+                      <p className="text-xs text-muted-foreground">Appel téléphonique</p>
+                      <p className="text-sm font-medium">{candidate.phoneCallDate}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
-                      <Phone className="h-5 w-5 text-success" />
-                    </div>
+                    <Calendar className="h-5 w-5 text-success" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Téléphone</p>
-                      <p className="text-sm font-medium">{candidate.phone}</p>
+                      <p className="text-xs text-muted-foreground">Entretien</p>
+                      <p className="text-sm font-medium">{candidate.interviewDate}</p>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <div className="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center">
-                      <Calendar className="h-5 w-5 text-warning" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Date de candidature</p>
-                      <p className="text-sm font-medium">{candidate.applicationDate}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <div className="w-10 h-10 rounded-lg bg-lavender/10 flex items-center justify-center">
-                      <FileText className="h-5 w-5 text-lavender" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">CV</p>
-                      <Button variant="link" className="h-auto p-0 text-sm font-medium text-lavender">
-                        <Download className="h-3.5 w-3.5 mr-1" />
-                        Télécharger CV
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Date appel téléphonique</p>
-                    <p className="text-sm font-medium flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-info" />
-                      {candidate.phoneCallDate}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Date entretien</p>
-                    <p className="text-sm font-medium flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-success" />
-                      {candidate.interviewDate}
-                    </p>
                   </div>
                 </div>
               </CardContent>

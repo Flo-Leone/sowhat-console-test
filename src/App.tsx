@@ -10,6 +10,7 @@ import StatistiquesPage from "./pages/StatistiquesPage";
 import OffresEmploiPage from "./pages/OffresEmploiPage";
 import EmployesPage from "./pages/EmployesPage";
 import UtilisateursPage from "./pages/UtilisateursPage";
+import UtilisateurFormPage from "./pages/UtilisateurFormPage";
 import RolesPage from "./pages/RolesPage";
 import NotFound from "./pages/NotFound";
 
@@ -32,6 +33,8 @@ const App = () => (
           <Route path="/parametres" element={<CandidaturesPage />} />
           <Route path="/employes" element={<EmployesPage />} />
           <Route path="/utilisateurs" element={<UtilisateursPage />} />
+          <Route path="/utilisateurs/nouveau" element={<UtilisateurFormPage />} />
+          <Route path="/utilisateurs/:id/modifier" element={<UtilisateurFormPage />} />
           <Route path="/utilisateurs/roles" element={<RolesPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

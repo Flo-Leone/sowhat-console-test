@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Plus,
@@ -101,6 +102,7 @@ interface ActiveFilter {
 }
 
 const UtilisateursPage = () => {
+  const navigate = useNavigate();
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -214,7 +216,7 @@ const UtilisateursPage = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <Button className="btn-primary gap-2">
+            <Button className="btn-primary gap-2" onClick={() => navigate("/utilisateurs/nouveau")}>
               <Plus className="h-4 w-4" />
               Inviter un utilisateur
             </Button>
@@ -309,11 +311,13 @@ const UtilisateursPage = () => {
                   <tr
                     key={utilisateur.id}
                     className={cn(
+                      "cursor-pointer",
                       selectedRows.includes(utilisateur.id) && "bg-primary/5"
                     )}
                     style={{ animationDelay: `${index * 50}ms` }}
+                    onClick={() => navigate(`/utilisateurs/${utilisateur.id}/modifier`)}
                   >
-                    <td>
+                    <td onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedRows.includes(utilisateur.id)}
                         onCheckedChange={() => toggleRow(utilisateur.id)}
@@ -388,11 +392,11 @@ const UtilisateursPage = () => {
                           align="end"
                           className="bg-card border-border shadow-elevated"
                         >
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate(`/utilisateurs/${utilisateur.id}/modifier`)}>
                             <Eye className="h-4 w-4 mr-2" />
                             Voir le profil
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate(`/utilisateurs/${utilisateur.id}/modifier`)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Modifier les droits
                           </DropdownMenuItem>

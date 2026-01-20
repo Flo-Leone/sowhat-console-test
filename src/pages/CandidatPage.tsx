@@ -22,6 +22,7 @@ import {
   Plus,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -106,12 +107,26 @@ const candidateData = {
     },
   ],
   comments: [
-    {
-      id: "1",
-      text: "Candidat très motivé, bon profil",
-      author: "Admin SW.AI",
-      date: "10/28/25, 12:16 PM",
-    },
+    { id: "1", text: "Candidat très motivé, bon profil", author: "Admin SW.AI", date: "01/19/26, 10:30 AM" },
+    { id: "2", text: "A confirmé sa disponibilité pour l'entretien", author: "Stephane Boussely", date: "01/18/26, 3:45 PM" },
+    { id: "3", text: "Expérience solide dans la restauration rapide", author: "Florian Guerrier", date: "01/17/26, 11:20 AM" },
+    { id: "4", text: "CV vérifié, références OK", author: "Admin SW.AI", date: "01/16/26, 9:15 AM" },
+    { id: "5", text: "À recontacter la semaine prochaine pour finaliser", author: "Marie Dupont", date: "01/15/26, 4:00 PM" },
+    { id: "6", text: "Très bonne impression lors de l'appel téléphonique", author: "Stephane Boussely", date: "01/14/26, 2:30 PM" },
+    { id: "7", text: "Flexible sur les horaires, point positif", author: "Florian Guerrier", date: "01/13/26, 10:00 AM" },
+    { id: "8", text: "Habitue proche du point de vente Carrousel", author: "Admin SW.AI", date: "01/12/26, 5:15 PM" },
+    { id: "9", text: "Souhaite évoluer vers un poste de manager à terme", author: "Marie Dupont", date: "01/11/26, 11:45 AM" },
+    { id: "10", text: "Disponible immédiatement", author: "Stephane Boussely", date: "01/10/26, 9:00 AM" },
+    { id: "11", text: "Parle couramment anglais, atout pour le Louvre", author: "Florian Guerrier", date: "01/09/26, 3:20 PM" },
+    { id: "12", text: "A déjà travaillé chez un concurrent direct", author: "Admin SW.AI", date: "01/08/26, 10:10 AM" },
+    { id: "13", text: "Profil polyvalent, peut travailler en caisse et en salle", author: "Marie Dupont", date: "01/07/26, 2:00 PM" },
+    { id: "14", text: "Recommandé par un employé actuel", author: "Stephane Boussely", date: "01/06/26, 4:30 PM" },
+    { id: "15", text: "Entretien prévu le 15 octobre confirmé", author: "Florian Guerrier", date: "01/05/26, 11:00 AM" },
+    { id: "16", text: "Documents administratifs complets", author: "Admin SW.AI", date: "01/04/26, 9:45 AM" },
+    { id: "17", text: "Motivation très claire lors de l'échange", author: "Marie Dupont", date: "01/03/26, 1:15 PM" },
+    { id: "18", text: "Peut commencer dès validation du contrat", author: "Stephane Boussely", date: "01/02/26, 10:30 AM" },
+    { id: "19", text: "À intégrer dans l'équipe du matin de préférence", author: "Florian Guerrier", date: "01/01/26, 3:00 PM" },
+    { id: "20", text: "Candidature prioritaire pour ce poste", author: "Admin SW.AI", date: "12/31/25, 11:30 AM" },
   ],
   history: [
     { date: "Jan 19, 2026", action: "Consulted by", user: "Florian Guerrier", type: "internal" as const },
@@ -603,25 +618,34 @@ const CandidatPage = () => {
             {/* Internal Comments */}
             <Card className="shadow-card">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-display flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-lavender" />
-                  Commentaires internes
+                <CardTitle className="text-lg font-display flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5 text-lavender" />
+                    Commentaires internes
+                  </span>
+                  <span className="text-xs font-normal text-muted-foreground">
+                    {candidate.comments.length} commentaires
+                  </span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {candidate.comments.map((comment) => (
-                  <div key={comment.id} className="p-3 rounded-lg bg-lavender/5 border border-lavender/10">
-                    <p className="text-sm">{comment.text}</p>
-                    <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                      <User className="h-3 w-3" />
-                      <span>{comment.author}</span>
-                      <span>·</span>
-                      <span>{comment.date}</span>
-                    </div>
+                <ScrollArea className="h-[300px] pr-4">
+                  <div className="space-y-3">
+                    {candidate.comments.map((comment) => (
+                      <div key={comment.id} className="p-3 rounded-lg bg-lavender/5 border border-lavender/10">
+                        <p className="text-sm">{comment.text}</p>
+                        <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                          <User className="h-3 w-3" />
+                          <span>{comment.author}</span>
+                          <span>·</span>
+                          <span>{comment.date}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </ScrollArea>
 
-                <div className="pt-2">
+                <div className="pt-2 border-t border-border">
                   <Textarea
                     placeholder="Ajouter un commentaire..."
                     className="min-h-[80px] resize-none"

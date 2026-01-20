@@ -315,6 +315,7 @@ const CandidaturesPage = () => {
                         <ArrowUpDown className="h-3 w-3" />
                       </div>
                     </th>
+                    <th className="min-w-[120px]">Profession</th>
                     <th className="min-w-[100px]">
                       <div className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
                         Date
@@ -404,6 +405,9 @@ const CandidaturesPage = () => {
                             )}
                           </div>
                         </div>
+                      </td>
+                      <td>
+                        <span className="text-sm">{candidate.profession}</span>
                       </td>
                       <td>
                         <span className="text-muted-foreground text-sm">

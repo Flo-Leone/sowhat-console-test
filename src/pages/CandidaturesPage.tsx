@@ -28,6 +28,7 @@ import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { StatusBadge, CandidateStatus } from "@/components/candidates/StatusBadge";
 import { ScoreBar } from "@/components/candidates/ScoreBar";
 import { FilterPanel } from "@/components/candidates/FilterPanel";
+import { AddCandidateDialog } from "@/components/candidates/AddCandidateDialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -187,6 +188,7 @@ const CandidaturesPage = () => {
   const [activeFilters, setActiveFilters] = useState(0);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [pageSize, setPageSize] = useState("50");
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const toggleSelectAll = () => {
     if (selectedRows.length === mockCandidates.length) {
@@ -217,7 +219,7 @@ const CandidaturesPage = () => {
               Les candidatures de votre périmètre
             </p>
           </div>
-          <Button className="btn-primary gap-2 self-start sm:self-auto">
+          <Button className="btn-primary gap-2 self-start sm:self-auto" onClick={() => setAddDialogOpen(true)}>
             <Plus className="h-4 w-4" />
             Ajouter un candidat
           </Button>
@@ -578,6 +580,12 @@ const CandidaturesPage = () => {
         activeFilters={activeFilters}
         onReset={() => setActiveFilters(0)}
         onApply={() => setFilterOpen(false)}
+      />
+
+      {/* Add Candidate Dialog */}
+      <AddCandidateDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
       />
     </ConsoleLayout>
   );

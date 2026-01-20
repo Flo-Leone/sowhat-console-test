@@ -179,7 +179,7 @@ export const CreateOffreDialog = ({ open, onOpenChange }: CreateOffreDialogProps
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 [&>button]:hidden">
         <DialogHeader className="p-6 pb-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-display">Créer offre</DialogTitle>
@@ -200,7 +200,7 @@ export const CreateOffreDialog = ({ open, onOpenChange }: CreateOffreDialogProps
                 Comment souhaitez-vous créer votre offre?
               </p>
 
-              <div className="flex gap-4">
+              <div className="flex justify-center gap-4">
                 <button
                   onClick={() => setCreationMethod("template")}
                   className={cn(

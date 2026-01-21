@@ -450,15 +450,6 @@ const CandidatPageV1 = () => {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" className="gap-2">
-              <Phone className="h-4 w-4" />
-              Appeler
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <Calendar className="h-4 w-4" />
-              Planifier entretien
-            </Button>
-            <ReassignStoreDropdown currentStore={candidate.assignedStore} onStoreChange={handleStoreChange} />
             <Button variant="outline" className="gap-2" onClick={handleArchive}>
               <Archive className="h-4 w-4" />
               Archiver
@@ -470,25 +461,29 @@ const CandidatPageV1 = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Main Info */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Dates Card */}
+            {/* Entretiens Card */}
             <Card className="shadow-card">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-display">Dates clés</CardTitle>
+              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-lg font-display">Entretiens</CardTitle>
+                <Button size="sm" className="gap-2 h-8">
+                  <Calendar className="h-4 w-4" />
+                  Planifier un entretien
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <Phone className="h-5 w-5 text-info" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-info/10 border border-info/20">
+                    <Calendar className="h-5 w-5 text-info" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Appel téléphonique</p>
-                      <p className="text-sm font-medium">{candidate.phoneCallDate}</p>
+                      <p className="text-xs text-muted-foreground">Entretien planifié</p>
+                      <p className="text-sm font-medium">{candidate.interviewDate}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <Calendar className="h-5 w-5 text-success" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-info/10 border border-info/20">
+                    <Phone className="h-5 w-5 text-info" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Entretien</p>
-                      <p className="text-sm font-medium">{candidate.interviewDate}</p>
+                      <p className="text-xs text-muted-foreground">Dernier appel</p>
+                      <p className="text-sm font-medium">{candidate.phoneCallDate}</p>
                     </div>
                   </div>
                 </div>
@@ -497,23 +492,24 @@ const CandidatPageV1 = () => {
 
             {/* Preferences & Matching Combined */}
             <Card className="shadow-card">
-              <CardHeader className="pb-4">
+              <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-lg font-display">Préférences & Matching</CardTitle>
+                <ReassignStoreDropdown currentStore={candidate.assignedStore} onStoreChange={handleStoreChange} />
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Preferences Section */}
                 <div>
                   <h4 className="text-sm font-semibold text-muted-foreground mb-3">Préférences du candidat</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-coral/5 border border-coral/10">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-coral/10 border border-coral/20">
                       <MapPin className="h-5 w-5 text-coral mt-0.5" />
                       <div>
                         <p className="text-xs text-muted-foreground">Point de vente préféré</p>
                         <p className="text-sm font-medium">{candidate.preferredStore}</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-info/5 border border-info/10">
-                      <FileText className="h-5 w-5 text-info mt-0.5" />
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-coral/10 border border-coral/20">
+                      <FileText className="h-5 w-5 text-coral mt-0.5" />
                       <div>
                         <p className="text-xs text-muted-foreground">Contrat préféré</p>
                         <p className="text-sm font-medium">{candidate.preferredContract}</p>

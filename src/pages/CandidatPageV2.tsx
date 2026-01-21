@@ -349,7 +349,7 @@ const CandidatPageV2 = () => {
         <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-lavender/10 via-coral/5 to-primary/10 border border-border p-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex items-center gap-5">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-lavender to-coral flex items-center justify-center text-3xl font-bold text-white shadow-lg">
+              <div className="w-20 h-20 rounded-2xl bg-lavender flex items-center justify-center text-3xl font-bold text-white shadow-lg">
                 {candidate.firstName[0]}{candidate.lastName[0]}
               </div>
               <div>

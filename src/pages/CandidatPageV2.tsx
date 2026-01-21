@@ -1,73 +1,64 @@
 // Variante 2 - Design avec tabs pour organiser le contenu
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  Mail,
-  Phone,
-  Calendar,
-  FileText,
-  MapPin,
-  User,
-  MessageSquare,
-  Send,
-  History,
-  CheckCircle2,
-  Download,
-  Archive,
-  RefreshCw,
-  ChevronDown,
-  X,
-  Plus,
-  Briefcase,
-  Clock,
-  Star,
-} from "lucide-react";
+import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, RefreshCw, ChevronDown, X, Plus, Briefcase, Clock, Star } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 // Status types and config
-type CandidateStatus =
-  | "nouveau"
-  | "vivier"
-  | "rejete_cv"
-  | "appel_attente"
-  | "appel_confirme"
-  | "rejete_appel"
-  | "invite_entretien"
-  | "rejete_entretien"
-  | "recrute"
-  | "recrute_autre";
-
-const statusConfig: Record<CandidateStatus, { label: string; className: string }> = {
-  nouveau: { label: "Nouveau", className: "status-new" },
-  vivier: { label: "Vivier", className: "status-vivier" },
-  rejete_cv: { label: "Rejeté après CV", className: "status-rejected" },
-  appel_attente: { label: "Appel en attente", className: "status-invited" },
-  appel_confirme: { label: "Appel confirmé", className: "status-invited" },
-  rejete_appel: { label: "Rejeté après appel", className: "status-rejected" },
-  invite_entretien: { label: "Invité pour entretien", className: "status-invited" },
-  rejete_entretien: { label: "Rejeté après entretien", className: "status-rejected" },
-  recrute: { label: "Recruté", className: "status-recruited" },
-  recrute_autre: { label: "Recruté ailleurs", className: "bg-muted text-muted-foreground" },
+type CandidateStatus = "nouveau" | "vivier" | "rejete_cv" | "appel_attente" | "appel_confirme" | "rejete_appel" | "invite_entretien" | "rejete_entretien" | "recrute" | "recrute_autre";
+const statusConfig: Record<CandidateStatus, {
+  label: string;
+  className: string;
+}> = {
+  nouveau: {
+    label: "Nouveau",
+    className: "status-new"
+  },
+  vivier: {
+    label: "Vivier",
+    className: "status-vivier"
+  },
+  rejete_cv: {
+    label: "Rejeté après CV",
+    className: "status-rejected"
+  },
+  appel_attente: {
+    label: "Appel en attente",
+    className: "status-invited"
+  },
+  appel_confirme: {
+    label: "Appel confirmé",
+    className: "status-invited"
+  },
+  rejete_appel: {
+    label: "Rejeté après appel",
+    className: "status-rejected"
+  },
+  invite_entretien: {
+    label: "Invité pour entretien",
+    className: "status-invited"
+  },
+  rejete_entretien: {
+    label: "Rejeté après entretien",
+    className: "status-rejected"
+  },
+  recrute: {
+    label: "Recruté",
+    className: "status-recruited"
+  },
+  recrute_autre: {
+    label: "Recruté ailleurs",
+    className: "bg-muted text-muted-foreground"
+  }
 };
-
 const conversionTagOptions = ["10H", "25H", "48H"];
 
 // Mock data
@@ -88,59 +79,160 @@ const candidateData = {
   preferredContract: "CDI",
   cvUrl: "#",
   availabilities: {
-    monday: { morning: true, lunch: false, afternoon: false },
-    tuesday: { morning: false, lunch: false, afternoon: false },
-    wednesday: { morning: false, lunch: false, afternoon: false },
-    thursday: { morning: false, lunch: false, afternoon: false },
-    friday: { morning: false, lunch: false, afternoon: false },
-    saturday: { morning: false, lunch: false, afternoon: false },
-    sunday: { morning: false, lunch: false, afternoon: false },
-  },
-  storesMatching: [
-    { name: "Paris Carrousel Du Louvre", score: 92 },
-    { name: "Paris Rivoli", score: 78 },
-    { name: "Paris Opéra", score: 65 },
-  ],
-  openQuestions: [
-    {
-      question: "Avez-vous déjà travaillé dans notre secteur d'activité auparavant ?",
-      answer: "Yes",
+    monday: {
+      morning: true,
+      lunch: false,
+      afternoon: false
     },
-  ],
-  comments: [
-    { id: "1", text: "Candidat très motivé, bon profil", author: "Admin SW.AI", date: "01/19/26, 10:30 AM" },
-    { id: "2", text: "A confirmé sa disponibilité pour l'entretien", author: "Stephane Boussely", date: "01/18/26, 3:45 PM" },
-    { id: "3", text: "Expérience solide dans la restauration rapide", author: "Florian Guerrier", date: "01/17/26, 11:20 AM" },
-    { id: "4", text: "Bonne présentation lors de l'appel", author: "Julie Martin", date: "01/16/26, 4:15 PM" },
-    { id: "5", text: "Ponctuel et professionnel", author: "Stephane Boussely", date: "01/15/26, 9:00 AM" },
-    { id: "6", text: "A posé des questions pertinentes sur le poste", author: "Admin SW.AI", date: "01/14/26, 2:30 PM" },
-    { id: "7", text: "Flexibilité horaire à confirmer", author: "Florian Guerrier", date: "01/13/26, 11:45 AM" },
-    { id: "8", text: "Références à vérifier", author: "Julie Martin", date: "01/12/26, 3:00 PM" },
-    { id: "9", text: "Connaissance du secteur confirmée", author: "Stephane Boussely", date: "01/11/26, 10:20 AM" },
-    { id: "10", text: "Premier contact positif par email", author: "Admin SW.AI", date: "01/10/26, 8:45 AM" },
-  ],
-  history: [
-    { date: "Jan 19, 2026", action: "Consulté par", user: "Florian Guerrier", type: "internal" as const },
-    { date: "Jan 18, 2026", action: "Relance effectuée", user: "Admin SW.AI", type: "internal" as const },
-    { date: "Jan 15, 2026", action: "Entretien planifié", user: "Stephane Boussely", type: "internal" as const },
-    { date: "Jan 12, 2026", action: "Documents demandés", user: "Julie Martin", type: "internal" as const },
-    { date: "Nov 12, 2025", action: "Date d'appel modifiée", user: "Stephane Boussely", type: "internal" as const },
-    { date: "Nov 10, 2025", action: "Appel de présélection", user: "", type: "candidate" as const },
-    { date: "Nov 05, 2025", action: "CV téléchargé", user: "Admin SW.AI", type: "internal" as const },
-    { date: "Oct 31, 2025", action: "Email de confirmation envoyé", user: "", type: "candidate" as const },
-    { date: "Oct 30, 2025", action: "Candidature assignée", user: "Florian Guerrier", type: "internal" as const },
-    { date: "Oct 29, 2025", action: "Candidature soumise", user: "", type: "candidate" as const },
-  ],
+    tuesday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    },
+    wednesday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    },
+    thursday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    },
+    friday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    },
+    saturday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    },
+    sunday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    }
+  },
+  storesMatching: [{
+    name: "Paris Carrousel Du Louvre",
+    score: 92
+  }, {
+    name: "Paris Rivoli",
+    score: 78
+  }, {
+    name: "Paris Opéra",
+    score: 65
+  }],
+  openQuestions: [{
+    question: "Avez-vous déjà travaillé dans notre secteur d'activité auparavant ?",
+    answer: "Yes"
+  }],
+  comments: [{
+    id: "1",
+    text: "Candidat très motivé, bon profil",
+    author: "Admin SW.AI",
+    date: "01/19/26, 10:30 AM"
+  }, {
+    id: "2",
+    text: "A confirmé sa disponibilité pour l'entretien",
+    author: "Stephane Boussely",
+    date: "01/18/26, 3:45 PM"
+  }, {
+    id: "3",
+    text: "Expérience solide dans la restauration rapide",
+    author: "Florian Guerrier",
+    date: "01/17/26, 11:20 AM"
+  }, {
+    id: "4",
+    text: "Bonne présentation lors de l'appel",
+    author: "Julie Martin",
+    date: "01/16/26, 4:15 PM"
+  }, {
+    id: "5",
+    text: "Ponctuel et professionnel",
+    author: "Stephane Boussely",
+    date: "01/15/26, 9:00 AM"
+  }, {
+    id: "6",
+    text: "A posé des questions pertinentes sur le poste",
+    author: "Admin SW.AI",
+    date: "01/14/26, 2:30 PM"
+  }, {
+    id: "7",
+    text: "Flexibilité horaire à confirmer",
+    author: "Florian Guerrier",
+    date: "01/13/26, 11:45 AM"
+  }, {
+    id: "8",
+    text: "Références à vérifier",
+    author: "Julie Martin",
+    date: "01/12/26, 3:00 PM"
+  }, {
+    id: "9",
+    text: "Connaissance du secteur confirmée",
+    author: "Stephane Boussely",
+    date: "01/11/26, 10:20 AM"
+  }, {
+    id: "10",
+    text: "Premier contact positif par email",
+    author: "Admin SW.AI",
+    date: "01/10/26, 8:45 AM"
+  }],
+  history: [{
+    date: "Jan 19, 2026",
+    action: "Consulté par",
+    user: "Florian Guerrier",
+    type: "internal" as const
+  }, {
+    date: "Jan 18, 2026",
+    action: "Relance effectuée",
+    user: "Admin SW.AI",
+    type: "internal" as const
+  }, {
+    date: "Jan 15, 2026",
+    action: "Entretien planifié",
+    user: "Stephane Boussely",
+    type: "internal" as const
+  }, {
+    date: "Jan 12, 2026",
+    action: "Documents demandés",
+    user: "Julie Martin",
+    type: "internal" as const
+  }, {
+    date: "Nov 12, 2025",
+    action: "Date d'appel modifiée",
+    user: "Stephane Boussely",
+    type: "internal" as const
+  }, {
+    date: "Nov 10, 2025",
+    action: "Appel de présélection",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "Nov 05, 2025",
+    action: "CV téléchargé",
+    user: "Admin SW.AI",
+    type: "internal" as const
+  }, {
+    date: "Oct 31, 2025",
+    action: "Email de confirmation envoyé",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "Oct 30, 2025",
+    action: "Candidature assignée",
+    user: "Florian Guerrier",
+    type: "internal" as const
+  }, {
+    date: "Oct 29, 2025",
+    action: "Candidature soumise",
+    user: "",
+    type: "candidate" as const
+  }]
 };
-
-const allStores = [
-  "Paris Carrousel Du Louvre",
-  "Paris Rivoli",
-  "Paris Opéra",
-  "Lyon Part-Dieu",
-  "Marseille Vieux-Port",
-];
-
+const allStores = ["Paris Carrousel Du Louvre", "Paris Rivoli", "Paris Opéra", "Lyon Part-Dieu", "Marseille Vieux-Port"];
 const dayLabels: Record<string, string> = {
   monday: "Lundi",
   tuesday: "Mardi",
@@ -148,22 +240,20 @@ const dayLabels: Record<string, string> = {
   thursday: "Jeudi",
   friday: "Vendredi",
   saturday: "Samedi",
-  sunday: "Dimanche",
+  sunday: "Dimanche"
 };
 
 // Reusable components
 const StatusDropdown = ({
   status,
-  onStatusChange,
+  onStatusChange
 }: {
   status: CandidateStatus;
   onStatusChange: (status: CandidateStatus) => void;
 }) => {
   const [open, setOpen] = useState(false);
   const config = statusConfig[status];
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
+  return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button className={cn("status-badge cursor-pointer hover:opacity-80 transition-opacity", config.className)}>
           <span className="w-1.5 h-1.5 rounded-full bg-current" />
@@ -173,65 +263,41 @@ const StatusDropdown = ({
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1" align="start">
         <div className="space-y-0.5">
-          {Object.entries(statusConfig).map(([key, value]) => (
-            <button
-              key={key}
-              onClick={() => {
-                onStatusChange(key as CandidateStatus);
-                setOpen(false);
-              }}
-              className={cn(
-                "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted",
-                status === key && "bg-muted"
-              )}
-            >
+          {Object.entries(statusConfig).map(([key, value]) => <button key={key} onClick={() => {
+          onStatusChange(key as CandidateStatus);
+          setOpen(false);
+        }} className={cn("w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted", status === key && "bg-muted")}>
               <span className={cn("status-badge text-xs", statusConfig[key as CandidateStatus].className)}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
                 {value.label}
               </span>
-            </button>
-          ))}
+            </button>)}
         </div>
       </PopoverContent>
-    </Popover>
-  );
+    </Popover>;
 };
-
 const tagColorMap: Record<string, string> = {
   "10H": "bg-lavender/20 text-lavender border-lavender/30",
   "25H": "bg-coral/20 text-coral border-coral/30",
-  "48H": "bg-primary/20 text-primary border-primary/30",
+  "48H": "bg-primary/20 text-primary border-primary/30"
 };
-
 const ConversionTagsEditor = ({
   tags,
-  onTagsChange,
+  onTagsChange
 }: {
   tags: string[];
   onTagsChange: (tags: string[]) => void;
 }) => {
   const [open, setOpen] = useState(false);
-  const availableTags = conversionTagOptions.filter((t) => !tags.includes(t));
-
-  return (
-    <div className="flex items-center gap-1.5">
-      {tags.map((tag) => (
-        <Badge 
-          key={tag} 
-          variant="secondary" 
-          className={cn("border group/tag relative pr-6", tagColorMap[tag] || "bg-muted text-muted-foreground")}
-        >
+  const availableTags = conversionTagOptions.filter(t => !tags.includes(t));
+  return <div className="flex items-center gap-1.5">
+      {tags.map(tag => <Badge key={tag} variant="secondary" className={cn("border group/tag relative pr-6", tagColorMap[tag] || "bg-muted text-muted-foreground")}>
           {tag}
-          <button
-            onClick={() => onTagsChange(tags.filter((t) => t !== tag))}
-            className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/tag:opacity-100 transition-opacity hover:text-destructive"
-          >
+          <button onClick={() => onTagsChange(tags.filter(t => t !== tag))} className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/tag:opacity-100 transition-opacity hover:text-destructive">
             <X className="h-3 w-3" />
           </button>
-        </Badge>
-      ))}
-      {availableTags.length > 0 && (
-        <Popover open={open} onOpenChange={setOpen}>
+        </Badge>)}
+      {availableTags.length > 0 && <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <button className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs text-muted-foreground hover:bg-muted transition-colors">
               <Plus className="h-3 w-3" />
@@ -239,51 +305,42 @@ const ConversionTagsEditor = ({
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-48 p-2" align="start">
-            {availableTags.map((tag) => (
-              <button
-                key={tag}
-                onClick={() => { onTagsChange([...tags, tag]); setOpen(false); }}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted"
-              >
+            {availableTags.map(tag => <button key={tag} onClick={() => {
+          onTagsChange([...tags, tag]);
+          setOpen(false);
+        }} className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted">
                 {tag}
-              </button>
-            ))}
+              </button>)}
           </PopoverContent>
-        </Popover>
-      )}
-    </div>
-  );
+        </Popover>}
+    </div>;
 };
-
 const CandidatPageV2 = () => {
-  const { id } = useParams();
+  const {
+    id
+  } = useParams();
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(candidateData);
   const [activeTab, setActiveTab] = useState("profil");
-
   const handleStatusChange = (newStatus: CandidateStatus) => {
-    setCandidate((prev) => ({ ...prev, status: newStatus }));
+    setCandidate(prev => ({
+      ...prev,
+      status: newStatus
+    }));
   };
-
   const handleTagsChange = (newTags: string[]) => {
-    setCandidate((prev) => ({ ...prev, conversionTags: newTags }));
+    setCandidate(prev => ({
+      ...prev,
+      conversionTags: newTags
+    }));
   };
-
-  return (
-    <ConsoleLayout>
+  return <ConsoleLayout>
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         {/* Version indicator */}
-        <div className="fixed top-20 right-8 z-50">
-          <Badge className="bg-coral text-white shadow-lg">
-            Design V2 - Tabs
-          </Badge>
-        </div>
+        
 
         {/* Back Navigation */}
-        <button
-          onClick={() => navigate("/candidatures")}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
+        <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">Retour aux candidatures</span>
         </button>
@@ -425,12 +482,10 @@ const CandidatPageV2 = () => {
                   <CardTitle className="text-base">Questions ouvertes</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {candidate.openQuestions.map((q, index) => (
-                    <div key={index} className="p-4 rounded-lg bg-info/5 border border-info/10">
+                  {candidate.openQuestions.map((q, index) => <div key={index} className="p-4 rounded-lg bg-info/5 border border-info/10">
                       <p className="text-sm font-medium mb-2">{q.question}</p>
                       <p className="text-sm text-info">{q.answer}</p>
-                    </div>
-                  ))}
+                    </div>)}
                 </CardContent>
               </Card>
             </div>
@@ -443,13 +498,9 @@ const CandidatPageV2 = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {candidate.storesMatching.map((store, index) => (
-                    <div key={store.name} className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
+                  {candidate.storesMatching.map((store, index) => <div key={store.name} className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
                       <div className="flex items-center gap-4">
-                        <div className={cn(
-                          "w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold",
-                          index === 0 ? "bg-success/20 text-success" : "bg-muted text-muted-foreground"
-                        )}>
+                        <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold", index === 0 ? "bg-success/20 text-success" : "bg-muted text-muted-foreground")}>
                           {index + 1}
                         </div>
                         <div>
@@ -459,23 +510,15 @@ const CandidatPageV2 = () => {
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="w-32 h-3 rounded-full bg-muted overflow-hidden">
-                          <div
-                            className={cn(
-                              "h-full rounded-full transition-all",
-                              store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-destructive"
-                            )}
-                            style={{ width: `${store.score}%` }}
-                          />
+                          <div className={cn("h-full rounded-full transition-all", store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-destructive")} style={{
+                        width: `${store.score}%`
+                      }} />
                         </div>
-                        <span className={cn(
-                          "text-lg font-bold min-w-[50px] text-right",
-                          store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive"
-                        )}>
+                        <span className={cn("text-lg font-bold min-w-[50px] text-right", store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive")}>
                           {store.score}%
                         </span>
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
               </CardContent>
             </Card>
@@ -489,47 +532,30 @@ const CandidatPageV2 = () => {
               <CardContent>
                 <div className="grid grid-cols-8 gap-2 text-center">
                   <div></div>
-                  {Object.keys(candidate.availabilities).map((day) => (
-                    <div key={day} className="text-xs font-medium text-muted-foreground py-2">
+                  {Object.keys(candidate.availabilities).map(day => <div key={day} className="text-xs font-medium text-muted-foreground py-2">
                       {dayLabels[day].slice(0, 3)}
-                    </div>
-                  ))}
+                    </div>)}
                   
                   <div className="text-xs font-medium text-muted-foreground py-3">Matin</div>
-                  {Object.values(candidate.availabilities).map((slots, i) => (
-                    <div key={`morning-${i}`} className="py-2">
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg mx-auto flex items-center justify-center",
-                        slots.morning ? "bg-success/20" : "bg-muted"
-                      )}>
+                  {Object.values(candidate.availabilities).map((slots, i) => <div key={`morning-${i}`} className="py-2">
+                      <div className={cn("w-8 h-8 rounded-lg mx-auto flex items-center justify-center", slots.morning ? "bg-success/20" : "bg-muted")}>
                         {slots.morning && <CheckCircle2 className="h-4 w-4 text-success" />}
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                   
                   <div className="text-xs font-medium text-muted-foreground py-3">Midi</div>
-                  {Object.values(candidate.availabilities).map((slots, i) => (
-                    <div key={`lunch-${i}`} className="py-2">
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg mx-auto flex items-center justify-center",
-                        slots.lunch ? "bg-success/20" : "bg-muted"
-                      )}>
+                  {Object.values(candidate.availabilities).map((slots, i) => <div key={`lunch-${i}`} className="py-2">
+                      <div className={cn("w-8 h-8 rounded-lg mx-auto flex items-center justify-center", slots.lunch ? "bg-success/20" : "bg-muted")}>
                         {slots.lunch && <CheckCircle2 className="h-4 w-4 text-success" />}
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                   
                   <div className="text-xs font-medium text-muted-foreground py-3">Après-midi</div>
-                  {Object.values(candidate.availabilities).map((slots, i) => (
-                    <div key={`afternoon-${i}`} className="py-2">
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg mx-auto flex items-center justify-center",
-                        slots.afternoon ? "bg-success/20" : "bg-muted"
-                      )}>
+                  {Object.values(candidate.availabilities).map((slots, i) => <div key={`afternoon-${i}`} className="py-2">
+                      <div className={cn("w-8 h-8 rounded-lg mx-auto flex items-center justify-center", slots.afternoon ? "bg-success/20" : "bg-muted")}>
                         {slots.afternoon && <CheckCircle2 className="h-4 w-4 text-success" />}
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
               </CardContent>
             </Card>
@@ -546,8 +572,7 @@ const CandidatPageV2 = () => {
               <CardContent className="space-y-4">
                 <ScrollArea className="h-[400px]">
                   <div className="space-y-3 pr-4">
-                    {candidate.comments.map((comment) => (
-                      <div key={comment.id} className="p-4 rounded-xl bg-lavender/5 border border-lavender/10">
+                    {candidate.comments.map(comment => <div key={comment.id} className="p-4 rounded-xl bg-lavender/5 border border-lavender/10">
                         <p className="text-sm">{comment.text}</p>
                         <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
                           <User className="h-3 w-3" />
@@ -555,8 +580,7 @@ const CandidatPageV2 = () => {
                           <span>·</span>
                           <span>{comment.date}</span>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </ScrollArea>
 
@@ -583,16 +607,8 @@ const CandidatPageV2 = () => {
                 <div className="relative">
                   <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
                   <div className="space-y-6 pl-10">
-                    {candidate.history.map((event, index) => (
-                      <div key={index} className="relative">
-                        <div
-                          className={cn(
-                            "absolute -left-6 w-4 h-4 rounded-full border-2",
-                            event.type === "internal"
-                              ? "bg-lavender/20 border-lavender"
-                              : "bg-coral/20 border-coral"
-                          )}
-                        />
+                    {candidate.history.map((event, index) => <div key={index} className="relative">
+                        <div className={cn("absolute -left-6 w-4 h-4 rounded-full border-2", event.type === "internal" ? "bg-lavender/20 border-lavender" : "bg-coral/20 border-coral")} />
                         <div className="bg-card p-4 rounded-xl border border-border">
                           <p className="text-xs text-muted-foreground mb-1">{event.date}</p>
                           <p className="text-sm">
@@ -600,8 +616,7 @@ const CandidatPageV2 = () => {
                             {event.user && <span className="font-medium text-foreground"> {event.user}</span>}
                           </p>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
               </CardContent>
@@ -609,8 +624,6 @@ const CandidatPageV2 = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </ConsoleLayout>
-  );
+    </ConsoleLayout>;
 };
-
 export default CandidatPageV2;

@@ -465,7 +465,7 @@ const CandidatPageV1 = () => {
             <Card className="shadow-card">
               <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-lg font-display">Entretiens</CardTitle>
-                <Button variant="outline" size="sm" className="gap-2 h-8">
+                <Button variant="outline" className="gap-2">
                   <Calendar className="h-4 w-4" />
                   Planifier un entretien
                 </Button>

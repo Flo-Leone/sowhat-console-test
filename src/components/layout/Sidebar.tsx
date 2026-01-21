@@ -71,7 +71,7 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemP
                     "block py-2 px-3 rounded-md text-sm transition-colors",
                     isActive
                       ? "nav-item-submenu-active"
-                      : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50"
+                      : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                   )
                 }
               >

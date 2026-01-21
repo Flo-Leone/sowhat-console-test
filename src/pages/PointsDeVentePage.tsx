@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { AddPointDeVenteDialog } from "@/components/points-de-vente/AddPointDeVenteDialog";
 
 interface PointDeVente {
   id: string;
@@ -183,6 +184,7 @@ const PointsDeVentePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   // Filter panel temporary state
   const [tempZone, setTempZone] = useState<string>("");
@@ -270,7 +272,7 @@ const PointsDeVentePage = () => {
               Gérez vos {mockPointsDeVente.length} points de vente
             </p>
           </div>
-          <Button className="btn-primary gap-2 self-start sm:self-auto">
+          <Button className="btn-primary gap-2 self-start sm:self-auto" onClick={() => setAddDialogOpen(true)}>
             <Plus className="h-4 w-4" />
             Ajouter un point de vente
           </Button>
@@ -642,6 +644,8 @@ const PointsDeVentePage = () => {
           </div>
         </SheetContent>
       </Sheet>
+
+      <AddPointDeVenteDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} />
     </ConsoleLayout>
   );
 };

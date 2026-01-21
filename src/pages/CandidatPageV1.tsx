@@ -1,70 +1,63 @@
 // Variante 1 - Design actuel (classique avec cards)
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  Mail,
-  Phone,
-  Calendar,
-  FileText,
-  MapPin,
-  Clock,
-  Building2,
-  User,
-  MessageSquare,
-  Send,
-  History,
-  CheckCircle2,
-  Download,
-  Archive,
-  RefreshCw,
-  ChevronDown,
-  X,
-  Plus,
-} from "lucide-react";
+import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, Clock, Building2, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, RefreshCw, ChevronDown, X, Plus } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 // Status types and config
-type CandidateStatus =
-  | "nouveau"
-  | "vivier"
-  | "rejete_cv"
-  | "appel_attente"
-  | "appel_confirme"
-  | "rejete_appel"
-  | "invite_entretien"
-  | "rejete_entretien"
-  | "recrute"
-  | "recrute_autre";
-
-const statusConfig: Record<CandidateStatus, { label: string; className: string }> = {
-  nouveau: { label: "Nouveau", className: "status-new" },
-  vivier: { label: "Vivier", className: "status-vivier" },
-  rejete_cv: { label: "Rejeté après CV", className: "status-rejected" },
-  appel_attente: { label: "Appel en attente", className: "status-invited" },
-  appel_confirme: { label: "Appel confirmé", className: "status-invited" },
-  rejete_appel: { label: "Rejeté après appel", className: "status-rejected" },
-  invite_entretien: { label: "Invité pour entretien", className: "status-invited" },
-  rejete_entretien: { label: "Rejeté après entretien", className: "status-rejected" },
-  recrute: { label: "Recruté", className: "status-recruited" },
-  recrute_autre: { label: "Recruté ailleurs", className: "bg-muted text-muted-foreground" },
+type CandidateStatus = "nouveau" | "vivier" | "rejete_cv" | "appel_attente" | "appel_confirme" | "rejete_appel" | "invite_entretien" | "rejete_entretien" | "recrute" | "recrute_autre";
+const statusConfig: Record<CandidateStatus, {
+  label: string;
+  className: string;
+}> = {
+  nouveau: {
+    label: "Nouveau",
+    className: "status-new"
+  },
+  vivier: {
+    label: "Vivier",
+    className: "status-vivier"
+  },
+  rejete_cv: {
+    label: "Rejeté après CV",
+    className: "status-rejected"
+  },
+  appel_attente: {
+    label: "Appel en attente",
+    className: "status-invited"
+  },
+  appel_confirme: {
+    label: "Appel confirmé",
+    className: "status-invited"
+  },
+  rejete_appel: {
+    label: "Rejeté après appel",
+    className: "status-rejected"
+  },
+  invite_entretien: {
+    label: "Invité pour entretien",
+    className: "status-invited"
+  },
+  rejete_entretien: {
+    label: "Rejeté après entretien",
+    className: "status-rejected"
+  },
+  recrute: {
+    label: "Recruté",
+    className: "status-recruited"
+  },
+  recrute_autre: {
+    label: "Recruté ailleurs",
+    className: "bg-muted text-muted-foreground"
+  }
 };
 
 // Conversion tags options
@@ -88,59 +81,160 @@ const candidateData = {
   preferredContract: "CDI",
   cvUrl: "#",
   availabilities: {
-    monday: { morning: true, lunch: true, afternoon: true },
-    tuesday: { morning: true, lunch: false, afternoon: true },
-    wednesday: { morning: false, lunch: false, afternoon: true },
-    thursday: { morning: true, lunch: true, afternoon: false },
-    friday: { morning: true, lunch: false, afternoon: false },
-    saturday: { morning: false, lunch: false, afternoon: false },
-    sunday: { morning: false, lunch: false, afternoon: false },
-  },
-  storesMatching: [
-    { name: "Paris Rivoli", score: 95 },
-    { name: "Paris Opéra", score: 82 },
-    { name: "Paris Carrousel Du Louvre", score: 70 },
-  ],
-  openQuestions: [
-    {
-      question: "Pourquoi souhaitez-vous rejoindre notre équipe ?",
-      answer: "Je souhaite évoluer vers un poste de management et votre enseigne est reconnue pour sa politique de promotion interne.",
+    monday: {
+      morning: true,
+      lunch: true,
+      afternoon: true
     },
-  ],
-  comments: [
-    { id: "1", text: "Excellente candidate avec expérience management", author: "Stephane Boussely", date: "01/19/26, 11:00 AM" },
-    { id: "2", text: "Entretien très positif, très à l'aise à l'oral", author: "Admin SW.AI", date: "01/18/26, 4:00 PM" },
-    { id: "3", text: "Disponibilité confirmée pour début février", author: "Florian Guerrier", date: "01/17/26, 2:30 PM" },
-    { id: "4", text: "A négocié le salaire, accord trouvé", author: "Stephane Boussely", date: "01/16/26, 10:15 AM" },
-    { id: "5", text: "Références vérifiées auprès de l'ancien employeur", author: "Admin SW.AI", date: "01/15/26, 3:45 PM" },
-    { id: "6", text: "Très motivée par le poste de management", author: "Julie Martin", date: "01/14/26, 11:00 AM" },
-    { id: "7", text: "CV impressionnant, 5 ans d'expérience retail", author: "Florian Guerrier", date: "01/13/26, 9:30 AM" },
-    { id: "8", text: "Appel de présélection réussi", author: "Stephane Boussely", date: "01/12/26, 4:00 PM" },
-    { id: "9", text: "Profil correspond parfaitement aux critères", author: "Admin SW.AI", date: "01/11/26, 2:00 PM" },
-    { id: "10", text: "Candidature spontanée à considérer en priorité", author: "Julie Martin", date: "01/10/26, 10:00 AM" },
-  ],
-  history: [
-    { date: "Jan 19, 2026", action: "Statut changé en Recruté par", user: "Stephane Boussely", type: "internal" as const },
-    { date: "Jan 18, 2026", action: "Contrat envoyé pour signature", user: "Admin SW.AI", type: "internal" as const },
-    { date: "Jan 16, 2026", action: "Négociation salariale finalisée", user: "Stephane Boussely", type: "internal" as const },
-    { date: "Jan 15, 2026", action: "Références vérifiées", user: "Admin SW.AI", type: "internal" as const },
-    { date: "Jan 12, 2026", action: "Deuxième entretien réalisé", user: "", type: "candidate" as const },
-    { date: "Nov 05, 2025", action: "Premier entretien réalisé", user: "", type: "candidate" as const },
-    { date: "Nov 02, 2025", action: "Invitation entretien envoyée", user: "Florian Guerrier", type: "internal" as const },
-    { date: "Oct 30, 2025", action: "Appel téléphonique effectué", user: "", type: "candidate" as const },
-    { date: "Oct 29, 2025", action: "CV analysé et approuvé", user: "Julie Martin", type: "internal" as const },
-    { date: "Oct 28, 2025", action: "Candidature reçue", user: "", type: "candidate" as const },
-  ],
+    tuesday: {
+      morning: true,
+      lunch: false,
+      afternoon: true
+    },
+    wednesday: {
+      morning: false,
+      lunch: false,
+      afternoon: true
+    },
+    thursday: {
+      morning: true,
+      lunch: true,
+      afternoon: false
+    },
+    friday: {
+      morning: true,
+      lunch: false,
+      afternoon: false
+    },
+    saturday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    },
+    sunday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    }
+  },
+  storesMatching: [{
+    name: "Paris Rivoli",
+    score: 95
+  }, {
+    name: "Paris Opéra",
+    score: 82
+  }, {
+    name: "Paris Carrousel Du Louvre",
+    score: 70
+  }],
+  openQuestions: [{
+    question: "Pourquoi souhaitez-vous rejoindre notre équipe ?",
+    answer: "Je souhaite évoluer vers un poste de management et votre enseigne est reconnue pour sa politique de promotion interne."
+  }],
+  comments: [{
+    id: "1",
+    text: "Excellente candidate avec expérience management",
+    author: "Stephane Boussely",
+    date: "01/19/26, 11:00 AM"
+  }, {
+    id: "2",
+    text: "Entretien très positif, très à l'aise à l'oral",
+    author: "Admin SW.AI",
+    date: "01/18/26, 4:00 PM"
+  }, {
+    id: "3",
+    text: "Disponibilité confirmée pour début février",
+    author: "Florian Guerrier",
+    date: "01/17/26, 2:30 PM"
+  }, {
+    id: "4",
+    text: "A négocié le salaire, accord trouvé",
+    author: "Stephane Boussely",
+    date: "01/16/26, 10:15 AM"
+  }, {
+    id: "5",
+    text: "Références vérifiées auprès de l'ancien employeur",
+    author: "Admin SW.AI",
+    date: "01/15/26, 3:45 PM"
+  }, {
+    id: "6",
+    text: "Très motivée par le poste de management",
+    author: "Julie Martin",
+    date: "01/14/26, 11:00 AM"
+  }, {
+    id: "7",
+    text: "CV impressionnant, 5 ans d'expérience retail",
+    author: "Florian Guerrier",
+    date: "01/13/26, 9:30 AM"
+  }, {
+    id: "8",
+    text: "Appel de présélection réussi",
+    author: "Stephane Boussely",
+    date: "01/12/26, 4:00 PM"
+  }, {
+    id: "9",
+    text: "Profil correspond parfaitement aux critères",
+    author: "Admin SW.AI",
+    date: "01/11/26, 2:00 PM"
+  }, {
+    id: "10",
+    text: "Candidature spontanée à considérer en priorité",
+    author: "Julie Martin",
+    date: "01/10/26, 10:00 AM"
+  }],
+  history: [{
+    date: "Jan 19, 2026",
+    action: "Statut changé en Recruté par",
+    user: "Stephane Boussely",
+    type: "internal" as const
+  }, {
+    date: "Jan 18, 2026",
+    action: "Contrat envoyé pour signature",
+    user: "Admin SW.AI",
+    type: "internal" as const
+  }, {
+    date: "Jan 16, 2026",
+    action: "Négociation salariale finalisée",
+    user: "Stephane Boussely",
+    type: "internal" as const
+  }, {
+    date: "Jan 15, 2026",
+    action: "Références vérifiées",
+    user: "Admin SW.AI",
+    type: "internal" as const
+  }, {
+    date: "Jan 12, 2026",
+    action: "Deuxième entretien réalisé",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "Nov 05, 2025",
+    action: "Premier entretien réalisé",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "Nov 02, 2025",
+    action: "Invitation entretien envoyée",
+    user: "Florian Guerrier",
+    type: "internal" as const
+  }, {
+    date: "Oct 30, 2025",
+    action: "Appel téléphonique effectué",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "Oct 29, 2025",
+    action: "CV analysé et approuvé",
+    user: "Julie Martin",
+    type: "internal" as const
+  }, {
+    date: "Oct 28, 2025",
+    action: "Candidature reçue",
+    user: "",
+    type: "candidate" as const
+  }]
 };
-
-const allStores = [
-  "Paris Carrousel Du Louvre",
-  "Paris Rivoli",
-  "Paris Opéra",
-  "Lyon Part-Dieu",
-  "Marseille Vieux-Port",
-];
-
+const allStores = ["Paris Carrousel Du Louvre", "Paris Rivoli", "Paris Opéra", "Lyon Part-Dieu", "Marseille Vieux-Port"];
 const dayLabels: Record<string, string> = {
   monday: "Lundi",
   tuesday: "Mardi",
@@ -148,22 +242,20 @@ const dayLabels: Record<string, string> = {
   thursday: "Jeudi",
   friday: "Vendredi",
   saturday: "Samedi",
-  sunday: "Dimanche",
+  sunday: "Dimanche"
 };
 
 // Status Dropdown Component
 const StatusDropdown = ({
   status,
-  onStatusChange,
+  onStatusChange
 }: {
   status: CandidateStatus;
   onStatusChange: (status: CandidateStatus) => void;
 }) => {
   const [open, setOpen] = useState(false);
   const config = statusConfig[status];
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
+  return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button className={cn("status-badge cursor-pointer hover:opacity-80 transition-opacity", config.className)}>
           <span className="w-1.5 h-1.5 rounded-full bg-current" />
@@ -173,81 +265,53 @@ const StatusDropdown = ({
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1" align="start">
         <div className="space-y-0.5">
-          {Object.entries(statusConfig).map(([key, value]) => (
-            <button
-              key={key}
-              onClick={() => {
-                onStatusChange(key as CandidateStatus);
-                setOpen(false);
-              }}
-              className={cn(
-                "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted",
-                status === key && "bg-muted"
-              )}
-            >
+          {Object.entries(statusConfig).map(([key, value]) => <button key={key} onClick={() => {
+          onStatusChange(key as CandidateStatus);
+          setOpen(false);
+        }} className={cn("w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted", status === key && "bg-muted")}>
               <span className={cn("status-badge text-xs", statusConfig[key as CandidateStatus].className)}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
                 {value.label}
               </span>
-            </button>
-          ))}
+            </button>)}
         </div>
       </PopoverContent>
-    </Popover>
-  );
+    </Popover>;
 };
 
 // Tag color mapping
 const tagColorMap: Record<string, string> = {
   "10H": "bg-lavender/20 text-lavender border-lavender/30",
   "25H": "bg-coral/20 text-coral border-coral/30",
-  "48H": "bg-primary/20 text-primary border-primary/30",
+  "48H": "bg-primary/20 text-primary border-primary/30"
 };
 
 // Conversion Tags Editor Component
 const ConversionTagsEditor = ({
   tags,
-  onTagsChange,
+  onTagsChange
 }: {
   tags: string[];
   onTagsChange: (tags: string[]) => void;
 }) => {
   const [open, setOpen] = useState(false);
-
   const removeTag = (tagToRemove: string) => {
-    onTagsChange(tags.filter((t) => t !== tagToRemove));
+    onTagsChange(tags.filter(t => t !== tagToRemove));
   };
-
   const addTag = (tag: string) => {
     if (!tags.includes(tag)) {
       onTagsChange([...tags, tag]);
     }
   };
-
-  const availableTags = conversionTagOptions.filter((t) => !tags.includes(t));
-
-  return (
-    <div className="flex items-center gap-1.5">
-      {tags.map((tag) => (
-        <Badge 
-          key={tag} 
-          variant="secondary" 
-          className={cn(
-            "border group/tag relative pr-6",
-            tagColorMap[tag] || "bg-muted text-muted-foreground"
-          )}
-        >
+  const availableTags = conversionTagOptions.filter(t => !tags.includes(t));
+  return <div className="flex items-center gap-1.5">
+      {tags.map(tag => <Badge key={tag} variant="secondary" className={cn("border group/tag relative pr-6", tagColorMap[tag] || "bg-muted text-muted-foreground")}>
           {tag}
-          <button
-            onClick={() => removeTag(tag)}
-            className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/tag:opacity-100 transition-opacity hover:text-destructive"
-          >
+          <button onClick={() => removeTag(tag)} className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/tag:opacity-100 transition-opacity hover:text-destructive">
             <X className="h-3 w-3" />
           </button>
-        </Badge>
-      ))}
-      {availableTags.length > 0 && (
-        <Popover open={open} onOpenChange={setOpen}>
+        </Badge>)}
+      {availableTags.length > 0 && <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <button className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs text-muted-foreground hover:bg-muted transition-colors">
               <Plus className="h-3 w-3" />
@@ -257,44 +321,29 @@ const ConversionTagsEditor = ({
           <PopoverContent className="w-48 p-2" align="start">
             <p className="text-xs font-medium text-muted-foreground mb-2">Tags de conversion</p>
             <div className="space-y-1">
-              {availableTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => {
-                    addTag(tag);
-                    setOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted"
-                >
-                  <span className={cn(
-                    "w-3 h-3 rounded-full",
-                    tag === "10H" && "bg-lavender",
-                    tag === "25H" && "bg-coral",
-                    tag === "48H" && "bg-primary"
-                  )} />
+              {availableTags.map(tag => <button key={tag} onClick={() => {
+            addTag(tag);
+            setOpen(false);
+          }} className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted">
+                  <span className={cn("w-3 h-3 rounded-full", tag === "10H" && "bg-lavender", tag === "25H" && "bg-coral", tag === "48H" && "bg-primary")} />
                   {tag}
-                </button>
-              ))}
+                </button>)}
             </div>
           </PopoverContent>
-        </Popover>
-      )}
-    </div>
-  );
+        </Popover>}
+    </div>;
 };
 
 // Reassign Store Component
 const ReassignStoreDropdown = ({
   currentStore,
-  onStoreChange,
+  onStoreChange
 }: {
   currentStore: string | null;
   onStoreChange: (store: string) => void;
 }) => {
   const [open, setOpen] = useState(false);
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
+  return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" className="gap-2">
           <RefreshCw className="h-4 w-4" />
@@ -304,64 +353,51 @@ const ReassignStoreDropdown = ({
       <PopoverContent className="w-64 p-2" align="end">
         <p className="text-xs font-medium text-muted-foreground mb-2 px-2">Assigner à un point de vente</p>
         <div className="space-y-0.5">
-          {allStores.map((store) => (
-            <button
-              key={store}
-              onClick={() => {
-                onStoreChange(store);
-                setOpen(false);
-              }}
-              className={cn(
-                "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted text-left",
-                currentStore === store && "bg-muted"
-              )}
-            >
+          {allStores.map(store => <button key={store} onClick={() => {
+          onStoreChange(store);
+          setOpen(false);
+        }} className={cn("w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted text-left", currentStore === store && "bg-muted")}>
               <MapPin className="h-4 w-4 text-coral shrink-0" />
               <span className="truncate">{store}</span>
-            </button>
-          ))}
+            </button>)}
         </div>
       </PopoverContent>
-    </Popover>
-  );
+    </Popover>;
 };
-
 const CandidatPageV1 = () => {
-  const { id } = useParams();
+  const {
+    id
+  } = useParams();
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(candidateData);
-
   const handleStatusChange = (newStatus: CandidateStatus) => {
-    setCandidate((prev) => ({ ...prev, status: newStatus }));
+    setCandidate(prev => ({
+      ...prev,
+      status: newStatus
+    }));
   };
-
   const handleTagsChange = (newTags: string[]) => {
-    setCandidate((prev) => ({ ...prev, conversionTags: newTags }));
+    setCandidate(prev => ({
+      ...prev,
+      conversionTags: newTags
+    }));
   };
-
   const handleStoreChange = (newStore: string) => {
-    setCandidate((prev) => ({ ...prev, assignedStore: newStore }));
+    setCandidate(prev => ({
+      ...prev,
+      assignedStore: newStore
+    }));
   };
-
   const handleArchive = () => {
     console.log("Archiving candidate", id);
   };
-
-  return (
-    <ConsoleLayout>
+  return <ConsoleLayout>
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         {/* Version indicator */}
-        <div className="fixed top-20 right-8 z-50">
-          <Badge className="bg-lavender text-white shadow-lg">
-            Design V1 - Classique
-          </Badge>
-        </div>
+        
 
         {/* Back Navigation */}
-        <button
-          onClick={() => navigate("/candidatures")}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
+        <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">Retour aux candidatures</span>
         </button>
@@ -377,20 +413,15 @@ const CandidatPageV1 = () => {
                 <h1 className="text-foreground">
                   {candidate.firstName} {candidate.lastName}
                 </h1>
-                <ConversionTagsEditor
-                  tags={candidate.conversionTags}
-                  onTagsChange={handleTagsChange}
-                />
+                <ConversionTagsEditor tags={candidate.conversionTags} onTagsChange={handleTagsChange} />
               </div>
               <p className="text-muted-foreground mt-1">
                 Candidature pour: <span className="text-foreground font-medium">{candidate.titreOffre}</span>
               </p>
-              {candidate.assignedStore && (
-                <p className="text-sm text-coral mt-1 flex items-center gap-1">
+              {candidate.assignedStore && <p className="text-sm text-coral mt-1 flex items-center gap-1">
                   <MapPin className="h-3.5 w-3.5" />
                   Assigné à: {candidate.assignedStore}
-                </p>
-              )}
+                </p>}
               
               {/* Compact profile info */}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm">
@@ -413,10 +444,7 @@ const CandidatPageV1 = () => {
               </div>
 
               <div className="flex items-center gap-4 mt-3">
-                <StatusDropdown
-                  status={candidate.status}
-                  onStatusChange={handleStatusChange}
-                />
+                <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
               </div>
             </div>
           </div>
@@ -430,10 +458,7 @@ const CandidatPageV1 = () => {
               <Calendar className="h-4 w-4" />
               Planifier entretien
             </Button>
-            <ReassignStoreDropdown
-              currentStore={candidate.assignedStore}
-              onStoreChange={handleStoreChange}
-            />
+            <ReassignStoreDropdown currentStore={candidate.assignedStore} onStoreChange={handleStoreChange} />
             <Button variant="outline" className="gap-2" onClick={handleArchive}>
               <Archive className="h-4 w-4" />
               Archiver
@@ -503,36 +528,24 @@ const CandidatPageV1 = () => {
                 <div>
                   <h4 className="text-sm font-semibold text-muted-foreground mb-3">Matching dynamique des points de vente</h4>
                   <div className="space-y-3">
-                    {candidate.storesMatching.map((store, index) => (
-                      <div key={store.name} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                    {candidate.storesMatching.map((store, index) => <div key={store.name} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                         <div className="flex items-center gap-3">
-                          <div className={cn(
-                            "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold",
-                            index === 0 ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
-                          )}>
+                          <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold", index === 0 ? "bg-success/10 text-success" : "bg-muted text-muted-foreground")}>
                             {index + 1}
                           </div>
                           <span className="font-medium">{store.name}</span>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
-                            <div
-                              className={cn(
-                                "h-full rounded-full transition-all",
-                                store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-destructive"
-                              )}
-                              style={{ width: `${store.score}%` }}
-                            />
+                            <div className={cn("h-full rounded-full transition-all", store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-destructive")} style={{
+                          width: `${store.score}%`
+                        }} />
                           </div>
-                          <span className={cn(
-                            "text-sm font-semibold min-w-[40px] text-right",
-                            store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive"
-                          )}>
+                          <span className={cn("text-sm font-semibold min-w-[40px] text-right", store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive")}>
                             {store.score}%
                           </span>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
               </CardContent>
@@ -555,38 +568,24 @@ const CandidatPageV1 = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.entries(candidate.availabilities).map(([day, slots]) => (
-                        <tr key={day} className="border-b border-border last:border-0">
+                      {Object.entries(candidate.availabilities).map(([day, slots]) => <tr key={day} className="border-b border-border last:border-0">
                           <td className="py-3 pr-4 font-medium">{dayLabels[day]}</td>
                           <td className="py-3 px-4 text-center">
-                            {slots.morning ? (
-                              <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
+                            {slots.morning ? <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
                                 <CheckCircle2 className="h-4 w-4 text-success" />
-                              </div>
-                            ) : (
-                              <div className="w-6 h-6 rounded-full bg-muted mx-auto" />
-                            )}
+                              </div> : <div className="w-6 h-6 rounded-full bg-muted mx-auto" />}
                           </td>
                           <td className="py-3 px-4 text-center">
-                            {slots.lunch ? (
-                              <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
+                            {slots.lunch ? <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
                                 <CheckCircle2 className="h-4 w-4 text-success" />
-                              </div>
-                            ) : (
-                              <div className="w-6 h-6 rounded-full bg-muted mx-auto" />
-                            )}
+                              </div> : <div className="w-6 h-6 rounded-full bg-muted mx-auto" />}
                           </td>
                           <td className="py-3 px-4 text-center">
-                            {slots.afternoon ? (
-                              <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
+                            {slots.afternoon ? <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
                                 <CheckCircle2 className="h-4 w-4 text-success" />
-                              </div>
-                            ) : (
-                              <div className="w-6 h-6 rounded-full bg-muted mx-auto" />
-                            )}
+                              </div> : <div className="w-6 h-6 rounded-full bg-muted mx-auto" />}
                           </td>
-                        </tr>
-                      ))}
+                        </tr>)}
                     </tbody>
                   </table>
                 </div>
@@ -600,12 +599,10 @@ const CandidatPageV1 = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {candidate.openQuestions.map((q, index) => (
-                    <div key={index} className="p-4 rounded-lg bg-info/5 border border-info/10">
+                  {candidate.openQuestions.map((q, index) => <div key={index} className="p-4 rounded-lg bg-info/5 border border-info/10">
                       <p className="text-sm font-medium text-foreground mb-2">{q.question}</p>
                       <p className="text-sm text-info font-medium">{q.answer}</p>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
               </CardContent>
             </Card>
@@ -627,8 +624,7 @@ const CandidatPageV1 = () => {
               <CardContent className="space-y-4">
                 <ScrollArea className="h-[300px] pr-4">
                   <div className="space-y-3">
-                    {candidate.comments.map((comment) => (
-                      <div key={comment.id} className="p-3 rounded-lg bg-lavender/5 border border-lavender/10">
+                    {candidate.comments.map(comment => <div key={comment.id} className="p-3 rounded-lg bg-lavender/5 border border-lavender/10">
                         <p className="text-sm">{comment.text}</p>
                         <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                           <User className="h-3 w-3" />
@@ -636,16 +632,12 @@ const CandidatPageV1 = () => {
                           <span>·</span>
                           <span>{comment.date}</span>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </ScrollArea>
 
                 <div className="pt-2 border-t border-border">
-                  <Textarea
-                    placeholder="Ajouter un commentaire..."
-                    className="min-h-[80px] resize-none"
-                  />
+                  <Textarea placeholder="Ajouter un commentaire..." className="min-h-[80px] resize-none" />
                   <Button className="mt-2 w-full gap-2" variant="outline">
                     <Send className="h-4 w-4" />
                     Ajouter
@@ -676,27 +668,16 @@ const CandidatPageV1 = () => {
                 <div className="relative">
                   <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border" />
                   <div className="space-y-4">
-                    {candidate.history.map((event, index) => (
-                      <div key={index} className="flex gap-4 relative">
-                        <div
-                          className={cn(
-                            "w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 z-10",
-                            event.type === "internal"
-                              ? "bg-lavender/20 border-lavender"
-                              : "bg-coral/20 border-coral"
-                          )}
-                        />
+                    {candidate.history.map((event, index) => <div key={index} className="flex gap-4 relative">
+                        <div className={cn("w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 z-10", event.type === "internal" ? "bg-lavender/20 border-lavender" : "bg-coral/20 border-coral")} />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-muted-foreground">{event.date}</p>
                           <p className="text-sm mt-0.5">
                             {event.action}
-                            {event.user && (
-                              <span className="font-medium text-foreground"> {event.user}</span>
-                            )}
+                            {event.user && <span className="font-medium text-foreground"> {event.user}</span>}
                           </p>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
               </CardContent>
@@ -704,8 +685,6 @@ const CandidatPageV1 = () => {
           </div>
         </div>
       </div>
-    </ConsoleLayout>
-  );
+    </ConsoleLayout>;
 };
-
 export default CandidatPageV1;

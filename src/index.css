@@ -217,6 +217,17 @@
       hsl(var(--vivid-orange)) 100%
     );
   }
+
+  /* Secondary colors gradient bar */
+  .bg-gradient-secondary {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--jungle-green)) 0%,
+      hsl(var(--blue-bell)) 33%,
+      hsl(var(--soft-lavender)) 66%,
+      hsl(var(--coral-glow)) 100%
+    );
+  }
   
   /* Status badges */
   .status-badge {

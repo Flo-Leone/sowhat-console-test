@@ -60,7 +60,7 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemP
           )}
         </button>
         {(isOpen || childIsActive) && !collapsed && (
-          <div className="ml-7 mt-1 space-y-0.5 border-l border-border pl-3">
+          <div className="ml-7 mt-1 space-y-0.5 border-l border-sidebar-foreground/20 pl-3">
             {children.map((child) => (
               <NavLink
                 key={child.to}

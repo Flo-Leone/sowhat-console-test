@@ -1,71 +1,74 @@
 // Variante 4 - Design minimal et épuré avec focus sur l'essentiel
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  Mail,
-  Phone,
-  Calendar,
-  FileText,
-  MapPin,
-  User,
-  MessageSquare,
-  Send,
-  History,
-  CheckCircle2,
-  Download,
-  Archive,
-  ChevronDown,
-  X,
-  Plus,
-  MoreHorizontal,
-  ExternalLink,
-  Sparkles,
-} from "lucide-react";
+import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, ChevronDown, X, Plus, MoreHorizontal, ExternalLink, Sparkles } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 // Status types and config
-type CandidateStatus =
-  | "nouveau"
-  | "vivier"
-  | "rejete_cv"
-  | "appel_attente"
-  | "appel_confirme"
-  | "rejete_appel"
-  | "invite_entretien"
-  | "rejete_entretien"
-  | "recrute"
-  | "recrute_autre";
-
-const statusConfig: Record<CandidateStatus, { label: string; className: string; color: string }> = {
-  nouveau: { label: "Nouveau", className: "status-new", color: "bg-info" },
-  vivier: { label: "Vivier", className: "status-vivier", color: "bg-lavender" },
-  rejete_cv: { label: "Rejeté CV", className: "status-rejected", color: "bg-destructive" },
-  appel_attente: { label: "Appel en attente", className: "status-invited", color: "bg-warning" },
-  appel_confirme: { label: "Appel confirmé", className: "status-invited", color: "bg-warning" },
-  rejete_appel: { label: "Rejeté appel", className: "status-rejected", color: "bg-destructive" },
-  invite_entretien: { label: "Entretien", className: "status-invited", color: "bg-warning" },
-  rejete_entretien: { label: "Rejeté entretien", className: "status-rejected", color: "bg-destructive" },
-  recrute: { label: "Recruté", className: "status-recruited", color: "bg-success" },
-  recrute_autre: { label: "Recruté ailleurs", className: "bg-muted text-muted-foreground", color: "bg-muted-foreground" },
+type CandidateStatus = "nouveau" | "vivier" | "rejete_cv" | "appel_attente" | "appel_confirme" | "rejete_appel" | "invite_entretien" | "rejete_entretien" | "recrute" | "recrute_autre";
+const statusConfig: Record<CandidateStatus, {
+  label: string;
+  className: string;
+  color: string;
+}> = {
+  nouveau: {
+    label: "Nouveau",
+    className: "status-new",
+    color: "bg-info"
+  },
+  vivier: {
+    label: "Vivier",
+    className: "status-vivier",
+    color: "bg-lavender"
+  },
+  rejete_cv: {
+    label: "Rejeté CV",
+    className: "status-rejected",
+    color: "bg-destructive"
+  },
+  appel_attente: {
+    label: "Appel en attente",
+    className: "status-invited",
+    color: "bg-warning"
+  },
+  appel_confirme: {
+    label: "Appel confirmé",
+    className: "status-invited",
+    color: "bg-warning"
+  },
+  rejete_appel: {
+    label: "Rejeté appel",
+    className: "status-rejected",
+    color: "bg-destructive"
+  },
+  invite_entretien: {
+    label: "Entretien",
+    className: "status-invited",
+    color: "bg-warning"
+  },
+  rejete_entretien: {
+    label: "Rejeté entretien",
+    className: "status-rejected",
+    color: "bg-destructive"
+  },
+  recrute: {
+    label: "Recruté",
+    className: "status-recruited",
+    color: "bg-success"
+  },
+  recrute_autre: {
+    label: "Recruté ailleurs",
+    className: "bg-muted text-muted-foreground",
+    color: "bg-muted-foreground"
+  }
 };
 
 // Mock data
@@ -89,47 +92,153 @@ const candidateData = {
   scores: {
     experience: 0,
     profession: null as number | null,
-    disponibilite: null as number | null,
+    disponibilite: null as number | null
   },
   availabilities: {
-    monday: { morning: true, lunch: true, afternoon: true },
-    tuesday: { morning: true, lunch: true, afternoon: true },
-    wednesday: { morning: true, lunch: true, afternoon: true },
-    thursday: { morning: true, lunch: true, afternoon: true },
-    friday: { morning: true, lunch: true, afternoon: true },
-    saturday: { morning: false, lunch: false, afternoon: false },
-    sunday: { morning: false, lunch: false, afternoon: false },
+    monday: {
+      morning: true,
+      lunch: true,
+      afternoon: true
+    },
+    tuesday: {
+      morning: true,
+      lunch: true,
+      afternoon: true
+    },
+    wednesday: {
+      morning: true,
+      lunch: true,
+      afternoon: true
+    },
+    thursday: {
+      morning: true,
+      lunch: true,
+      afternoon: true
+    },
+    friday: {
+      morning: true,
+      lunch: true,
+      afternoon: true
+    },
+    saturday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    },
+    sunday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    }
   },
-  storesMatching: [
-    { name: "Paris Rivoli", score: 100 },
-  ],
+  storesMatching: [{
+    name: "Paris Rivoli",
+    score: 100
+  }],
   openQuestions: [],
-  comments: [
-    { id: "1", text: "Recrutement finalisé, contrat signé", author: "Stephane Boussely", date: "15/01/26" },
-    { id: "2", text: "Dernier entretien validé à l'unanimité", author: "Admin SW.AI", date: "14/01/26" },
-    { id: "3", text: "Très bonne impression générale", author: "Florian Guerrier", date: "12/01/26" },
-    { id: "4", text: "Tests de compétences réussis", author: "Julie Martin", date: "10/01/26" },
-    { id: "5", text: "Présentation impeccable lors de l'entretien", author: "Stephane Boussely", date: "08/01/26" },
-    { id: "6", text: "Parcours professionnel cohérent", author: "Admin SW.AI", date: "05/01/26" },
-    { id: "7", text: "Recommandations excellentes", author: "Florian Guerrier", date: "03/01/26" },
-    { id: "8", text: "Candidat sérieux et ponctuel", author: "Julie Martin", date: "02/01/26" },
-    { id: "9", text: "Appel initial très positif", author: "Stephane Boussely", date: "20/10/25" },
-    { id: "10", text: "CV bien structuré, à convoquer rapidement", author: "Admin SW.AI", date: "13/10/25" },
-  ],
-  history: [
-    { date: "15 jan. 2026", action: "Recruté par", user: "Stephane Boussely", type: "internal" as const },
-    { date: "14 jan. 2026", action: "Contrat signé", user: "", type: "candidate" as const },
-    { date: "12 jan. 2026", action: "Offre acceptée", user: "", type: "candidate" as const },
-    { date: "10 jan. 2026", action: "Proposition salariale envoyée", user: "Admin SW.AI", type: "internal" as const },
-    { date: "08 jan. 2026", action: "Entretien final réalisé", user: "", type: "candidate" as const },
-    { date: "05 jan. 2026", action: "Entretien technique passé", user: "", type: "candidate" as const },
-    { date: "02 jan. 2026", action: "Invitation entretien envoyée", user: "Florian Guerrier", type: "internal" as const },
-    { date: "20 oct. 2025", action: "Appel de présélection", user: "", type: "candidate" as const },
-    { date: "15 oct. 2025", action: "CV analysé", user: "Julie Martin", type: "internal" as const },
-    { date: "13 oct. 2025", action: "Candidature reçue", user: "", type: "candidate" as const },
-  ],
+  comments: [{
+    id: "1",
+    text: "Recrutement finalisé, contrat signé",
+    author: "Stephane Boussely",
+    date: "15/01/26"
+  }, {
+    id: "2",
+    text: "Dernier entretien validé à l'unanimité",
+    author: "Admin SW.AI",
+    date: "14/01/26"
+  }, {
+    id: "3",
+    text: "Très bonne impression générale",
+    author: "Florian Guerrier",
+    date: "12/01/26"
+  }, {
+    id: "4",
+    text: "Tests de compétences réussis",
+    author: "Julie Martin",
+    date: "10/01/26"
+  }, {
+    id: "5",
+    text: "Présentation impeccable lors de l'entretien",
+    author: "Stephane Boussely",
+    date: "08/01/26"
+  }, {
+    id: "6",
+    text: "Parcours professionnel cohérent",
+    author: "Admin SW.AI",
+    date: "05/01/26"
+  }, {
+    id: "7",
+    text: "Recommandations excellentes",
+    author: "Florian Guerrier",
+    date: "03/01/26"
+  }, {
+    id: "8",
+    text: "Candidat sérieux et ponctuel",
+    author: "Julie Martin",
+    date: "02/01/26"
+  }, {
+    id: "9",
+    text: "Appel initial très positif",
+    author: "Stephane Boussely",
+    date: "20/10/25"
+  }, {
+    id: "10",
+    text: "CV bien structuré, à convoquer rapidement",
+    author: "Admin SW.AI",
+    date: "13/10/25"
+  }],
+  history: [{
+    date: "15 jan. 2026",
+    action: "Recruté par",
+    user: "Stephane Boussely",
+    type: "internal" as const
+  }, {
+    date: "14 jan. 2026",
+    action: "Contrat signé",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "12 jan. 2026",
+    action: "Offre acceptée",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "10 jan. 2026",
+    action: "Proposition salariale envoyée",
+    user: "Admin SW.AI",
+    type: "internal" as const
+  }, {
+    date: "08 jan. 2026",
+    action: "Entretien final réalisé",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "05 jan. 2026",
+    action: "Entretien technique passé",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "02 jan. 2026",
+    action: "Invitation entretien envoyée",
+    user: "Florian Guerrier",
+    type: "internal" as const
+  }, {
+    date: "20 oct. 2025",
+    action: "Appel de présélection",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "15 oct. 2025",
+    action: "CV analysé",
+    user: "Julie Martin",
+    type: "internal" as const
+  }, {
+    date: "13 oct. 2025",
+    action: "Candidature reçue",
+    user: "",
+    type: "candidate" as const
+  }]
 };
-
 const dayLabelsShort: Record<string, string> = {
   monday: "Lun",
   tuesday: "Mar",
@@ -137,21 +246,18 @@ const dayLabelsShort: Record<string, string> = {
   thursday: "Jeu",
   friday: "Ven",
   saturday: "Sam",
-  sunday: "Dim",
+  sunday: "Dim"
 };
-
 const StatusDropdown = ({
   status,
-  onStatusChange,
+  onStatusChange
 }: {
   status: CandidateStatus;
   onStatusChange: (status: CandidateStatus) => void;
 }) => {
   const [open, setOpen] = useState(false);
   const config = statusConfig[status];
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
+  return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button className={cn("status-badge cursor-pointer hover:opacity-80 transition-opacity", config.className)}>
           <span className="w-1.5 h-1.5 rounded-full bg-current" />
@@ -161,53 +267,43 @@ const StatusDropdown = ({
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1" align="start">
         <div className="space-y-0.5">
-          {Object.entries(statusConfig).map(([key, value]) => (
-            <button
-              key={key}
-              onClick={() => { onStatusChange(key as CandidateStatus); setOpen(false); }}
-              className={cn("w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted", status === key && "bg-muted")}
-            >
+          {Object.entries(statusConfig).map(([key, value]) => <button key={key} onClick={() => {
+          onStatusChange(key as CandidateStatus);
+          setOpen(false);
+        }} className={cn("w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted", status === key && "bg-muted")}>
               <span className={cn("status-badge text-xs", statusConfig[key as CandidateStatus].className)}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
                 {value.label}
               </span>
-            </button>
-          ))}
+            </button>)}
         </div>
       </PopoverContent>
-    </Popover>
-  );
+    </Popover>;
 };
-
 const CandidatPageV4 = () => {
-  const { id } = useParams();
+  const {
+    id
+  } = useParams();
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(candidateData);
   const [newComment, setNewComment] = useState("");
-
   const handleStatusChange = (newStatus: CandidateStatus) => {
-    setCandidate((prev) => ({ ...prev, status: newStatus }));
+    setCandidate(prev => ({
+      ...prev,
+      status: newStatus
+    }));
   };
-
-  return (
-    <ConsoleLayout>
+  return <ConsoleLayout>
       <div className="min-h-screen bg-background">
         {/* Version indicator */}
-        <div className="fixed top-20 right-8 z-50">
-          <Badge className="bg-primary text-primary-foreground shadow-lg">
-            Design V4 - Minimal
-          </Badge>
-        </div>
+        
 
         {/* Sticky Header */}
         <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border">
           <div className="px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-6">
-                <button
-                  onClick={() => navigate("/candidatures")}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-                >
+                <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
                   <ArrowLeft className="h-4 w-4" />
                 </button>
                 
@@ -269,8 +365,7 @@ const CandidatPageV4 = () => {
         {/* Content */}
         <div className="px-6 lg:px-8 py-8 max-w-5xl mx-auto space-y-8 animate-fade-in">
           {/* Success Banner for recruited */}
-          {candidate.status === "recrute" && (
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-success/10 border border-success/20">
+          {candidate.status === "recrute" && <div className="flex items-center gap-3 p-4 rounded-xl bg-success/10 border border-success/20">
               <Sparkles className="h-5 w-5 text-success" />
               <div>
                 <p className="font-medium text-success">Candidat recruté !</p>
@@ -278,17 +373,13 @@ const CandidatPageV4 = () => {
                   Recrutement finalisé le {candidate.recruitedDate} par {candidate.assignedStore}
                 </p>
               </div>
-            </div>
-          )}
+            </div>}
 
           {/* Contact & Info */}
           <section className="space-y-4">
             <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Coordonnées</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <a 
-                href={`mailto:${candidate.email}`}
-                className="flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors group"
-              >
+              <a href={`mailto:${candidate.email}`} className="flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors group">
                 <div className="w-10 h-10 rounded-full bg-info/10 flex items-center justify-center">
                   <Mail className="h-4 w-4 text-info" />
                 </div>
@@ -297,10 +388,7 @@ const CandidatPageV4 = () => {
                   <p className="text-sm font-medium truncate group-hover:text-info transition-colors">{candidate.email}</p>
                 </div>
               </a>
-              <a 
-                href={`tel:${candidate.phone}`}
-                className="flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors group"
-              >
+              <a href={`tel:${candidate.phone}`} className="flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors group">
                 <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
                   <Phone className="h-4 w-4 text-success" />
                 </div>
@@ -345,19 +433,10 @@ const CandidatPageV4 = () => {
                 <p className="text-sm font-medium">{candidate.interviewDate || "—"}</p>
               </div>
               <div className="w-8 h-px bg-border" />
-              <div className={cn(
-                "flex-1 text-center p-4 rounded-xl",
-                candidate.status === "recrute" ? "bg-success/10" : "bg-muted/30"
-              )}>
-                <CheckCircle2 className={cn(
-                  "h-5 w-5 mx-auto mb-2",
-                  candidate.status === "recrute" ? "text-success" : "text-muted-foreground"
-                )} />
+              <div className={cn("flex-1 text-center p-4 rounded-xl", candidate.status === "recrute" ? "bg-success/10" : "bg-muted/30")}>
+                <CheckCircle2 className={cn("h-5 w-5 mx-auto mb-2", candidate.status === "recrute" ? "text-success" : "text-muted-foreground")} />
                 <p className="text-xs text-muted-foreground">Décision</p>
-                <p className={cn(
-                  "text-sm font-medium",
-                  candidate.status === "recrute" && "text-success"
-                )}>
+                <p className={cn("text-sm font-medium", candidate.status === "recrute" && "text-success")}>
                   {candidate.status === "recrute" ? candidate.recruitedDate : "—"}
                 </p>
               </div>
@@ -371,23 +450,13 @@ const CandidatPageV4 = () => {
             <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Disponibilités</h2>
             <div className="flex items-center gap-2">
               {Object.entries(candidate.availabilities).map(([day, slots]) => {
-                const available = slots.morning || slots.lunch || slots.afternoon;
-                const full = slots.morning && slots.lunch && slots.afternoon;
-                return (
-                  <div 
-                    key={day}
-                    className={cn(
-                      "flex-1 text-center py-3 rounded-xl border transition-colors",
-                      full ? "bg-success/10 border-success/20 text-success" :
-                      available ? "bg-warning/10 border-warning/20 text-warning" :
-                      "bg-muted/50 border-border text-muted-foreground"
-                    )}
-                  >
+              const available = slots.morning || slots.lunch || slots.afternoon;
+              const full = slots.morning && slots.lunch && slots.afternoon;
+              return <div key={day} className={cn("flex-1 text-center py-3 rounded-xl border transition-colors", full ? "bg-success/10 border-success/20 text-success" : available ? "bg-warning/10 border-warning/20 text-warning" : "bg-muted/50 border-border text-muted-foreground")}>
                     <p className="text-xs font-medium">{dayLabelsShort[day]}</p>
                     {full && <CheckCircle2 className="h-4 w-4 mx-auto mt-1" />}
-                  </div>
-                );
-              })}
+                  </div>;
+            })}
             </div>
           </section>
 
@@ -401,23 +470,16 @@ const CandidatPageV4 = () => {
             </div>
             
             <div className="space-y-3">
-              {candidate.comments.map((comment) => (
-                <div key={comment.id} className="p-4 rounded-xl bg-muted/30">
+              {candidate.comments.map(comment => <div key={comment.id} className="p-4 rounded-xl bg-muted/30">
                   <p className="text-sm">{comment.text}</p>
                   <p className="text-xs text-muted-foreground mt-2">
                     {comment.author} · {comment.date}
                   </p>
-                </div>
-              ))}
+                </div>)}
             </div>
 
             <div className="flex gap-3">
-              <Textarea 
-                placeholder="Ajouter une note..." 
-                className="min-h-[80px] resize-none bg-card"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-              />
+              <Textarea placeholder="Ajouter une note..." className="min-h-[80px] resize-none bg-card" value={newComment} onChange={e => setNewComment(e.target.value)} />
             </div>
             <Button className="gap-2" disabled={!newComment.trim()}>
               <Send className="h-4 w-4" />
@@ -431,25 +493,18 @@ const CandidatPageV4 = () => {
           <section className="space-y-4">
             <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Historique</h2>
             <div className="space-y-2">
-              {candidate.history.map((event, index) => (
-                <div key={index} className="flex items-center gap-4 text-sm">
+              {candidate.history.map((event, index) => <div key={index} className="flex items-center gap-4 text-sm">
                   <span className="text-muted-foreground w-24 shrink-0">{event.date}</span>
-                  <div className={cn(
-                    "w-2 h-2 rounded-full shrink-0",
-                    event.type === "internal" ? "bg-lavender" : "bg-coral"
-                  )} />
+                  <div className={cn("w-2 h-2 rounded-full shrink-0", event.type === "internal" ? "bg-lavender" : "bg-coral")} />
                   <span>
                     {event.action}
                     {event.user && <span className="font-medium"> {event.user}</span>}
                   </span>
-                </div>
-              ))}
+                </div>)}
             </div>
           </section>
         </div>
       </div>
-    </ConsoleLayout>
-  );
+    </ConsoleLayout>;
 };
-
 export default CandidatPageV4;

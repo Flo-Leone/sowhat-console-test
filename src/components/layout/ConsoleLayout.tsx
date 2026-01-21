@@ -12,6 +12,7 @@ export const ConsoleLayout = ({ children }: ConsoleLayoutProps) => {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <main className="flex-1 overflow-auto bg-gradient-coral">
+          <div className="h-2.5 w-full bg-gradient-secondary" />
           {children}
         </main>
       </div>

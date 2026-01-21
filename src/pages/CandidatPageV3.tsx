@@ -1,74 +1,75 @@
 // Variante 3 - Design dashboard avec sidebar fixe à droite
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  Mail,
-  Phone,
-  Calendar,
-  FileText,
-  MapPin,
-  User,
-  MessageSquare,
-  Send,
-  History,
-  CheckCircle2,
-  Download,
-  Archive,
-  ChevronDown,
-  X,
-  Plus,
-  Briefcase,
-  Clock,
-  TrendingUp,
-  Target,
-  ExternalLink,
-} from "lucide-react";
+import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, ChevronDown, X, Plus, Briefcase, Clock, TrendingUp, Target, ExternalLink } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 // Status types and config
-type CandidateStatus =
-  | "nouveau"
-  | "vivier"
-  | "rejete_cv"
-  | "appel_attente"
-  | "appel_confirme"
-  | "rejete_appel"
-  | "invite_entretien"
-  | "rejete_entretien"
-  | "recrute"
-  | "recrute_autre";
-
-const statusConfig: Record<CandidateStatus, { label: string; className: string; step: number }> = {
-  nouveau: { label: "Nouveau", className: "status-new", step: 1 },
-  vivier: { label: "Vivier", className: "status-vivier", step: 1 },
-  rejete_cv: { label: "Rejeté CV", className: "status-rejected", step: 1 },
-  appel_attente: { label: "Appel en attente", className: "status-invited", step: 2 },
-  appel_confirme: { label: "Appel confirmé", className: "status-invited", step: 2 },
-  rejete_appel: { label: "Rejeté appel", className: "status-rejected", step: 2 },
-  invite_entretien: { label: "Entretien", className: "status-invited", step: 3 },
-  rejete_entretien: { label: "Rejeté entretien", className: "status-rejected", step: 3 },
-  recrute: { label: "Recruté", className: "status-recruited", step: 4 },
-  recrute_autre: { label: "Recruté ailleurs", className: "bg-muted text-muted-foreground", step: 4 },
+type CandidateStatus = "nouveau" | "vivier" | "rejete_cv" | "appel_attente" | "appel_confirme" | "rejete_appel" | "invite_entretien" | "rejete_entretien" | "recrute" | "recrute_autre";
+const statusConfig: Record<CandidateStatus, {
+  label: string;
+  className: string;
+  step: number;
+}> = {
+  nouveau: {
+    label: "Nouveau",
+    className: "status-new",
+    step: 1
+  },
+  vivier: {
+    label: "Vivier",
+    className: "status-vivier",
+    step: 1
+  },
+  rejete_cv: {
+    label: "Rejeté CV",
+    className: "status-rejected",
+    step: 1
+  },
+  appel_attente: {
+    label: "Appel en attente",
+    className: "status-invited",
+    step: 2
+  },
+  appel_confirme: {
+    label: "Appel confirmé",
+    className: "status-invited",
+    step: 2
+  },
+  rejete_appel: {
+    label: "Rejeté appel",
+    className: "status-rejected",
+    step: 2
+  },
+  invite_entretien: {
+    label: "Entretien",
+    className: "status-invited",
+    step: 3
+  },
+  rejete_entretien: {
+    label: "Rejeté entretien",
+    className: "status-rejected",
+    step: 3
+  },
+  recrute: {
+    label: "Recruté",
+    className: "status-recruited",
+    step: 4
+  },
+  recrute_autre: {
+    label: "Recruté ailleurs",
+    className: "bg-muted text-muted-foreground",
+    step: 4
+  }
 };
-
 const conversionTagOptions = ["10H", "25H", "48H"];
 
 // Mock data
@@ -91,54 +92,162 @@ const candidateData = {
     experience: 100,
     profession: 37,
     disponibilite: 37,
-    global: 58,
+    global: 58
   },
   availabilities: {
-    monday: { morning: true, lunch: true, afternoon: false },
-    tuesday: { morning: false, lunch: true, afternoon: true },
-    wednesday: { morning: true, lunch: false, afternoon: true },
-    thursday: { morning: false, lunch: false, afternoon: false },
-    friday: { morning: true, lunch: true, afternoon: true },
-    saturday: { morning: false, lunch: false, afternoon: true },
-    sunday: { morning: false, lunch: false, afternoon: false },
-  },
-  storesMatching: [
-    { name: "Paris Rivoli", score: 85 },
-    { name: "Paris Opéra", score: 72 },
-    { name: "Lyon Part-Dieu", score: 58 },
-  ],
-  openQuestions: [
-    {
-      question: "Quelle est votre disponibilité ?",
-      answer: "Disponible immédiatement pour un CDD de 6 mois minimum.",
+    monday: {
+      morning: true,
+      lunch: true,
+      afternoon: false
     },
-  ],
-  comments: [
-    { id: "1", text: "Bon profil, expérience intéressante", author: "Julien Gantheret", date: "01/18/26" },
-    { id: "2", text: "À revoir pour le planning", author: "Admin SW.AI", date: "01/17/26" },
-    { id: "3", text: "Entretien technique satisfaisant", author: "Stephane Boussely", date: "01/16/26" },
-    { id: "4", text: "Motivation claire pour le poste", author: "Florian Guerrier", date: "01/15/26" },
-    { id: "5", text: "Bonne capacité d'adaptation", author: "Julie Martin", date: "01/14/26" },
-    { id: "6", text: "Expérience CDD précédente validée", author: "Admin SW.AI", date: "01/13/26" },
-    { id: "7", text: "Présentation soignée", author: "Stephane Boussely", date: "01/12/26" },
-    { id: "8", text: "Questions pertinentes sur l'équipe", author: "Florian Guerrier", date: "01/11/26" },
-    { id: "9", text: "Disponibilité immédiate confirmée", author: "Julie Martin", date: "01/10/26" },
-    { id: "10", text: "Candidature prometteuse à suivre", author: "Admin SW.AI", date: "01/09/26" },
-  ],
-  history: [
-    { date: "Jan 18, 2026", action: "Consulté par", user: "Admin SW.AI", type: "internal" as const },
-    { date: "Jan 17, 2026", action: "Planning revu", user: "Stephane Boussely", type: "internal" as const },
-    { date: "Jan 15, 2026", action: "Entretien technique réalisé", user: "", type: "candidate" as const },
-    { date: "Jan 12, 2026", action: "Préparation dossier", user: "Florian Guerrier", type: "internal" as const },
-    { date: "Jan 10, 2026", action: "Documents reçus", user: "", type: "candidate" as const },
-    { date: "Nov 15, 2025", action: "Rappel entretien envoyé", user: "Julie Martin", type: "internal" as const },
-    { date: "Nov 12, 2025", action: "Appel programmé", user: "", type: "candidate" as const },
-    { date: "Oct 20, 2025", action: "Profil analysé", user: "Admin SW.AI", type: "internal" as const },
-    { date: "Oct 15, 2025", action: "Accusé de réception envoyé", user: "", type: "candidate" as const },
-    { date: "Oct 13, 2025", action: "Candidature reçue", user: "", type: "candidate" as const },
-  ],
+    tuesday: {
+      morning: false,
+      lunch: true,
+      afternoon: true
+    },
+    wednesday: {
+      morning: true,
+      lunch: false,
+      afternoon: true
+    },
+    thursday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    },
+    friday: {
+      morning: true,
+      lunch: true,
+      afternoon: true
+    },
+    saturday: {
+      morning: false,
+      lunch: false,
+      afternoon: true
+    },
+    sunday: {
+      morning: false,
+      lunch: false,
+      afternoon: false
+    }
+  },
+  storesMatching: [{
+    name: "Paris Rivoli",
+    score: 85
+  }, {
+    name: "Paris Opéra",
+    score: 72
+  }, {
+    name: "Lyon Part-Dieu",
+    score: 58
+  }],
+  openQuestions: [{
+    question: "Quelle est votre disponibilité ?",
+    answer: "Disponible immédiatement pour un CDD de 6 mois minimum."
+  }],
+  comments: [{
+    id: "1",
+    text: "Bon profil, expérience intéressante",
+    author: "Julien Gantheret",
+    date: "01/18/26"
+  }, {
+    id: "2",
+    text: "À revoir pour le planning",
+    author: "Admin SW.AI",
+    date: "01/17/26"
+  }, {
+    id: "3",
+    text: "Entretien technique satisfaisant",
+    author: "Stephane Boussely",
+    date: "01/16/26"
+  }, {
+    id: "4",
+    text: "Motivation claire pour le poste",
+    author: "Florian Guerrier",
+    date: "01/15/26"
+  }, {
+    id: "5",
+    text: "Bonne capacité d'adaptation",
+    author: "Julie Martin",
+    date: "01/14/26"
+  }, {
+    id: "6",
+    text: "Expérience CDD précédente validée",
+    author: "Admin SW.AI",
+    date: "01/13/26"
+  }, {
+    id: "7",
+    text: "Présentation soignée",
+    author: "Stephane Boussely",
+    date: "01/12/26"
+  }, {
+    id: "8",
+    text: "Questions pertinentes sur l'équipe",
+    author: "Florian Guerrier",
+    date: "01/11/26"
+  }, {
+    id: "9",
+    text: "Disponibilité immédiate confirmée",
+    author: "Julie Martin",
+    date: "01/10/26"
+  }, {
+    id: "10",
+    text: "Candidature prometteuse à suivre",
+    author: "Admin SW.AI",
+    date: "01/09/26"
+  }],
+  history: [{
+    date: "Jan 18, 2026",
+    action: "Consulté par",
+    user: "Admin SW.AI",
+    type: "internal" as const
+  }, {
+    date: "Jan 17, 2026",
+    action: "Planning revu",
+    user: "Stephane Boussely",
+    type: "internal" as const
+  }, {
+    date: "Jan 15, 2026",
+    action: "Entretien technique réalisé",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "Jan 12, 2026",
+    action: "Préparation dossier",
+    user: "Florian Guerrier",
+    type: "internal" as const
+  }, {
+    date: "Jan 10, 2026",
+    action: "Documents reçus",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "Nov 15, 2025",
+    action: "Rappel entretien envoyé",
+    user: "Julie Martin",
+    type: "internal" as const
+  }, {
+    date: "Nov 12, 2025",
+    action: "Appel programmé",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "Oct 20, 2025",
+    action: "Profil analysé",
+    user: "Admin SW.AI",
+    type: "internal" as const
+  }, {
+    date: "Oct 15, 2025",
+    action: "Accusé de réception envoyé",
+    user: "",
+    type: "candidate" as const
+  }, {
+    date: "Oct 13, 2025",
+    action: "Candidature reçue",
+    user: "",
+    type: "candidate" as const
+  }]
 };
-
 const dayLabels: Record<string, string> = {
   monday: "L",
   tuesday: "M",
@@ -146,27 +255,23 @@ const dayLabels: Record<string, string> = {
   thursday: "J",
   friday: "V",
   saturday: "S",
-  sunday: "D",
+  sunday: "D"
 };
-
 const tagColorMap: Record<string, string> = {
   "10H": "bg-lavender/20 text-lavender border-lavender/30",
   "25H": "bg-coral/20 text-coral border-coral/30",
-  "48H": "bg-primary/20 text-primary border-primary/30",
+  "48H": "bg-primary/20 text-primary border-primary/30"
 };
-
 const StatusDropdown = ({
   status,
-  onStatusChange,
+  onStatusChange
 }: {
   status: CandidateStatus;
   onStatusChange: (status: CandidateStatus) => void;
 }) => {
   const [open, setOpen] = useState(false);
   const config = statusConfig[status];
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
+  return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button className={cn("status-badge cursor-pointer hover:opacity-80 transition-opacity", config.className)}>
           <span className="w-1.5 h-1.5 rounded-full bg-current" />
@@ -176,53 +281,42 @@ const StatusDropdown = ({
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1" align="start">
         <div className="space-y-0.5">
-          {Object.entries(statusConfig).map(([key, value]) => (
-            <button
-              key={key}
-              onClick={() => { onStatusChange(key as CandidateStatus); setOpen(false); }}
-              className={cn("w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted", status === key && "bg-muted")}
-            >
+          {Object.entries(statusConfig).map(([key, value]) => <button key={key} onClick={() => {
+          onStatusChange(key as CandidateStatus);
+          setOpen(false);
+        }} className={cn("w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted", status === key && "bg-muted")}>
               <span className={cn("status-badge text-xs", statusConfig[key as CandidateStatus].className)}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
                 {value.label}
               </span>
-            </button>
-          ))}
+            </button>)}
         </div>
       </PopoverContent>
-    </Popover>
-  );
+    </Popover>;
 };
-
 const CandidatPageV3 = () => {
-  const { id } = useParams();
+  const {
+    id
+  } = useParams();
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(candidateData);
-
   const handleStatusChange = (newStatus: CandidateStatus) => {
-    setCandidate((prev) => ({ ...prev, status: newStatus }));
+    setCandidate(prev => ({
+      ...prev,
+      status: newStatus
+    }));
   };
-
   const currentStep = statusConfig[candidate.status].step;
-
-  return (
-    <ConsoleLayout>
+  return <ConsoleLayout>
       <div className="animate-fade-in">
         {/* Version indicator */}
-        <div className="fixed top-20 right-8 z-50">
-          <Badge className="bg-success text-white shadow-lg">
-            Design V3 - Dashboard
-          </Badge>
-        </div>
+        
 
         <div className="flex">
           {/* Main Content */}
           <div className="flex-1 p-6 lg:p-8 space-y-6">
             {/* Back Navigation */}
-            <button
-              onClick={() => navigate("/candidatures")}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="h-4 w-4" />
               <span className="text-sm">Retour</span>
             </button>
@@ -239,13 +333,11 @@ const CandidatPageV3 = () => {
                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <Briefcase className="h-3.5 w-3.5" />
                       {candidate.titreOffre}
-                      {candidate.assignedStore && (
-                        <>
+                      {candidate.assignedStore && <>
                           <span className="text-border">•</span>
                           <MapPin className="h-3.5 w-3.5 text-coral" />
                           {candidate.assignedStore}
-                        </>
-                      )}
+                        </>}
                     </p>
                   </div>
                 </div>
@@ -254,23 +346,15 @@ const CandidatPageV3 = () => {
 
               {/* Progress Steps */}
               <div className="flex items-center gap-2 p-4 rounded-xl bg-muted/30">
-                {["CV reçu", "Appel", "Entretien", "Décision"].map((step, index) => (
-                  <div key={step} className="flex-1 flex items-center">
+                {["CV reçu", "Appel", "Entretien", "Décision"].map((step, index) => <div key={step} className="flex-1 flex items-center">
                     <div className="flex-1">
-                      <div className={cn(
-                        "h-2 rounded-full transition-all",
-                        index + 1 <= currentStep ? "bg-success" : "bg-muted"
-                      )} />
-                      <p className={cn(
-                        "text-xs mt-1 text-center",
-                        index + 1 <= currentStep ? "text-success font-medium" : "text-muted-foreground"
-                      )}>
+                      <div className={cn("h-2 rounded-full transition-all", index + 1 <= currentStep ? "bg-success" : "bg-muted")} />
+                      <p className={cn("text-xs mt-1 text-center", index + 1 <= currentStep ? "text-success font-medium" : "text-muted-foreground")}>
                         {step}
                       </p>
                     </div>
                     {index < 3 && <div className="w-4" />}
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </div>
 
@@ -305,26 +389,18 @@ const CandidatPageV3 = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {candidate.storesMatching.map((store, index) => (
-                    <div key={store.name} className="flex items-center gap-3">
-                      <div className={cn(
-                        "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
-                        index === 0 ? "bg-success text-white" : "bg-muted text-muted-foreground"
-                      )}>
+                  {candidate.storesMatching.map((store, index) => <div key={store.name} className="flex items-center gap-3">
+                      <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold", index === 0 ? "bg-success text-white" : "bg-muted text-muted-foreground")}>
                         {index + 1}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-medium">{store.name}</span>
-                          <span className={cn(
-                            "text-sm font-bold",
-                            store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive"
-                          )}>{store.score}%</span>
+                          <span className={cn("text-sm font-bold", store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive")}>{store.score}%</span>
                         </div>
                         <Progress value={store.score} className="h-1.5" />
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                 </CardContent>
               </Card>
 
@@ -339,22 +415,14 @@ const CandidatPageV3 = () => {
                 <CardContent>
                   <div className="grid grid-cols-7 gap-1 text-center">
                     {Object.entries(candidate.availabilities).map(([day, slots]) => {
-                      const total = [slots.morning, slots.lunch, slots.afternoon].filter(Boolean).length;
-                      return (
-                        <div key={day} className="space-y-1">
+                    const total = [slots.morning, slots.lunch, slots.afternoon].filter(Boolean).length;
+                    return <div key={day} className="space-y-1">
                           <div className="text-xs font-medium text-muted-foreground">{dayLabels[day]}</div>
-                          <div className={cn(
-                            "w-full aspect-square rounded-lg flex items-center justify-center text-xs font-bold",
-                            total === 3 ? "bg-success/20 text-success" :
-                            total === 2 ? "bg-warning/20 text-warning" :
-                            total === 1 ? "bg-coral/20 text-coral" :
-                            "bg-muted text-muted-foreground"
-                          )}>
+                          <div className={cn("w-full aspect-square rounded-lg flex items-center justify-center text-xs font-bold", total === 3 ? "bg-success/20 text-success" : total === 2 ? "bg-warning/20 text-warning" : total === 1 ? "bg-coral/20 text-coral" : "bg-muted text-muted-foreground")}>
                             {total > 0 ? total : "-"}
                           </div>
-                        </div>
-                      );
-                    })}
+                        </div>;
+                  })}
                   </div>
                   <div className="flex items-center justify-center gap-4 mt-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-success" /> Complet</span>
@@ -387,12 +455,10 @@ const CandidatPageV3 = () => {
                   <CardTitle className="text-base">Questions ouvertes</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {candidate.openQuestions.map((q, i) => (
-                    <div key={i} className="p-3 rounded-lg bg-info/5 border border-info/10">
+                  {candidate.openQuestions.map((q, i) => <div key={i} className="p-3 rounded-lg bg-info/5 border border-info/10">
                       <p className="text-xs text-muted-foreground mb-1">{q.question}</p>
                       <p className="text-sm font-medium">{q.answer}</p>
-                    </div>
-                  ))}
+                    </div>)}
                 </CardContent>
               </Card>
             </div>
@@ -461,12 +527,10 @@ const CandidatPageV3 = () => {
               </div>
               <ScrollArea className="h-[200px]">
                 <div className="space-y-2 pr-2">
-                  {candidate.comments.map((comment) => (
-                    <div key={comment.id} className="p-2 rounded-lg bg-card text-xs">
+                  {candidate.comments.map(comment => <div key={comment.id} className="p-2 rounded-lg bg-card text-xs">
                       <p className="line-clamp-2">{comment.text}</p>
                       <p className="text-muted-foreground mt-1">{comment.author} · {comment.date}</p>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
               </ScrollArea>
               <Textarea placeholder="Ajouter..." className="min-h-[60px] text-sm" />
@@ -478,8 +542,6 @@ const CandidatPageV3 = () => {
           </div>
         </div>
       </div>
-    </ConsoleLayout>
-  );
+    </ConsoleLayout>;
 };
-
 export default CandidatPageV3;

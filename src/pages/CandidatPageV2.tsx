@@ -371,14 +371,6 @@ const CandidatPageV2 = () => {
 
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" className="gap-2 bg-white/50">
-                <Phone className="h-4 w-4" />
-                Appeler
-              </Button>
-              <Button variant="outline" className="gap-2 bg-white/50">
-                <Calendar className="h-4 w-4" />
-                Planifier
-              </Button>
-              <Button variant="outline" className="gap-2 bg-white/50">
                 <Download className="h-4 w-4" />
                 CV
               </Button>
@@ -434,41 +426,49 @@ const CandidatPageV2 = () => {
           <TabsContent value="profil" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Dates clés</CardTitle>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                  <CardTitle className="text-base">Entretiens</CardTitle>
+                  <Button size="sm" className="gap-2 h-8">
+                    <Calendar className="h-4 w-4" />
+                    Planifier un entretien
+                  </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-info/5">
-                    <Phone className="h-5 w-5 text-info" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-info/10 border border-info/20">
+                    <Calendar className="h-5 w-5 text-info" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Appel</p>
-                      <p className="text-sm font-medium">{candidate.phoneCallDate}</p>
+                      <p className="text-xs text-muted-foreground">Entretien planifié</p>
+                      <p className="text-sm font-medium">{candidate.interviewDate}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-success/5">
-                    <Calendar className="h-5 w-5 text-success" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-info/10 border border-info/20">
+                    <Phone className="h-5 w-5 text-info" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Entretien</p>
-                      <p className="text-sm font-medium">{candidate.interviewDate}</p>
+                      <p className="text-xs text-muted-foreground">Dernier appel</p>
+                      <p className="text-sm font-medium">{candidate.phoneCallDate}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Préférences</CardTitle>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                  <CardTitle className="text-base">Préférences & Matching</CardTitle>
+                  <Button variant="outline" size="sm" className="gap-2 h-8">
+                    <RefreshCw className="h-4 w-4" />
+                    Réassigner
+                  </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-coral/5">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-coral/10 border border-coral/20">
                     <MapPin className="h-5 w-5 text-coral" />
                     <div>
                       <p className="text-xs text-muted-foreground">Point de vente préféré</p>
                       <p className="text-sm font-medium">{candidate.preferredStore}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-lavender/5">
-                    <FileText className="h-5 w-5 text-lavender" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-coral/10 border border-coral/20">
+                    <FileText className="h-5 w-5 text-coral" />
                     <div>
                       <p className="text-xs text-muted-foreground">Contrat préféré</p>
                       <p className="text-sm font-medium">{candidate.preferredContract}</p>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, ChevronDown, RotateCcw } from "lucide-react";
+import { X, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -7,19 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface FilterPanelProps {
   isOpen: boolean;
@@ -170,357 +158,294 @@ export const FilterPanel = ({
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <Accordion type="multiple" defaultValue={["pdv", "statut", "candidat"]} className="space-y-2">
+        {/* Content - No accordions, all sections visible */}
+        <ScrollArea className="flex-1">
+          <div className="p-6 space-y-6">
             {/* Point de vente / Zone */}
-            <AccordionItem value="pdv" className="border border-border rounded-lg px-4 bg-background/50">
-              <AccordionTrigger className="hover:no-underline py-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Point de vente / Zone</span>
-                  {selectedPointsVente.length > 0 && (
-                    <span className="px-2 py-0.5 rounded-full bg-info/10 text-info text-xs font-medium">
-                      {selectedPointsVente.length}
-                    </span>
-                  )}
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <div className="space-y-2">
-                  {pointsDeVente.map((pdv) => (
-                    <label
-                      key={pdv.id}
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
-                        "border border-transparent hover:bg-muted",
-                        selectedPointsVente.includes(pdv.id) &&
-                          "bg-info/5 border-info/20"
-                      )}
-                    >
-                      <Checkbox
-                        checked={selectedPointsVente.includes(pdv.id)}
-                        onCheckedChange={() => togglePointVente(pdv.id)}
-                        className="data-[state=checked]:bg-info data-[state=checked]:border-info"
-                      />
-                      <span className="text-sm">{pdv.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <h3 className="font-medium text-sm">Point de vente / Zone</h3>
+                {selectedPointsVente.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-info/10 text-info text-xs font-medium">
+                    {selectedPointsVente.length}
+                  </span>
+                )}
+              </div>
+              <div className="space-y-1">
+                {pointsDeVente.map((pdv) => (
+                  <label
+                    key={pdv.id}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
+                      "border border-transparent hover:bg-muted",
+                      selectedPointsVente.includes(pdv.id) &&
+                        "bg-info/5 border-info/20"
+                    )}
+                  >
+                    <Checkbox
+                      checked={selectedPointsVente.includes(pdv.id)}
+                      onCheckedChange={() => togglePointVente(pdv.id)}
+                    />
+                    <span className="text-sm">{pdv.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
 
-            {/* Dates de conversation */}
-            <AccordionItem value="dates" className="border border-border rounded-lg px-4 bg-background/50">
-              <AccordionTrigger className="hover:no-underline py-3">
-                <span className="font-medium">Dates de candidature</span>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">De</Label>
-                    <Input
-                      type="date"
-                      value={dateDebut}
-                      onChange={(e) => setDateDebut(e.target.value)}
-                      className="bg-background"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">À</Label>
-                    <Input
-                      type="date"
-                      value={dateFin}
-                      onChange={(e) => setDateFin(e.target.value)}
-                      className="bg-background"
-                    />
-                  </div>
+            {/* Dates de candidature */}
+            <div className="space-y-3 pt-4 border-t border-border">
+              <h3 className="font-medium text-sm">Dates de candidature</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">De</Label>
+                  <Input
+                    type="date"
+                    value={dateDebut}
+                    onChange={(e) => setDateDebut(e.target.value)}
+                    className="bg-background"
+                  />
                 </div>
-              </AccordionContent>
-            </AccordionItem>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">À</Label>
+                  <Input
+                    type="date"
+                    value={dateFin}
+                    onChange={(e) => setDateFin(e.target.value)}
+                    className="bg-background"
+                  />
+                </div>
+              </div>
+            </div>
 
             {/* Tags */}
-            <AccordionItem value="tags" className="border border-border rounded-lg px-4 bg-background/50">
-              <AccordionTrigger className="hover:no-underline py-3">
-                <span className="font-medium">Tags</span>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <RadioGroup value={tagsCondition} onValueChange={setTagsCondition} className="space-y-2">
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem value="all" id="tags-all" />
-                    <Label htmlFor="tags-all" className="text-sm cursor-pointer">Réunit toutes les conditions</Label>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem value="any" id="tags-any" />
-                    <Label htmlFor="tags-any" className="text-sm cursor-pointer">Au moins une des conditions</Label>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem value="none" id="tags-none" />
-                    <Label htmlFor="tags-none" className="text-sm cursor-pointer">Aucune des conditions</Label>
-                  </div>
-                </RadioGroup>
-              </AccordionContent>
-            </AccordionItem>
+            <div className="space-y-3 pt-4 border-t border-border">
+              <h3 className="font-medium text-sm">Tags</h3>
+              <RadioGroup value={tagsCondition} onValueChange={setTagsCondition} className="space-y-2">
+                <div className="flex items-center space-x-3">
+                  <RadioGroupItem value="all" id="tags-all" />
+                  <Label htmlFor="tags-all" className="text-sm cursor-pointer">Réunit toutes les conditions</Label>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <RadioGroupItem value="any" id="tags-any" />
+                  <Label htmlFor="tags-any" className="text-sm cursor-pointer">Au moins une des conditions</Label>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <RadioGroupItem value="none" id="tags-none" />
+                  <Label htmlFor="tags-none" className="text-sm cursor-pointer">Aucune des conditions</Label>
+                </div>
+              </RadioGroup>
+            </div>
 
             {/* Statut */}
-            <AccordionItem value="statut" className="border border-border rounded-lg px-4 bg-background/50">
-              <AccordionTrigger className="hover:no-underline py-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Statut</span>
-                  {selectedStatuses.length > 0 && (
-                    <span className="px-2 py-0.5 rounded-full bg-lavender/10 text-lavender text-xs font-medium">
-                      {selectedStatuses.length}
-                    </span>
-                  )}
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <div className="flex gap-2 mb-3">
-                  <button
-                    onClick={selectAllStatuses}
-                    className="text-xs text-info hover:underline"
+            <div className="space-y-3 pt-4 border-t border-border">
+              <div className="flex items-center gap-2">
+                <h3 className="font-medium text-sm">Statut</h3>
+                {selectedStatuses.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-lavender/10 text-lavender text-xs font-medium">
+                    {selectedStatuses.length}
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-2 mb-2">
+                <button
+                  onClick={selectAllStatuses}
+                  className="text-xs text-info hover:underline"
+                >
+                  Tout sélectionner
+                </button>
+                <span className="text-muted-foreground">·</span>
+                <button
+                  onClick={() => setSelectedStatuses([])}
+                  className="text-xs text-muted-foreground hover:underline"
+                >
+                  Réinitialiser
+                </button>
+              </div>
+              <div className="space-y-1">
+                {statuses.map((status) => (
+                  <label
+                    key={status.id}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
+                      "hover:bg-muted",
+                      selectedStatuses.includes(status.id) && "bg-lavender/5"
+                    )}
                   >
-                    Tout sélectionner
-                  </button>
-                  <span className="text-muted-foreground">·</span>
-                  <button
-                    onClick={() => setSelectedStatuses([])}
-                    className="text-xs text-muted-foreground hover:underline"
-                  >
-                    Réinitialiser
-                  </button>
-                </div>
-                <div className="space-y-1">
-                  {statuses.map((status) => (
-                    <label
-                      key={status.id}
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
-                        "hover:bg-muted",
-                        selectedStatuses.includes(status.id) && "bg-lavender/5"
-                      )}
-                    >
-                      <Checkbox
-                        checked={selectedStatuses.includes(status.id)}
-                        onCheckedChange={() => toggleStatus(status.id)}
-                        className="data-[state=checked]:bg-lavender data-[state=checked]:border-lavender"
-                      />
-                      <div className={cn("w-2 h-2 rounded-full", status.color)} />
-                      <span className="text-sm">{status.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+                    <Checkbox
+                      checked={selectedStatuses.includes(status.id)}
+                      onCheckedChange={() => toggleStatus(status.id)}
+                    />
+                    <div className={cn("w-2 h-2 rounded-full", status.color)} />
+                    <span className="text-sm">{status.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
 
             {/* Candidat */}
-            <AccordionItem value="candidat" className="border border-border rounded-lg px-4 bg-background/50">
-              <AccordionTrigger className="hover:no-underline py-3">
-                <span className="font-medium">Candidat</span>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Prénom</Label>
-                    <Input
-                      placeholder="Filtrer par prénom"
-                      value={prenomFiltre}
-                      onChange={(e) => setPrenomFiltre(e.target.value)}
-                      className="bg-background"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Nom</Label>
-                    <Input
-                      placeholder="Filtrer par nom"
-                      value={nomFiltre}
-                      onChange={(e) => setNomFiltre(e.target.value)}
-                      className="bg-background"
-                    />
-                  </div>
+            <div className="space-y-3 pt-4 border-t border-border">
+              <h3 className="font-medium text-sm">Candidat</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Prénom</Label>
+                  <Input
+                    placeholder="Filtrer par prénom"
+                    value={prenomFiltre}
+                    onChange={(e) => setPrenomFiltre(e.target.value)}
+                    className="bg-background"
+                  />
                 </div>
-              </AccordionContent>
-            </AccordionItem>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Nom</Label>
+                  <Input
+                    placeholder="Filtrer par nom"
+                    value={nomFiltre}
+                    onChange={(e) => setNomFiltre(e.target.value)}
+                    className="bg-background"
+                  />
+                </div>
+              </div>
+            </div>
 
             {/* Offre */}
-            <AccordionItem value="offre" className="border border-border rounded-lg px-4 bg-background/50">
-              <AccordionTrigger className="hover:no-underline py-3">
-                <span className="font-medium">Offre d'emploi</span>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Profession</Label>
-                    <Input
-                      placeholder="Filtrer par profession"
-                      value={professionFiltre}
-                      onChange={(e) => setProfessionFiltre(e.target.value)}
-                      className="bg-background"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Titre de l'offre</Label>
-                    <Input
-                      placeholder="Filtrer par titre"
-                      value={titreOffreFiltre}
-                      onChange={(e) => setTitreOffreFiltre(e.target.value)}
-                      className="bg-background"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Référence de l'offre</Label>
-                    <Input
-                      placeholder="Ex: EQP-042"
-                      value={referenceOffreFiltre}
-                      onChange={(e) => setReferenceOffreFiltre(e.target.value)}
-                      className="bg-background"
-                    />
-                  </div>
+            <div className="space-y-3 pt-4 border-t border-border">
+              <h3 className="font-medium text-sm">Offre d'emploi</h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Profession</Label>
+                  <Input
+                    placeholder="Filtrer par profession"
+                    value={professionFiltre}
+                    onChange={(e) => setProfessionFiltre(e.target.value)}
+                    className="bg-background"
+                  />
                 </div>
-              </AccordionContent>
-            </AccordionItem>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Titre de l'offre</Label>
+                  <Input
+                    placeholder="Filtrer par titre"
+                    value={titreOffreFiltre}
+                    onChange={(e) => setTitreOffreFiltre(e.target.value)}
+                    className="bg-background"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Référence de l'offre</Label>
+                  <Input
+                    placeholder="Ex: EQP-042"
+                    value={referenceOffreFiltre}
+                    onChange={(e) => setReferenceOffreFiltre(e.target.value)}
+                    className="bg-background"
+                  />
+                </div>
+              </div>
+            </div>
 
             {/* Score expérience */}
-            <AccordionItem value="score" className="border border-border rounded-lg px-4 bg-background/50">
-              <AccordionTrigger className="hover:no-underline py-3">
-                <span className="font-medium">Score expérience</span>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <div className="px-2">
-                  <Slider
-                    value={experienceRange}
-                    onValueChange={setExperienceRange}
-                    min={0}
-                    max={100}
-                    step={5}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between mt-3 text-sm">
-                    <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{experienceRange[0]}%</span>
-                    <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{experienceRange[1]}%</span>
-                  </div>
+            <div className="space-y-3 pt-4 border-t border-border">
+              <h3 className="font-medium text-sm">Score expérience</h3>
+              <div className="px-2">
+                <Slider
+                  value={experienceRange}
+                  onValueChange={setExperienceRange}
+                  min={0}
+                  max={100}
+                  step={5}
+                  className="w-full"
+                />
+                <div className="flex justify-between mt-3 text-sm">
+                  <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{experienceRange[0]}%</span>
+                  <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{experienceRange[1]}%</span>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
+              </div>
+            </div>
 
             {/* Type de contrat */}
-            <AccordionItem value="contrat" className="border border-border rounded-lg px-4 bg-background/50">
-              <AccordionTrigger className="hover:no-underline py-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Type de contrat</span>
-                  {selectedContracts.length > 0 && (
-                    <span className="px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">
-                      {selectedContracts.length}
-                    </span>
-                  )}
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <div className="flex flex-wrap gap-2">
-                  {contractTypes.map((type) => (
-                    <button
-                      key={type.id}
-                      onClick={() => toggleContract(type.id)}
-                      className={cn(
-                        "px-4 py-2 rounded-lg text-sm font-medium transition-all border",
-                        selectedContracts.includes(type.id)
-                          ? "bg-success text-success-foreground border-success"
-                          : "bg-background text-muted-foreground border-border hover:border-success/50"
-                      )}
-                    >
-                      {type.label}
-                    </button>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Dates de contrat */}
-            <AccordionItem value="dates-contrat" className="border border-border rounded-lg px-4 bg-background/50">
-              <AccordionTrigger className="hover:no-underline py-3">
-                <span className="font-medium">Dates de contrat</span>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">De</Label>
-                    <Input type="date" className="bg-background" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">À</Label>
-                    <Input type="date" className="bg-background" />
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+            <div className="space-y-3 pt-4 border-t border-border">
+              <div className="flex items-center gap-2">
+                <h3 className="font-medium text-sm">Type de contrat</h3>
+                {selectedContracts.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-success/10 text-success text-xs font-medium">
+                    {selectedContracts.length}
+                  </span>
+                )}
+              </div>
+              <div className="space-y-1">
+                {contractTypes.map((contract) => (
+                  <label
+                    key={contract.id}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
+                      "hover:bg-muted",
+                      selectedContracts.includes(contract.id) && "bg-success/5"
+                    )}
+                  >
+                    <Checkbox
+                      checked={selectedContracts.includes(contract.id)}
+                      onCheckedChange={() => toggleContract(contract.id)}
+                    />
+                    <span className="text-sm">{contract.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
 
             {/* Heures hebdomadaires */}
-            <AccordionItem value="heures" className="border border-border rounded-lg px-4 bg-background/50">
-              <AccordionTrigger className="hover:no-underline py-3">
-                <span className="font-medium">Heures hebdomadaires</span>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <div className="px-2">
-                  <Slider
-                    value={hoursRange}
-                    onValueChange={setHoursRange}
-                    min={0}
-                    max={50}
-                    step={5}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between mt-3 text-sm">
-                    <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{hoursRange[0]}h</span>
-                    <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{hoursRange[1]}h</span>
-                  </div>
+            <div className="space-y-3 pt-4 border-t border-border">
+              <h3 className="font-medium text-sm">Heures hebdomadaires</h3>
+              <div className="px-2">
+                <Slider
+                  value={hoursRange}
+                  onValueChange={setHoursRange}
+                  min={0}
+                  max={50}
+                  step={1}
+                  className="w-full"
+                />
+                <div className="flex justify-between mt-3 text-sm">
+                  <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{hoursRange[0]}h</span>
+                  <span className="px-2 py-1 rounded bg-muted text-muted-foreground">{hoursRange[1]}h</span>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
+              </div>
+            </div>
 
-            {/* Filtres supplémentaires */}
-            <AccordionItem value="additional" className="border border-border rounded-lg px-4 bg-background/50">
-              <AccordionTrigger className="hover:no-underline py-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Filtres supplémentaires</span>
-                  {selectedAdditional.length > 0 && (
-                    <span className="px-2 py-0.5 rounded-full bg-warning/10 text-warning text-xs font-medium">
-                      {selectedAdditional.length}
-                    </span>
-                  )}
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <div className="grid grid-cols-1 gap-1">
-                  {additionalFilters.map((filter) => (
-                    <label
-                      key={filter.id}
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-muted transition-colors"
-                    >
-                      <Checkbox
-                        checked={selectedAdditional.includes(filter.id)}
-                        onCheckedChange={() => toggleAdditional(filter.id)}
-                        className="data-[state=checked]:bg-warning data-[state=checked]:border-warning"
-                      />
-                      <span className="text-sm">{filter.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
+            {/* Filtres additionnels */}
+            <div className="space-y-3 pt-4 border-t border-border">
+              <h3 className="font-medium text-sm">Filtres additionnels</h3>
+              <div className="space-y-1">
+                {additionalFilters.map((filter) => (
+                  <label
+                    key={filter.id}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
+                      "hover:bg-muted",
+                      selectedAdditional.includes(filter.id) && "bg-coral/5"
+                    )}
+                  >
+                    <Checkbox
+                      checked={selectedAdditional.includes(filter.id)}
+                      onCheckedChange={() => toggleAdditional(filter.id)}
+                    />
+                    <span className="text-sm">{filter.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-border bg-muted/30">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/30">
           <Button
             variant="ghost"
             onClick={resetAll}
-            className="text-muted-foreground gap-2"
+            className="gap-2 text-muted-foreground hover:text-foreground"
           >
             <RotateCcw className="h-4 w-4" />
             Réinitialiser
           </Button>
-          <Button onClick={onApply} className="btn-primary px-6">
-            Appliquer les filtres
+          <Button onClick={onApply} className="btn-primary px-8">
+            Appliquer
           </Button>
         </div>
       </div>

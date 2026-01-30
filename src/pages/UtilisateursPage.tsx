@@ -324,21 +324,15 @@ const UtilisateursPage = () => {
                       />
                     </td>
                     <td>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-golden/20 flex items-center justify-center text-sm font-semibold text-golden-700">
-                          {utilisateur.prenom[0]}
-                          {utilisateur.nom[0]}
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">
-                            {utilisateur.prenom} {utilisateur.nom}
-                          </p>
-                          {utilisateur.fonctionLegale && (
-                            <p className="text-2xs text-muted-foreground">
-                              {utilisateur.fonctionLegale}
-                            </p>
-                          )}
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-lavender/15 border border-lavender/25 text-sm font-medium text-foreground">
+                          {utilisateur.prenom} {utilisateur.nom}
+                        </span>
+                        {utilisateur.fonctionLegale && (
+                          <span className="text-2xs text-muted-foreground">
+                            {utilisateur.fonctionLegale}
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td>

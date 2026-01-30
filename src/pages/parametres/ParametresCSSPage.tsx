@@ -4,15 +4,8 @@ import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-
 interface CSSConfig {
   id: string;
   nom: string;
@@ -21,37 +14,27 @@ interface CSSConfig {
   marque: string;
   actif: boolean;
 }
-
-const mockCSSConfigs: CSSConfig[] = [
-  {
-    id: "1",
-    nom: "CSS Gallika",
-    couleurPrimaire: "#2e6cb2",
-    couleurSecondaire: "#ffffff",
-    marque: "Gallika",
-    actif: true,
-  },
-];
-
+const mockCSSConfigs: CSSConfig[] = [{
+  id: "1",
+  nom: "CSS Gallika",
+  couleurPrimaire: "#2e6cb2",
+  couleurSecondaire: "#ffffff",
+  marque: "Gallika",
+  actif: true
+}];
 const ParametresCSSPage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-
   const toggleSelectAll = () => {
     if (selectedRows.length === mockCSSConfigs.length) {
       setSelectedRows([]);
     } else {
-      setSelectedRows(mockCSSConfigs.map((c) => c.id));
+      setSelectedRows(mockCSSConfigs.map(c => c.id));
     }
   };
-
   const toggleRow = (id: string) => {
-    setSelectedRows((prev) =>
-      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
-    );
+    setSelectedRows(prev => prev.includes(id) ? prev.filter(r => r !== id) : [...prev, id]);
   };
-
-  return (
-    <ConsoleLayout>
+  return <ConsoleLayout>
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -70,13 +53,7 @@ const ParametresCSSPage = () => {
           </div>
           
           <Tabs defaultValue="css" className="w-full">
-            <div className="px-6 pt-4">
-              <TabsList className="bg-muted/50">
-                <TabsTrigger value="css" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  CSS
-                </TabsTrigger>
-              </TabsList>
-            </div>
+            
             
             <TabsContent value="css" className="p-6 pt-4">
               <div className="space-y-4">
@@ -91,10 +68,7 @@ const ParametresCSSPage = () => {
                     <thead>
                       <tr>
                         <th className="w-12">
-                          <Checkbox
-                            checked={selectedRows.length === mockCSSConfigs.length}
-                            onCheckedChange={toggleSelectAll}
-                          />
+                          <Checkbox checked={selectedRows.length === mockCSSConfigs.length} onCheckedChange={toggleSelectAll} />
                         </th>
                         <th className="w-12"></th>
                         <th>Nom</th>
@@ -105,32 +79,19 @@ const ParametresCSSPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {mockCSSConfigs.map((config) => (
-                        <tr
-                          key={config.id}
-                          className={cn(
-                            selectedRows.includes(config.id) && "bg-primary/5"
-                          )}
-                        >
+                      {mockCSSConfigs.map(config => <tr key={config.id} className={cn(selectedRows.includes(config.id) && "bg-primary/5")}>
                           <td>
-                            <Checkbox
-                              checked={selectedRows.includes(config.id)}
-                              onCheckedChange={() => toggleRow(config.id)}
-                            />
+                            <Checkbox checked={selectedRows.includes(config.id)} onCheckedChange={() => toggleRow(config.id)} />
                           </td>
                           <td>
-                            <span className={cn(
-                              "w-2.5 h-2.5 rounded-full inline-block",
-                              config.actif ? "bg-success" : "bg-muted"
-                            )} />
+                            <span className={cn("w-2.5 h-2.5 rounded-full inline-block", config.actif ? "bg-success" : "bg-muted")} />
                           </td>
                           <td className="font-medium">{config.nom}</td>
                           <td>
                             <div className="flex items-center gap-2">
-                              <span 
-                                className="w-4 h-4 rounded border border-border"
-                                style={{ backgroundColor: config.couleurPrimaire }}
-                              />
+                              <span className="w-4 h-4 rounded border border-border" style={{
+                            backgroundColor: config.couleurPrimaire
+                          }} />
                               <span className="text-sm text-muted-foreground font-mono">
                                 {config.couleurPrimaire}
                               </span>
@@ -138,10 +99,9 @@ const ParametresCSSPage = () => {
                           </td>
                           <td>
                             <div className="flex items-center gap-2">
-                              <span 
-                                className="w-4 h-4 rounded border border-border"
-                                style={{ backgroundColor: config.couleurSecondaire }}
-                              />
+                              <span className="w-4 h-4 rounded border border-border" style={{
+                            backgroundColor: config.couleurSecondaire
+                          }} />
                               <span className="text-sm text-muted-foreground font-mono">
                                 {config.couleurSecondaire}
                               </span>
@@ -153,8 +113,7 @@ const ParametresCSSPage = () => {
                               <Eye className="h-4 w-4 text-muted-foreground" />
                             </button>
                           </td>
-                        </tr>
-                      ))}
+                        </tr>)}
                     </tbody>
                   </table>
                 </div>
@@ -163,8 +122,6 @@ const ParametresCSSPage = () => {
           </Tabs>
         </div>
       </div>
-    </ConsoleLayout>
-  );
+    </ConsoleLayout>;
 };
-
 export default ParametresCSSPage;

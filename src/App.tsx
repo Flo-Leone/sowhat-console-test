@@ -13,6 +13,10 @@ import EmployesPage from "./pages/EmployesPage";
 import UtilisateursPage from "./pages/UtilisateursPage";
 import UtilisateurFormPage from "./pages/UtilisateurFormPage";
 import RolesPage from "./pages/RolesPage";
+import ParametresCSSPage from "./pages/parametres/ParametresCSSPage";
+import ParametresOffresPage from "./pages/parametres/ParametresOffresPage";
+import ParametresMessagesPage from "./pages/parametres/ParametresMessagesPage";
+import ParametresPreembauchePage from "./pages/parametres/ParametresPreembauchePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,7 +35,11 @@ const App = () => (
           <Route path="/statistiques" element={<StatistiquesPage />} />
           <Route path="/offres-emploi" element={<OffresEmploiPage />} />
           <Route path="/offres-emploi/nouvelle" element={<CreateOffrePage />} />
-          <Route path="/parametres" element={<CandidaturesPage />} />
+          <Route path="/parametres" element={<Navigate to="/parametres/css" replace />} />
+          <Route path="/parametres/css" element={<ParametresCSSPage />} />
+          <Route path="/parametres/offres" element={<ParametresOffresPage />} />
+          <Route path="/parametres/messages" element={<ParametresMessagesPage />} />
+          <Route path="/parametres/pre-embauche" element={<ParametresPreembauchePage />} />
           <Route path="/employes" element={<EmployesPage />} />
           <Route path="/utilisateurs" element={<UtilisateursPage />} />
           <Route path="/utilisateurs/nouveau" element={<UtilisateurFormPage />} />

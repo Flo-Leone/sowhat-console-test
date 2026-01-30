@@ -364,7 +364,7 @@
     @apply bg-[hsl(var(--coral-glow))] text-white;
     @apply text-sm font-medium;
     @apply transition-all duration-150;
-    @apply hover:bg-[hsl(18_100%_60%)] active:brightness-95;
+    @apply hover:bg-[hsl(18_100%_76%)] active:bg-[hsl(18_100%_62%)];
   }
   
   /* Secondary Button - Outline style with coral hover */

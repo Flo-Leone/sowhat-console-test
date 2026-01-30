@@ -297,7 +297,7 @@ const CandidaturesPage = () => {
         </div>
 
         {/* Data Table with horizontal scroll */}
-        <div className="bg-white rounded-xl border border-border overflow-hidden">
+        <div className="bg-white rounded-xl overflow-hidden">
           <ScrollArea className="w-full">
             <div className="min-w-[1400px]">
               <table className="data-table w-full">

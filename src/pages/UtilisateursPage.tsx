@@ -191,7 +191,7 @@ const UtilisateursPage = () => {
             {selectedRows.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className="gap-2 bg-lavender hover:bg-lavender/90 text-white">
+                  <Button className="gap-2 bg-[hsl(var(--coral-glow))] hover:bg-[hsl(18_100%_75%)] text-white">
                     Actions ({selectedRows.length})
                     <ChevronDown className="h-4 w-4" />
                   </Button>
@@ -287,7 +287,7 @@ const UtilisateursPage = () => {
         </div>
 
         {/* Data Table */}
-        <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
+        <div className="bg-white rounded-xl border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="data-table">
               <thead>

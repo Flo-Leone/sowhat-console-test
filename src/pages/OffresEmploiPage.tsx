@@ -120,7 +120,7 @@ const OffresEmploiPage = () => {
             {selectedRows.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className="gap-2 bg-lavender hover:bg-lavender/90 text-white">
+                  <Button className="gap-2 bg-[hsl(var(--coral-glow))] hover:bg-[hsl(18_100%_75%)] text-white">
                     Actions ({selectedRows.length})
                     <ChevronDown className="h-4 w-4" />
                   </Button>
@@ -167,7 +167,7 @@ const OffresEmploiPage = () => {
           </TabsList>
 
           <TabsContent value="en-cours" className="mt-6">
-            <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
+            <div className="bg-white rounded-xl border border-border overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="data-table">
                   <thead>
@@ -273,7 +273,7 @@ const OffresEmploiPage = () => {
           </TabsContent>
 
           <TabsContent value="demandes" className="mt-6">
-            <div className="bg-card rounded-xl shadow-card border border-border p-12 text-center">
+            <div className="bg-white rounded-xl border border-border p-12 text-center">
               <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center mb-4">
                 <Briefcase className="h-6 w-6 text-muted-foreground" />
               </div>

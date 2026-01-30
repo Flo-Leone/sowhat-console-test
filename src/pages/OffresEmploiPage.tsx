@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   MoreHorizontal,
@@ -14,7 +15,6 @@ import {
   Archive,
 } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
-import { CreateOffreDialog } from "@/components/offres/CreateOffreDialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -82,9 +82,9 @@ const mockModeles = [
 ];
 
 const OffresEmploiPage = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("en-cours");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const toggleSelectAll = () => {
     if (selectedRows.length === mockOffres.length) {
@@ -98,6 +98,10 @@ const OffresEmploiPage = () => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
     );
+  };
+
+  const handleCreateOffre = () => {
+    navigate("/offres-emploi/nouvelle");
   };
 
   return (
@@ -141,14 +145,12 @@ const OffresEmploiPage = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <Button className="btn-primary gap-2" onClick={() => setCreateDialogOpen(true)}>
+            <Button className="btn-primary gap-2" onClick={handleCreateOffre}>
               <Plus className="h-4 w-4" />
               Créer une offre
             </Button>
           </div>
         </div>
-
-        <CreateOffreDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>

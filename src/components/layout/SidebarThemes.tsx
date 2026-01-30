@@ -1,7 +1,7 @@
-// Sidebar theme definitions for the 4 color variants
-// Carbon, Lavender Nuit, Golden Pale, Coral Pale
+// Sidebar theme definitions for the 5 color variants
+// Carbon, Lavender Nuit, Golden Pale, Coral Pale, Porcelain Coral
 
-export type SidebarTheme = "carbon" | "lavender" | "golden" | "coral";
+export type SidebarTheme = "carbon" | "lavender" | "golden" | "coral" | "porcelain";
 
 interface ThemeConfig {
   name: string;
@@ -19,6 +19,7 @@ interface ThemeConfig {
   mainBackground?: string; // Optional: custom main content background
   navActiveClass: string;
   navActiveGlow: string;
+  navHoverClass?: string; // Optional: custom hover text color
   logoVariant: "dark" | "light";
 }
 
@@ -70,7 +71,7 @@ export const sidebarThemes: Record<SidebarTheme, ThemeConfig> = {
       "--sidebar-border": "48 50% 70%",
       "--sidebar-ring": "44 100% 67%",
     },
-    mainBackground: "45 50% 97%", // Fond principal crème
+    mainBackground: "45 50% 97%",
     navActiveClass: "bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))]",
     navActiveGlow: "0 2px 8px rgba(255, 210, 85, 0.35)",
     logoVariant: "dark",
@@ -91,6 +92,25 @@ export const sidebarThemes: Record<SidebarTheme, ThemeConfig> = {
     navActiveClass: "bg-[hsl(var(--coral-glow))] text-[hsl(var(--carbon-black))]",
     navActiveGlow: "0 2px 8px rgba(255, 140, 97, 0.35)",
     logoVariant: "dark",
+  },
+  porcelain: {
+    name: "Porcelain Coral",
+    description: "Fond clair crème, accents corail",
+    cssVars: {
+      "--sidebar-background": "40 50% 96%",
+      "--sidebar-foreground": "0 0% 25%",
+      "--sidebar-primary": "18 100% 69%",
+      "--sidebar-primary-foreground": "0 0% 100%",
+      "--sidebar-accent": "40 35% 92%",
+      "--sidebar-accent-foreground": "0 0% 20%",
+      "--sidebar-border": "40 30% 90%",
+      "--sidebar-ring": "18 100% 69%",
+    },
+    mainBackground: "0 0% 100%",
+    navActiveClass: "bg-[hsl(var(--coral-glow))] text-white",
+    navActiveGlow: "0 2px 8px rgba(255, 140, 97, 0.3)",
+    navHoverClass: "text-[hsl(var(--coral-glow))]",
+    logoVariant: "light",
   },
 };
 

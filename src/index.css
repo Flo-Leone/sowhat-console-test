@@ -325,6 +325,11 @@
   .nav-item:hover {
     @apply bg-sidebar-accent text-sidebar-accent-foreground;
   }
+
+  /* Coral hover for light themes */
+  .nav-item-coral-hover:hover {
+    color: hsl(var(--coral-glow)) !important;
+  }
   
   .nav-item.active {
     @apply bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))];
@@ -378,13 +383,14 @@
     @apply hover:bg-muted transition-all duration-150;
   }
   
-  /* Tertiary Button - Ghost/Text style */
+  /* Tertiary Button - Coral accent style */
   .btn-tertiary {
     @apply inline-flex items-center justify-center gap-2;
     @apply h-10 px-4 rounded-lg;
-    @apply bg-transparent text-muted-foreground;
+    @apply bg-transparent;
+    color: hsl(var(--coral-glow));
     @apply text-sm font-medium;
-    @apply hover:text-foreground hover:bg-muted/50 transition-all duration-150;
+    @apply hover:bg-[hsl(var(--coral-glow)/0.1)] transition-all duration-150;
   }
 
   /* Small buttons */

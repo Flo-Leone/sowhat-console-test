@@ -3,7 +3,26 @@
 
 export type SidebarTheme = "carbon" | "lavender" | "golden" | "coral";
 
-export const sidebarThemes = {
+interface ThemeConfig {
+  name: string;
+  description: string;
+  cssVars: {
+    "--sidebar-background": string;
+    "--sidebar-foreground": string;
+    "--sidebar-primary": string;
+    "--sidebar-primary-foreground": string;
+    "--sidebar-accent": string;
+    "--sidebar-accent-foreground": string;
+    "--sidebar-border": string;
+    "--sidebar-ring": string;
+  };
+  mainBackground?: string; // Optional: custom main content background
+  navActiveClass: string;
+  navActiveGlow: string;
+  logoVariant: "dark" | "light";
+}
+
+export const sidebarThemes: Record<SidebarTheme, ThemeConfig> = {
   carbon: {
     name: "Carbon Premium",
     description: "Noir carbon, menu actif jaune SoWhat",
@@ -19,7 +38,7 @@ export const sidebarThemes = {
     },
     navActiveClass: "bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))]",
     navActiveGlow: "0 2px 8px rgba(255, 210, 85, 0.3)",
-    logoVariant: "dark", // uses sowhat-logo-dark.png
+    logoVariant: "dark",
   },
   lavender: {
     name: "Lavender Nuit",
@@ -40,17 +59,18 @@ export const sidebarThemes = {
   },
   golden: {
     name: "Golden Pale",
-    description: "Jaune SoWhat 40%, menu actif 100%",
+    description: "Jaune SoWhat, menu actif 100%",
     cssVars: {
-      "--sidebar-background": "44 55% 90%",
+      "--sidebar-background": "48 75% 78%",
       "--sidebar-foreground": "0 0% 20%",
       "--sidebar-primary": "44 100% 67%",
       "--sidebar-primary-foreground": "0 0% 12%",
-      "--sidebar-accent": "44 40% 84%",
+      "--sidebar-accent": "48 60% 72%",
       "--sidebar-accent-foreground": "0 0% 15%",
-      "--sidebar-border": "44 30% 82%",
+      "--sidebar-border": "48 50% 70%",
       "--sidebar-ring": "44 100% 67%",
     },
+    mainBackground: "45 50% 97%", // Fond principal crème
     navActiveClass: "bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))]",
     navActiveGlow: "0 2px 8px rgba(255, 210, 85, 0.35)",
     logoVariant: "dark",
@@ -72,7 +92,7 @@ export const sidebarThemes = {
     navActiveGlow: "0 2px 8px rgba(255, 140, 97, 0.35)",
     logoVariant: "dark",
   },
-} as const;
+};
 
 // Helper to apply theme CSS vars to an element
 export const applySidebarTheme = (theme: SidebarTheme): React.CSSProperties => {

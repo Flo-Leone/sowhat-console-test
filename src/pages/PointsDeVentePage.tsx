@@ -272,7 +272,10 @@ const PointsDeVentePage = () => {
               Gérez vos {mockPointsDeVente.length} points de vente
             </p>
           </div>
-          <Button className="btn-primary gap-2 self-start sm:self-auto" onClick={() => setAddDialogOpen(true)}>
+          <Button 
+            className="gap-2 self-start sm:self-auto bg-[hsl(18_100%_69%)] hover:bg-[hsl(18_100%_76%)] text-white" 
+            onClick={() => setAddDialogOpen(true)}
+          >
             <Plus className="h-4 w-4" />
             Ajouter un point de vente
           </Button>
@@ -297,7 +300,7 @@ const PointsDeVentePage = () => {
             <Button
               variant="outline"
               className={cn(
-                "gap-2 shrink-0",
+                "gap-2 shrink-0 hover:border-[hsl(var(--coral-glow))] hover:text-[hsl(var(--coral-glow))] hover:bg-[hsl(var(--coral-glow)/0.08)]",
                 activeFilters.length > 0 && "border-primary bg-primary/5"
               )}
               onClick={() => setFilterPanelOpen(true)}
@@ -342,7 +345,7 @@ const PointsDeVentePage = () => {
             )}
 
             {/* Download CSV */}
-            <Button variant="outline" className="gap-2 shrink-0">
+            <Button variant="outline" className="gap-2 shrink-0 hover:border-[hsl(var(--coral-glow))] hover:text-[hsl(var(--coral-glow))] hover:bg-[hsl(var(--coral-glow)/0.08)]">
               <Download className="h-4 w-4" />
               <span className="hidden sm:inline">Télécharger CSV</span>
             </Button>
@@ -378,7 +381,7 @@ const PointsDeVentePage = () => {
         </div>
 
         {/* Data Table */}
-        <div className="bg-white rounded-xl border border-border overflow-hidden">
+        <div className="bg-white rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="data-table">
               <thead>
@@ -492,7 +495,7 @@ const PointsDeVentePage = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 border-t border-border bg-muted/30">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 border-t border-border bg-white">
             <span className="text-sm text-muted-foreground">
               {filteredPoints.length} résultat{filteredPoints.length > 1 ? "s" : ""}
             </span>

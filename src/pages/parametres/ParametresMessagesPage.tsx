@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { Plus, Undo, Redo, ChevronDown } from "lucide-react";
+import { Undo, Redo, ChevronDown, Save, MessageSquare } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -19,101 +17,141 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+const messageTypes = [
+  { value: "rappel", label: "Message de rappel", icon: "🔔" },
+  { value: "bienvenue", label: "Message de bienvenue", icon: "👋" },
+  { value: "confirmation", label: "Confirmation entretien", icon: "✅" },
+  { value: "rejet", label: "Message de rejet", icon: "❌" },
+];
+
+const defaultMessages: Record<string, string> = {
+  rappel: "Bonjour {{firstName}}, nous n'avons pas eu de nouvelles de vous concernant votre candidature chez {{company}}. Êtes-vous toujours intéressé(e) ?",
+  bienvenue: "Bienvenue {{firstName}} ! Nous sommes ravis de votre intérêt pour le poste de {{profession}} chez {{company}}.",
+  confirmation: "Bonjour {{firstName}}, nous confirmons votre entretien pour le poste de {{profession}} le {{date}} à {{store}}.",
+  rejet: "Bonjour {{firstName}}, nous avons bien reçu votre candidature pour le poste de {{profession}} chez {{company}}. Après étude de votre profil, nous ne pouvons malheureusement pas donner suite.",
+};
+
 const ParametresMessagesPage = () => {
   const [selectedMarque, setSelectedMarque] = useState("gallika");
   const [messageType, setMessageType] = useState("rappel");
-  const [messageContent, setMessageContent] = useState(
-    "Bonjour {{firstName}}, nous n'avons pas eu de nouvelles de vous concernant votre candidature chez {{company}}. Êtes-vous toujours intéressé(e) ?"
-  );
+  const [messageContent, setMessageContent] = useState(defaultMessages.rappel);
+
+  const handleTypeChange = (type: string) => {
+    setMessageType(type);
+    setMessageContent(defaultMessages[type] || "");
+  };
 
   return (
     <ConsoleLayout>
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-foreground">Paramètres</h1>
-            <p className="text-muted-foreground mt-1">
-              Configuration des messages automatiques
-            </p>
-          </div>
+        <div>
+          <h1>Paramètres Messages</h1>
+          <p className="text-muted-foreground mt-1">
+            Configuration des messages automatiques
+          </p>
         </div>
 
         {/* Marque Selector */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-muted-foreground">Marque :</span>
+          <Select value={selectedMarque} onValueChange={setSelectedMarque}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Sélectionner une marque" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gallika">Gallika</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Message Type Selector */}
         <div className="bg-card rounded-xl border border-border overflow-hidden">
           <div className="px-6 py-4 border-b border-border">
-            <Select value={selectedMarque} onValueChange={setSelectedMarque}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Sélectionner une marque" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="gallika">Marque</SelectItem>
-              </SelectContent>
-            </Select>
+            <h2>Type de message</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Sélectionnez le type de message à configurer
+            </p>
           </div>
 
-          <div className="p-6 space-y-8">
-            {/* Type de message */}
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold">Configuration des messages</h2>
-              
-              <div className="space-y-3">
-                <Label>Type de message</Label>
-                <Select value={messageType} onValueChange={setMessageType}>
-                  <SelectTrigger className="w-64">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="rappel">Message de rappel</SelectItem>
-                    <SelectItem value="bienvenue">Message de bienvenue</SelectItem>
-                    <SelectItem value="confirmation">Confirmation entretien</SelectItem>
-                    <SelectItem value="rejet">Message de rejet</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <div className="p-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {messageTypes.map((type) => (
+                <button
+                  key={type.value}
+                  onClick={() => handleTypeChange(type.value)}
+                  className={`p-4 rounded-lg border text-left transition-all ${
+                    messageType === type.value
+                      ? "border-primary bg-primary/5 ring-1 ring-primary"
+                      : "border-border hover:border-primary/50 hover:bg-muted/50"
+                  }`}
+                >
+                  <span className="text-xl mb-2 block">{type.icon}</span>
+                  <span className="text-sm font-medium">{type.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
 
-              {/* Éditeur de message */}
-              <div className="space-y-3">
-                <Label>Contenu du message</Label>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <button className="p-1.5 rounded hover:bg-muted transition-colors">
-                      <Undo className="h-4 w-4 text-muted-foreground" />
-                    </button>
-                    <button className="p-1.5 rounded hover:bg-muted transition-colors">
-                      <Redo className="h-4 w-4 text-muted-foreground" />
-                    </button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="gap-1 text-sm">
-                          Ajouter paramètre
-                          <ChevronDown className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem>{"{{firstName}}"}</DropdownMenuItem>
-                        <DropdownMenuItem>{"{{lastName}}"}</DropdownMenuItem>
-                        <DropdownMenuItem>{"{{profession}}"}</DropdownMenuItem>
-                        <DropdownMenuItem>{"{{store}}"}</DropdownMenuItem>
-                        <DropdownMenuItem>{"{{company}}"}</DropdownMenuItem>
-                        <DropdownMenuItem>{"{{date}}"}</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                  <Textarea
-                    value={messageContent}
-                    onChange={(e) => setMessageContent(e.target.value)}
-                    rows={8}
-                    className="resize-none"
-                  />
-                </div>
-              </div>
+        {/* Message Editor */}
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+          <div className="px-6 py-4 border-b border-border flex items-center gap-3">
+            <MessageSquare className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <h2>Contenu du message</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {messageTypes.find(t => t.value === messageType)?.label}
+              </p>
             </div>
           </div>
 
+          <div className="p-6 space-y-4">
+            {/* Toolbar */}
+            <div className="flex items-center gap-2 pb-2 border-b border-border">
+              <button className="p-2 rounded-md hover:bg-muted transition-colors" title="Annuler">
+                <Undo className="h-4 w-4 text-muted-foreground" />
+              </button>
+              <button className="p-2 rounded-md hover:bg-muted transition-colors" title="Rétablir">
+                <Redo className="h-4 w-4 text-muted-foreground" />
+              </button>
+              <div className="w-px h-5 bg-border mx-1" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-1.5 h-8">
+                    Insérer variable
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem className="font-mono text-sm">{"{{firstName}}"}</DropdownMenuItem>
+                  <DropdownMenuItem className="font-mono text-sm">{"{{lastName}}"}</DropdownMenuItem>
+                  <DropdownMenuItem className="font-mono text-sm">{"{{profession}}"}</DropdownMenuItem>
+                  <DropdownMenuItem className="font-mono text-sm">{"{{store}}"}</DropdownMenuItem>
+                  <DropdownMenuItem className="font-mono text-sm">{"{{company}}"}</DropdownMenuItem>
+                  <DropdownMenuItem className="font-mono text-sm">{"{{date}}"}</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Textarea */}
+            <Textarea
+              value={messageContent}
+              onChange={(e) => setMessageContent(e.target.value)}
+              rows={6}
+              className="resize-none"
+              placeholder="Saisissez votre message..."
+            />
+
+            <p className="text-xs text-muted-foreground">
+              Variables disponibles : <code className="bg-muted px-1 py-0.5 rounded">{"{{firstName}}"}</code>, <code className="bg-muted px-1 py-0.5 rounded">{"{{lastName}}"}</code>, <code className="bg-muted px-1 py-0.5 rounded">{"{{profession}}"}</code>, <code className="bg-muted px-1 py-0.5 rounded">{"{{store}}"}</code>, <code className="bg-muted px-1 py-0.5 rounded">{"{{company}}"}</code>, <code className="bg-muted px-1 py-0.5 rounded">{"{{date}}"}</code>
+            </p>
+          </div>
+
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-border flex justify-end">
-            <Button className="btn-primary">
+          <div className="px-6 py-4 border-t border-border bg-muted/30 flex justify-end">
+            <Button className="btn-primary gap-2">
+              <Save className="h-4 w-4" />
               Sauvegarder
             </Button>
           </div>

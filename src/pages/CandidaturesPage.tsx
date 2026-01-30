@@ -219,7 +219,10 @@ const CandidaturesPage = () => {
               Les candidatures de votre périmètre
             </p>
           </div>
-          <Button className="btn-primary gap-2 self-start sm:self-auto" onClick={() => setAddDialogOpen(true)}>
+          <Button 
+            className="gap-2 self-start sm:self-auto bg-[hsl(18_100%_69%)] hover:bg-[hsl(18_100%_76%)] text-white" 
+            onClick={() => setAddDialogOpen(true)}
+          >
             <Plus className="h-4 w-4" />
             Ajouter un candidat
           </Button>

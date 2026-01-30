@@ -82,7 +82,10 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed, theme }: N
                     "block py-2 px-3 rounded-md text-sm transition-colors",
                     isActive
                       ? cn(themeConfig.navActiveClass, "font-medium")
-                      : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                      : cn(
+                          "text-sidebar-foreground/80 hover:bg-sidebar-accent/50",
+                          themeConfig.navHoverClass ? `hover:${themeConfig.navHoverClass}` : "hover:text-sidebar-foreground"
+                        )
                   )
                 }
                 style={({ isActive }) => isActive ? { boxShadow: themeConfig.navActiveGlow } : undefined}
@@ -102,7 +105,8 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed, theme }: N
       className={({ isActive }) =>
         cn(
           "nav-item",
-          isActive && themeConfig.navActiveClass
+          isActive && themeConfig.navActiveClass,
+          !isActive && themeConfig.navHoverClass && "nav-item-coral-hover"
         )
       }
       style={({ isActive }) => isActive ? { boxShadow: themeConfig.navActiveGlow } : undefined}

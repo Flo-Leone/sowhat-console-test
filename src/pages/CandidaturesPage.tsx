@@ -385,24 +385,19 @@ const CandidaturesPage = () => {
                         />
                       </td>
                       <td className="sticky left-12 bg-card z-10">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-md bg-lavender/20 flex items-center justify-center text-sm font-semibold text-lavender">
-                            {candidate.firstName[0]}{candidate.lastName[0]}
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm">
-                              {candidate.firstName} {candidate.lastName}
-                            </p>
-                            {candidate.tags.length > 0 && (
-                              <div className="flex gap-1 mt-0.5">
-                                {candidate.tags.map((tag) => (
-                                  <span key={tag} className="tag tag-primary text-2xs">
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-lavender/15 border border-lavender/25 text-sm font-medium text-foreground">
+                            {candidate.firstName} {candidate.lastName}
+                          </span>
+                          {candidate.tags.length > 0 && (
+                            <div className="flex gap-1">
+                              {candidate.tags.map((tag) => (
+                                <span key={tag} className="tag tag-primary text-2xs">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td>

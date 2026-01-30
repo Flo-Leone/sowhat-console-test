@@ -106,6 +106,7 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed, theme }: N
         cn(
           "nav-item",
           isActive && themeConfig.navActiveClass,
+          isActive && "nav-item-active-no-hover",
           !isActive && themeConfig.navHoverClass && "nav-item-coral-hover"
         )
       }

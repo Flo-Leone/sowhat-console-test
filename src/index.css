@@ -316,13 +316,18 @@
     @apply text-sidebar-foreground transition-all duration-150;
   }
   
-  .nav-item:hover {
+  .nav-item:hover:not(.nav-item-active-no-hover) {
     @apply bg-sidebar-accent text-sidebar-accent-foreground;
   }
 
   /* Coral hover for light themes */
   .nav-item-coral-hover:hover {
     color: hsl(var(--coral-glow)) !important;
+  }
+
+  /* Active state - no hover change */
+  .nav-item-active-no-hover:hover {
+    /* Keep active styling on hover */
   }
   
   .nav-item.active {

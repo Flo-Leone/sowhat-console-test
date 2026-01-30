@@ -386,9 +386,8 @@ const CandidaturesPage = () => {
                       </td>
                       <td className="sticky left-12 bg-card z-10">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-lavender/20 flex items-center justify-center text-sm font-semibold text-lavender">
-                            {candidate.firstName[0]}
-                            {candidate.lastName[0]}
+                          <div className="w-8 h-8 rounded-md bg-lavender/20 flex items-center justify-center text-sm font-semibold text-lavender">
+                            {candidate.firstName[0]}{candidate.lastName[0]}
                           </div>
                           <div>
                             <p className="font-medium text-sm">
@@ -431,13 +430,13 @@ const CandidaturesPage = () => {
                         </div>
                       </td>
                       <td>
-                        <ScoreBar value={candidate.scoreExperience} />
+                        <ScoreBar value={candidate.scoreExperience} compact />
                       </td>
                       <td>
-                        <ScoreBar value={candidate.scoreProfession} />
+                        <ScoreBar value={candidate.scoreProfession} compact />
                       </td>
                       <td>
-                        <ScoreBar value={candidate.scoreDisponibilite} />
+                        <ScoreBar value={candidate.scoreDisponibilite} compact />
                       </td>
                       <td>
                         {candidate.appelDate ? (

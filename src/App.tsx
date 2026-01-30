@@ -8,6 +8,7 @@ import CandidatPage from "./pages/CandidatPage";
 import PointsDeVentePage from "./pages/PointsDeVentePage";
 import StatistiquesPage from "./pages/StatistiquesPage";
 import OffresEmploiPage from "./pages/OffresEmploiPage";
+import CreateOffrePage from "./pages/CreateOffrePage";
 import EmployesPage from "./pages/EmployesPage";
 import UtilisateursPage from "./pages/UtilisateursPage";
 import UtilisateurFormPage from "./pages/UtilisateurFormPage";
@@ -29,7 +30,7 @@ const App = () => (
           <Route path="/points-de-vente" element={<PointsDeVentePage />} />
           <Route path="/statistiques" element={<StatistiquesPage />} />
           <Route path="/offres-emploi" element={<OffresEmploiPage />} />
-          <Route path="/offres-emploi/*" element={<OffresEmploiPage />} />
+          <Route path="/offres-emploi/nouvelle" element={<CreateOffrePage />} />
           <Route path="/parametres" element={<CandidaturesPage />} />
           <Route path="/employes" element={<EmployesPage />} />
           <Route path="/utilisateurs" element={<UtilisateursPage />} />

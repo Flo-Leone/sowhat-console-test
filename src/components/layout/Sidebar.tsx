@@ -12,10 +12,18 @@ import {
   ChevronRight,
   PanelLeftClose,
   PanelLeft,
+  Palette,
 } from "lucide-react";
 import sowhatLogoDark from "@/assets/sowhat-logo-dark.png";
+import sowhatLogo from "@/assets/sowhat-logo.png";
 import sowhatBubble from "@/assets/sowhat-bubble.png";
 import { cn } from "@/lib/utils";
+import { sidebarThemes, SidebarTheme, applySidebarTheme } from "./SidebarThemes";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface NavItemProps {
   to: string;
@@ -24,13 +32,15 @@ interface NavItemProps {
   badge?: number;
   children?: { to: string; label: string }[];
   collapsed?: boolean;
+  theme: SidebarTheme;
 }
 
-const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemProps) => {
+const NavItem = ({ to, icon: Icon, label, badge, children, collapsed, theme }: NavItemProps) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const isActive = location.pathname === to || location.pathname.startsWith(to + "/");
   const hasChildren = children && children.length > 0;
+  const themeConfig = sidebarThemes[theme];
 
   // Auto-open if child is active
   const childIsActive = children?.some(
@@ -70,10 +80,11 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemP
                   cn(
                     "block py-2 px-3 rounded-md text-sm transition-colors",
                     isActive
-                      ? "nav-item-submenu-active"
+                      ? cn(themeConfig.navActiveClass, "font-medium")
                       : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                   )
                 }
+                style={({ isActive }) => isActive ? { boxShadow: themeConfig.navActiveGlow } : undefined}
               >
                 {child.label}
               </NavLink>
@@ -88,8 +99,12 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemP
     <NavLink
       to={to}
       className={({ isActive }) =>
-        cn("nav-item", isActive && "active")
+        cn(
+          "nav-item",
+          isActive && themeConfig.navActiveClass
+        )
       }
+      style={({ isActive }) => isActive ? { boxShadow: themeConfig.navActiveGlow } : undefined}
     >
       <Icon className="h-[18px] w-[18px] shrink-0" />
       {!collapsed && (
@@ -98,7 +113,11 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed }: NavItemP
           {badge !== undefined && badge > 0 && (
             <span className={cn(
               "flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-2xs font-semibold",
-              isActive ? "bg-white text-[hsl(var(--carbon-black))]" : "bg-primary text-primary-foreground"
+              theme === "carbon" 
+                ? "bg-white text-[hsl(var(--carbon-black))]" 
+                : theme === "lavender"
+                ? "bg-white text-lavender"
+                : "bg-white text-coral"
             )}>
               {badge > 99 ? "99+" : badge}
             </span>
@@ -132,19 +151,72 @@ const secondaryNavItems = [
 
 export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [theme, setTheme] = useState<SidebarTheme>("carbon");
+  const [themePickerOpen, setThemePickerOpen] = useState(false);
+  
+  const themeConfig = sidebarThemes[theme];
+  const logoSrc = themeConfig.logoVariant === "dark" ? sowhatLogoDark : sowhatLogo;
 
   return (
     <aside
       className={cn(
-        "h-full bg-sidebar border-r border-sidebar-border flex flex-col transition-all duration-200",
+        "h-full border-r flex flex-col transition-all duration-200",
         collapsed ? "w-16" : "w-60"
       )}
+      style={{
+        ...applySidebarTheme(theme),
+        backgroundColor: `hsl(${sidebarThemes[theme].cssVars["--sidebar-background"]})`,
+        borderColor: `hsl(${sidebarThemes[theme].cssVars["--sidebar-border"]})`,
+        color: `hsl(${sidebarThemes[theme].cssVars["--sidebar-foreground"]})`,
+      }}
     >
-      {/* Collapse toggle */}
-      <div className="flex items-center justify-end p-3 border-b border-sidebar-border">
+      {/* Collapse toggle + Theme picker */}
+      <div className="flex items-center justify-between p-3 border-b" style={{ borderColor: `hsl(${sidebarThemes[theme].cssVars["--sidebar-border"]})` }}>
+        {!collapsed && (
+          <Popover open={themePickerOpen} onOpenChange={setThemePickerOpen}>
+            <PopoverTrigger asChild>
+              <button
+                className="p-1.5 rounded-md hover:bg-sidebar-accent transition-colors"
+                title="Changer le thème"
+              >
+                <Palette className="h-4 w-4" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-2" align="start">
+              <p className="text-xs font-medium text-muted-foreground mb-2 px-2">Thème de la sidebar</p>
+              <div className="space-y-1">
+                {(Object.keys(sidebarThemes) as SidebarTheme[]).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => {
+                      setTheme(t);
+                      setThemePickerOpen(false);
+                    }}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted text-left",
+                      theme === t && "bg-muted"
+                    )}
+                  >
+                    <div 
+                      className="w-4 h-4 rounded-full border-2"
+                      style={{ 
+                        backgroundColor: `hsl(${sidebarThemes[t].cssVars["--sidebar-background"]})`,
+                        borderColor: `hsl(${sidebarThemes[t].cssVars["--sidebar-primary"]})`
+                      }}
+                    />
+                    <div>
+                      <p className="font-medium">{sidebarThemes[t].name}</p>
+                      <p className="text-2xs text-muted-foreground">{sidebarThemes[t].description}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+          className="p-1.5 rounded-md hover:bg-sidebar-accent transition-colors ml-auto"
         >
           {collapsed ? (
             <PanelLeft className="h-4 w-4" />
@@ -158,20 +230,20 @@ export const Sidebar = () => {
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         <div className="space-y-1">
           {navItems.map((item) => (
-            <NavItem key={item.to} {...item} collapsed={collapsed} />
+            <NavItem key={item.to} {...item} collapsed={collapsed} theme={theme} />
           ))}
         </div>
 
         {/* Section divider */}
         <div className="pt-4 pb-2">
           {!collapsed && (
-            <span className="px-3 text-2xs font-semibold uppercase tracking-wider text-muted-foreground/60">
+            <span className="px-3 text-2xs font-semibold uppercase tracking-wider opacity-60">
               Gestion
             </span>
           )}
           <div className="mt-2 space-y-1">
             {secondaryNavItems.map((item) => (
-              <NavItem key={item.to} {...item} collapsed={collapsed} />
+              <NavItem key={item.to} {...item} collapsed={collapsed} theme={theme} />
             ))}
           </div>
         </div>
@@ -179,20 +251,21 @@ export const Sidebar = () => {
 
       {/* Footer: SoWhat branding */}
       <div className={cn(
-        "p-4 border-t border-sidebar-border",
+        "p-4 border-t",
         collapsed ? "flex justify-center" : ""
-      )}>
+      )} style={{ borderColor: `hsl(${sidebarThemes[theme].cssVars["--sidebar-border"]})` }}>
       {collapsed ? (
           <img src={sowhatBubble} alt="SoWhat" className="h-6 opacity-60" />
         ) : (
           <div className="flex items-center gap-2 opacity-70 hover:opacity-100 transition-opacity">
-            <span className="text-xs text-sidebar-foreground">
+            <span className="text-xs">
               Powered by
             </span>
-            <img src={sowhatLogoDark} alt="SoWhat AI" className="h-3.5" />
+            <img src={logoSrc} alt="SoWhat AI" className="h-3.5" />
           </div>
         )}
       </div>
     </aside>
   );
 };
+

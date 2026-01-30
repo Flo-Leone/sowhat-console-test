@@ -115,8 +115,8 @@ export default {
         "2xl": "calc(var(--radius) + 8px)",
       },
       fontFamily: {
-        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
-        display: ["Plus Jakarta Sans", "Inter", "sans-serif"],
+        sans: ["Roboto", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        display: ["Plus Jakarta Sans", "Roboto", "sans-serif"],
       },
       fontSize: {
         "2xs": ["0.6875rem", { lineHeight: "1rem" }],

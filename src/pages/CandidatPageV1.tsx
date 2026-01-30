@@ -133,52 +133,52 @@ const candidateData = {
   }],
   comments: [{
     id: "1",
-    text: "Excellente candidate avec expérience management",
+    text: "Excellente candidate avec une solide expérience en management. Elle a démontré une capacité remarquable à gérer des équipes de plus de 15 personnes, avec des résultats mesurables en termes de satisfaction client et de performance commerciale. Son parcours montre une progression constante vers des postes à responsabilité. Elle communique de manière très professionnelle et sait mettre en avant ses réalisations avec des exemples concrets. Je recommande vivement de poursuivre le processus de recrutement avec cette candidate. Son profil correspond parfaitement à ce que nous recherchons pour le poste de manager.",
     author: "Stephane Boussely",
     date: "01/19/26, 11:00 AM"
   }, {
     id: "2",
-    text: "Entretien très positif, très à l'aise à l'oral",
+    text: "Entretien très positif. La candidate était très à l'aise à l'oral et a su répondre à toutes nos questions avec pertinence. Elle a montré une bonne connaissance du secteur retail et des enjeux spécifiques à notre marque. Points forts : leadership naturel, bonne gestion du stress, capacité d'adaptation. Elle a également posé des questions très pertinentes sur l'évolution possible au sein de l'entreprise, ce qui montre sa motivation à s'investir sur le long terme.",
     author: "Admin SW.AI",
     date: "01/18/26, 4:00 PM"
   }, {
     id: "3",
-    text: "Disponibilité confirmée pour début février",
+    text: "Disponibilité confirmée pour début février. La candidate peut commencer dès le 3 février si besoin, ce qui correspond parfaitement à notre planning d'ouverture du nouveau point de vente. Elle a également mentionné qu'elle serait flexible sur les horaires pendant la période de formation.",
     author: "Florian Guerrier",
     date: "01/17/26, 2:30 PM"
   }, {
     id: "4",
-    text: "A négocié le salaire, accord trouvé",
+    text: "A négocié le salaire, accord trouvé à 2800€ brut mensuel + primes sur objectifs. La candidate était initialement sur une demande à 3200€ mais a accepté notre contre-proposition compte tenu des perspectives d'évolution et des avantages proposés (mutuelle, tickets restaurant, intéressement).",
     author: "Stephane Boussely",
     date: "01/16/26, 10:15 AM"
   }, {
     id: "5",
-    text: "Références vérifiées auprès de l'ancien employeur",
+    text: "Références vérifiées auprès de l'ancien employeur (Retail Group SA). Retours très positifs sur sa performance, son implication et sa capacité à fédérer les équipes. Son ancien manager a confirmé qu'elle était partie de son plein gré pour des raisons géographiques (déménagement) et qu'il la reprendrait sans hésitation si elle revenait dans la région.",
     author: "Admin SW.AI",
     date: "01/15/26, 3:45 PM"
   }, {
     id: "6",
-    text: "Très motivée par le poste de management",
+    text: "Très motivée par le poste de management proposé. Elle voit cette opportunité comme une étape importante dans sa carrière et souhaite développer ses compétences en gestion d'équipe et en pilotage commercial. Elle a notamment apprécié notre politique de formation continue.",
     author: "Julie Martin",
     date: "01/14/26, 11:00 AM"
   }, {
     id: "7",
-    text: "CV impressionnant, 5 ans d'expérience retail",
+    text: "CV impressionnant avec 5 ans d'expérience retail dont 3 ans sur des postes d'encadrement. Formation initiale en commerce (BTS MUC) complétée par une licence professionnelle en management des organisations. Maîtrise des outils informatiques courants et du logiciel de caisse utilisé dans nos points de vente.",
     author: "Florian Guerrier",
     date: "01/13/26, 9:30 AM"
   }, {
     id: "8",
-    text: "Appel de présélection réussi",
+    text: "Appel de présélection réussi. Bonne élocution, répond de manière structurée aux questions. A bien préparé l'entretien et connaît notre enseigne. Motivation claire et cohérente avec son projet professionnel. Disponible rapidement.",
     author: "Stephane Boussely",
     date: "01/12/26, 4:00 PM"
   }, {
     id: "9",
-    text: "Profil correspond parfaitement aux critères",
+    text: "Profil correspond parfaitement aux critères définis dans le brief : expérience management confirmée, connaissance du retail, disponibilité immédiate, mobilité géographique. Score de matching élevé sur tous les critères.",
     author: "Admin SW.AI",
     date: "01/11/26, 2:00 PM"
   }, {
     id: "10",
-    text: "Candidature spontanée à considérer en priorité",
+    text: "Candidature spontanée à considérer en priorité. CV reçu via notre page carrières avec une lettre de motivation personnalisée mentionnant spécifiquement notre enseigne et ses valeurs. Ce type de démarche proactive est toujours un bon indicateur de motivation.",
     author: "Julie Martin",
     date: "01/10/26, 10:00 AM"
   }],
@@ -392,70 +392,72 @@ const CandidatPageV1 = () => {
     console.log("Archiving candidate", id);
   };
   return <ConsoleLayout>
-      <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-        {/* Version indicator */}
-        
-
-        {/* Back Navigation */}
-        <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="h-4 w-4" />
-          <span className="text-sm">Retour aux candidatures</span>
-        </button>
-
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-full bg-lavender/20 flex items-center justify-center text-2xl font-bold text-lavender">
-              {candidate.firstName[0]}{candidate.lastName[0]}
+      <div className="relative">
+        {/* Sticky Action Bar */}
+        <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between">
+            <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <ArrowLeft className="h-4 w-4" />
+              <span className="text-sm">Retour aux candidatures</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" className="gap-2">
+                <Calendar className="h-4 w-4" />
+                Planifier un entretien
+              </Button>
+              <Button variant="outline" className="gap-2" onClick={handleArchive}>
+                <Archive className="h-4 w-4" />
+                Archiver
+              </Button>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-foreground">
-                  {candidate.firstName} {candidate.lastName}
-                </h1>
-                <ConversionTagsEditor tags={candidate.conversionTags} onTagsChange={handleTagsChange} />
-              </div>
-              <p className="text-muted-foreground mt-1">
-                Candidature pour: <span className="text-foreground font-medium">{candidate.titreOffre}</span>
-              </p>
-              {candidate.assignedStore && <p className="text-sm text-coral mt-1 flex items-center gap-1">
-                  <MapPin className="h-3.5 w-3.5" />
-                  Assigné à: {candidate.assignedStore}
-                </p>}
-              
-              {/* Compact profile info */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm">
-                <a href={`mailto:${candidate.email}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
-                  <Mail className="h-4 w-4 text-info" />
-                  <span>{candidate.email}</span>
-                </a>
-                <a href={`tel:${candidate.phone}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
-                  <Phone className="h-4 w-4 text-success" />
-                  <span>{candidate.phone}</span>
-                </a>
-                <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <Calendar className="h-4 w-4 text-warning" />
-                  <span>{candidate.applicationDate}</span>
-                </span>
-                <Button variant="link" className="h-auto p-0 text-sm text-lavender hover:text-lavender/80">
-                  <Download className="h-3.5 w-3.5 mr-1" />
-                  Télécharger CV
-                </Button>
-              </div>
-
-              <div className="flex items-center gap-4 mt-3">
-                <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" className="gap-2" onClick={handleArchive}>
-              <Archive className="h-4 w-4" />
-              Archiver
-            </Button>
           </div>
         </div>
+
+        <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+          {/* Header */}
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+            <div className="flex items-start gap-4">
+              <div className="w-16 h-16 rounded-md bg-lavender/20 flex items-center justify-center text-2xl font-bold text-lavender">
+                {candidate.firstName[0]}{candidate.lastName[0]}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h1 className="text-foreground">
+                    {candidate.firstName} {candidate.lastName}
+                  </h1>
+                  <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
+                  <ConversionTagsEditor tags={candidate.conversionTags} onTagsChange={handleTagsChange} />
+                </div>
+                <p className="text-muted-foreground mt-1">
+                  Candidature pour: <span className="text-foreground font-medium">{candidate.titreOffre}</span>
+                </p>
+                {candidate.assignedStore && <p className="text-sm text-coral mt-1 flex items-center gap-1">
+                    <MapPin className="h-3.5 w-3.5" />
+                    Assigné à: {candidate.assignedStore}
+                  </p>}
+                
+                {/* Compact profile info */}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm">
+                  <a href={`mailto:${candidate.email}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                    <Mail className="h-4 w-4 text-info" />
+                    <span>{candidate.email}</span>
+                  </a>
+                  <a href={`tel:${candidate.phone}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                    <Phone className="h-4 w-4 text-success" />
+                    <span>{candidate.phone}</span>
+                  </a>
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                    <Calendar className="h-4 w-4 text-warning" />
+                    <span>{candidate.applicationDate}</span>
+                  </span>
+                  <Button variant="link" className="h-auto p-0 text-sm text-lavender hover:text-lavender/80">
+                    <Download className="h-3.5 w-3.5 mr-1" />
+                    Télécharger CV
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -679,6 +681,7 @@ const CandidatPageV1 = () => {
               </CardContent>
             </Card>
           </div>
+        </div>
         </div>
       </div>
     </ConsoleLayout>;

@@ -135,7 +135,17 @@ const navItems = [
   { to: "/points-de-vente", icon: Store, label: "Points de vente" },
   { to: "/statistiques", icon: TrendingUp, label: "Statistiques" },
   { to: "/offres-emploi", icon: Briefcase, label: "Offres d'emploi" },
-  { to: "/parametres", icon: Settings, label: "Paramètres" },
+  { 
+    to: "/parametres", 
+    icon: Settings, 
+    label: "Paramètres",
+    children: [
+      { to: "/parametres/css", label: "CSS" },
+      { to: "/parametres/offres", label: "Offres d'emploi" },
+      { to: "/parametres/messages", label: "Messages" },
+      { to: "/parametres/pre-embauche", label: "Pré-embauche" },
+    ],
+  },
 ];
 
 const secondaryNavItems = [

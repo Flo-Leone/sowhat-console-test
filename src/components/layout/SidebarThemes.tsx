@@ -110,7 +110,7 @@ export const sidebarThemes: Record<SidebarTheme, ThemeConfig> = {
     navActiveClass: "bg-[hsl(var(--coral-glow))] text-white",
     navActiveGlow: "0 2px 8px rgba(255, 140, 97, 0.3)",
     navHoverClass: "text-[hsl(var(--coral-glow))]",
-    logoVariant: "light",
+    logoVariant: "dark",
   },
 };
 

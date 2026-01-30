@@ -429,10 +429,10 @@ const PointsDeVentePage = () => {
                     </td>
                     <td>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
                         </div>
-                        <span className="font-medium text-sm">{point.nom}</span>
+                        <span className="font-semibold text-foreground text-sm">{point.nom}</span>
                       </div>
                     </td>
                     <td>

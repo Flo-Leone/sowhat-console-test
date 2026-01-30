@@ -537,7 +537,7 @@ const CandidaturesPage = () => {
           </ScrollArea>
 
           {/* Pagination */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 border-t border-border bg-muted/30">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 border-t border-border bg-white">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>Résultats par page</span>
               <Select value={pageSize} onValueChange={setPageSize}>

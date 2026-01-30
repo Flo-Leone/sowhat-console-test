@@ -251,7 +251,7 @@ const CandidaturesPage = () => {
             {selectedRows.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className="gap-2 bg-lavender hover:bg-lavender/90 text-white">
+                  <Button className="gap-2 bg-[hsl(var(--coral-glow))] hover:bg-[hsl(18_100%_75%)] text-white">
                     Actions ({selectedRows.length})
                     <ChevronDown className="h-4 w-4" />
                   </Button>
@@ -297,20 +297,20 @@ const CandidaturesPage = () => {
         </div>
 
         {/* Data Table with horizontal scroll */}
-        <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">
+        <div className="bg-white rounded-xl border border-border overflow-hidden">
           <ScrollArea className="w-full">
             <div className="min-w-[1400px]">
               <table className="data-table w-full">
                 <thead>
                   <tr>
-                    <th className="w-12 sticky left-0 bg-[hsl(var(--table-header))] z-10">
+                    <th className="w-12 sticky left-0 bg-white z-10">
                       <Checkbox
                         checked={selectedRows.length === mockCandidates.length}
                         onCheckedChange={toggleSelectAll}
                       />
                     </th>
-                    <th className="sticky left-12 bg-[hsl(var(--table-header))] z-10 min-w-[180px]">
-                      <div className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
+                    <th className="sticky left-12 bg-white z-10 min-w-[180px]">
+                      <div className="flex items-center gap-1.5 cursor-pointer hover:text-[hsl(var(--coral-glow))]">
                         Candidat
                         <ArrowUpDown className="h-3 w-3" />
                       </div>
@@ -376,7 +376,7 @@ const CandidaturesPage = () => {
                       onClick={() => handleRowClick(candidate.id)}
                     >
                       <td 
-                        className="sticky left-0 bg-card z-10"
+                        className="sticky left-0 bg-white z-10"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <Checkbox
@@ -384,7 +384,7 @@ const CandidaturesPage = () => {
                           onCheckedChange={() => toggleRow(candidate.id)}
                         />
                       </td>
-                      <td className="sticky left-12 bg-card z-10">
+                      <td className="sticky left-12 bg-white z-10">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-foreground">
                             {candidate.firstName} {candidate.lastName}

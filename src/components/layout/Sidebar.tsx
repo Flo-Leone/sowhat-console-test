@@ -116,8 +116,10 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed, theme }: N
               theme === "carbon" 
                 ? "bg-white text-[hsl(var(--carbon-black))]" 
                 : theme === "lavender"
-                ? "bg-white text-lavender"
-                : "bg-white text-coral"
+                ? "bg-white text-[hsl(241,40%,16%)]"
+                : theme === "golden"
+                ? "bg-[hsl(var(--carbon-black))] text-white"
+                : "bg-[hsl(var(--carbon-black))] text-white"
             )}>
               {badge > 99 ? "99+" : badge}
             </span>

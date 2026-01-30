@@ -389,7 +389,7 @@ const CandidaturesPage = () => {
                       </td>
                       <td className="sticky left-12 bg-white z-10">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-[hsl(var(--coral-glow))]">
+                          <span className="font-semibold text-[hsl(18_100%_45%)]">
                             {candidate.firstName} {candidate.lastName}
                           </span>
                           {candidate.tags.length > 0 && (

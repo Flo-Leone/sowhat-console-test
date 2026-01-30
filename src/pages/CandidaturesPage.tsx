@@ -386,7 +386,7 @@ const CandidaturesPage = () => {
                       </td>
                       <td className="sticky left-12 bg-card z-10">
                         <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-lavender/15 border border-lavender/25 text-sm font-medium text-foreground">
+                          <span className="font-semibold text-foreground">
                             {candidate.firstName} {candidate.lastName}
                           </span>
                           {candidate.tags.length > 0 && (

@@ -216,7 +216,10 @@ const UtilisateursPage = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <Button className="btn-primary gap-2" onClick={() => navigate("/utilisateurs/nouveau")}>
+            <Button 
+              className="gap-2 bg-[hsl(18_100%_69%)] hover:bg-[hsl(18_100%_76%)] text-white" 
+              onClick={() => navigate("/utilisateurs/nouveau")}
+            >
               <Plus className="h-4 w-4" />
               Inviter un utilisateur
             </Button>
@@ -242,7 +245,7 @@ const UtilisateursPage = () => {
             <Button
               variant="outline"
               className={cn(
-                "gap-2 shrink-0",
+                "gap-2 shrink-0 hover:border-[hsl(var(--coral-glow))] hover:text-[hsl(var(--coral-glow))] hover:bg-[hsl(var(--coral-glow)/0.08)]",
                 activeFilters.length > 0 && "border-primary bg-primary/5"
               )}
               onClick={() => setFilterPanelOpen(true)}
@@ -287,7 +290,7 @@ const UtilisateursPage = () => {
         </div>
 
         {/* Data Table */}
-        <div className="bg-white rounded-xl border border-border overflow-hidden">
+        <div className="bg-white rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="data-table">
               <thead>
@@ -413,7 +416,7 @@ const UtilisateursPage = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 border-t border-border bg-muted/30">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 border-t border-border bg-white">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Résultats par page</span>
               <Select defaultValue="10">

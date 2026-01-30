@@ -145,7 +145,10 @@ const OffresEmploiPage = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <Button className="btn-primary gap-2" onClick={handleCreateOffre}>
+            <Button 
+              className="gap-2 bg-[hsl(18_100%_69%)] hover:bg-[hsl(18_100%_76%)] text-white" 
+              onClick={handleCreateOffre}
+            >
               <Plus className="h-4 w-4" />
               Créer une offre
             </Button>
@@ -167,7 +170,7 @@ const OffresEmploiPage = () => {
           </TabsList>
 
           <TabsContent value="en-cours" className="mt-6">
-            <div className="bg-white rounded-xl border border-border overflow-hidden">
+            <div className="bg-white rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="data-table">
                   <thead>

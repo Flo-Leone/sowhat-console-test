@@ -19,6 +19,7 @@ import sowhatLogo from "@/assets/sowhat-logo.png";
 import sowhatBubble from "@/assets/sowhat-bubble.png";
 import { cn } from "@/lib/utils";
 import { sidebarThemes, SidebarTheme, applySidebarTheme } from "./SidebarThemes";
+import { useSidebarTheme } from "./SidebarThemeContext";
 import {
   Popover,
   PopoverContent,
@@ -163,7 +164,7 @@ const secondaryNavItems = [
 
 export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [theme, setTheme] = useState<SidebarTheme>("carbon");
+  const { theme, setTheme } = useSidebarTheme();
   const [themePickerOpen, setThemePickerOpen] = useState(false);
   
   const themeConfig = sidebarThemes[theme];

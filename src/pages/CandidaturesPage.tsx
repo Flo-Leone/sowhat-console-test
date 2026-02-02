@@ -220,7 +220,7 @@ const CandidaturesPage = () => {
             </p>
           </div>
           <Button 
-            className="gap-2 self-start sm:self-auto bg-[hsl(18_100%_69%)] hover:bg-[hsl(18_100%_76%)] text-white" 
+            className="btn-primary self-start sm:self-auto" 
             onClick={() => setAddDialogOpen(true)}
           >
             <Plus className="h-4 w-4" />

@@ -257,13 +257,19 @@ const StatusDropdown = ({
   const config = statusConfig[status];
   return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className={cn("status-badge cursor-pointer hover:opacity-80 transition-opacity", config.className)}>
-          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+        <button className={cn(
+          "inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+          "border-2 cursor-pointer hover:shadow-sm",
+          config.className,
+          "bg-opacity-15 hover:bg-opacity-25"
+        )}>
+          <span className="w-2 h-2 rounded-full bg-current" />
           {config.label}
-          <ChevronDown className="h-3 w-3 ml-1" />
+          <ChevronDown className="h-4 w-4 ml-1 opacity-60" />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1" align="start">
+        <p className="text-xs font-medium text-muted-foreground px-3 py-2">Changer le statut</p>
         <div className="space-y-0.5">
           {Object.entries(statusConfig).map(([key, value]) => <button key={key} onClick={() => {
           onStatusChange(key as CandidateStatus);

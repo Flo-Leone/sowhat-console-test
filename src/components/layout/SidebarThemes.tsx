@@ -94,22 +94,21 @@ export const sidebarThemes: Record<SidebarTheme, ThemeConfig> = {
     logoVariant: "dark",
   },
   porcelain: {
-    name: "Porcelain Coral",
-    description: "Fond blanc, accents corail",
+    name: "Porcelain Golden",
+    description: "Fond blanc, accents jaune SoWhat",
     cssVars: {
       "--sidebar-background": "0 0% 100%",
       "--sidebar-foreground": "0 0% 25%",
-      "--sidebar-primary": "18 100% 69%",
-      "--sidebar-primary-foreground": "0 0% 100%",
-      "--sidebar-accent": "40 20% 96%",
-      "--sidebar-accent-foreground": "0 0% 20%",
-      "--sidebar-border": "40 20% 92%",
-      "--sidebar-ring": "18 100% 69%",
+      "--sidebar-primary": "44 100% 67%",
+      "--sidebar-primary-foreground": "0 0% 12%",
+      "--sidebar-accent": "40 39% 95%", // Porcelain/floral white for hover
+      "--sidebar-accent-foreground": "38 100% 40%", // Dark golden for hover text
+      "--sidebar-border": "40 15% 88%",
+      "--sidebar-ring": "44 100% 67%",
     },
-    mainBackground: "16 30% 97%",
-    navActiveClass: "bg-[hsl(var(--coral-glow))] text-white",
-    navActiveGlow: "0 2px 8px rgba(255, 140, 97, 0.3)",
-    navHoverClass: "text-[hsl(var(--coral-glow))]",
+    navActiveClass: "bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))]",
+    navActiveGlow: "0 2px 8px rgba(255, 210, 85, 0.3)",
+    navHoverClass: "text-[hsl(38_100%_40%)]", // Dark golden on hover
     logoVariant: "dark",
   },
 };

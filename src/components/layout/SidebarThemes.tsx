@@ -10,7 +10,7 @@ export const sidebarStyles = {
   border: "40 15% 88%",
   ring: "44 100% 67%",
   navActiveClass: "bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))]",
-  navActiveGlow: "0 2px 8px rgba(255, 210, 85, 0.3)",
+  navActiveGlow: "none",
 };
 
 // Apply sidebar CSS vars as inline styles

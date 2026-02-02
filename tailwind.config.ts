@@ -126,9 +126,9 @@ export default {
         "18": "4.5rem",
       },
       boxShadow: {
-        soft: "0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 2px 8px 0 rgba(0, 0, 0, 0.04), 0 4px 16px 0 rgba(0, 0, 0, 0.03)",
-        card: "0 0 0 1px hsl(var(--border)), 0 2px 4px 0 rgba(0, 0, 0, 0.02), 0 4px 12px 0 rgba(0, 0, 0, 0.04)",
-        elevated: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 20px -3px rgba(0, 0, 0, 0.08), 0 20px 40px -5px rgba(0, 0, 0, 0.05)",
+        soft: "none",
+        card: "none",
+        elevated: "none",
       },
       keyframes: {
         "accordion-down": {

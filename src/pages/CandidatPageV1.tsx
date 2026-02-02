@@ -401,11 +401,11 @@ const CandidatPageV1 = () => {
               <span className="text-sm">Retour aux candidatures</span>
             </button>
             <div className="flex items-center gap-2">
-              <Button variant="outline" className="gap-2">
+              <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
                 <Calendar className="h-4 w-4" />
                 Planifier un entretien
               </Button>
-              <Button variant="outline" className="gap-2" onClick={handleArchive}>
+              <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]" onClick={handleArchive}>
                 <Archive className="h-4 w-4" />
                 Archiver
               </Button>

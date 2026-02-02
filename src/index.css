@@ -223,7 +223,7 @@
 
   /* Subtle coral tinted background for main content area */
   .bg-gradient-coral {
-    background: hsl(18 20% 98%);
+    background: linear-gradient(180deg, rgba(255, 140, 97, 0.10) 0%, #F8F5ED 100%);
   }
 
   .bg-gradient-brand {

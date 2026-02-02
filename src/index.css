@@ -193,12 +193,9 @@
 }
 
 @layer components {
-  /* Premium shadows */
+  /* Premium shadows - disabled for flat design */
   .shadow-soft {
-    box-shadow: 
-      0 1px 2px 0 rgba(0, 0, 0, 0.03),
-      0 2px 8px 0 rgba(0, 0, 0, 0.04),
-      0 4px 16px 0 rgba(0, 0, 0, 0.03);
+    box-shadow: none;
   }
   
   .shadow-card {
@@ -206,10 +203,7 @@
   }
   
   .shadow-elevated {
-    box-shadow: 
-      0 4px 6px -1px rgba(0, 0, 0, 0.05),
-      0 10px 20px -3px rgba(0, 0, 0, 0.08),
-      0 20px 40px -5px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
   }
 
   /* Subtle gradient backgrounds */
@@ -337,13 +331,11 @@
   
   .nav-item.active {
     @apply bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))];
-    box-shadow: 0 2px 8px rgba(255, 210, 85, 0.3);
   }
 
   /* Submenu active state */
   .nav-item-submenu-active {
     @apply bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] font-medium;
-    box-shadow: 0 2px 6px rgba(255, 210, 85, 0.25);
   }
 
   /* Score indicators */

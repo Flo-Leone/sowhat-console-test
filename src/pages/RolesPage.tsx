@@ -223,41 +223,11 @@ const RolesPage = () => {
     <ConsoleLayout>
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-foreground">Rôles</h1>
-            <p className="text-muted-foreground mt-1">
-              Gérez les rôles et permissions
-            </p>
-          </div>
-          {selectedRows.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="gap-2 bg-[hsl(var(--coral-glow))] hover:bg-[hsl(18_100%_75%)] text-white self-start sm:self-auto">
-                  Actions ({selectedRows.length})
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="w-56 bg-card border-border shadow-elevated"
-              >
-                <DropdownMenuItem className="gap-3 py-2.5">
-                  <RefreshCw className="h-4 w-4" />
-                  Modifier les rôles
-                </DropdownMenuItem>
-                <DropdownMenuItem className="gap-3 py-2.5">
-                  <Edit className="h-4 w-4" />
-                  Dupliquer
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="gap-3 py-2.5 text-destructive">
-                  <Trash2 className="h-4 w-4" />
-                  Supprimer
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+        <div>
+          <h1 className="text-foreground">Rôles</h1>
+          <p className="text-muted-foreground mt-1">
+            Gérez les rôles et permissions
+          </p>
         </div>
 
         {/* Search and Filters */}
@@ -292,6 +262,36 @@ const RolesPage = () => {
                 </Badge>
               )}
             </Button>
+
+            {/* Actions Button - appears when rows are selected */}
+            {selectedRows.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="gap-2 bg-[hsl(var(--coral-glow))] hover:bg-[hsl(18_100%_75%)] text-white">
+                    Actions ({selectedRows.length})
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-card border-border shadow-elevated"
+                >
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <RefreshCw className="h-4 w-4" />
+                    Modifier les rôles
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Edit className="h-4 w-4" />
+                    Dupliquer
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="gap-3 py-2.5 text-destructive">
+                    <Trash2 className="h-4 w-4" />
+                    Supprimer
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
 
           {/* Active Filters Display */}

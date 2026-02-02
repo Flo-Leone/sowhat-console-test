@@ -32,7 +32,7 @@
     --background: 40 39% 97%;
     --foreground: 0 0% 12%;
     
-    --card: 0 0% 100%;
+    --card: 0 0% 100%;         /* Pure white #FFFFFF */
     --card-foreground: 0 0% 12%;
     
     --popover: 0 0% 100%;
@@ -277,16 +277,19 @@
 
   /* Data table styling */
   .data-table {
-    @apply w-full border-collapse bg-white;
+    @apply w-full border-collapse;
+    background-color: #FFFFFF;
   }
   
   .data-table th {
     @apply text-left text-xs font-bold tracking-wider text-foreground;
-    @apply px-4 py-3 bg-white border-b border-[hsl(var(--table-border))];
+    @apply px-4 py-3 border-b border-[hsl(var(--table-border))];
+    background-color: #FFFFFF;
   }
   
   .data-table td {
-    @apply px-4 py-3 text-sm border-b border-[hsl(var(--table-border))] bg-white;
+    @apply px-4 py-3 text-sm border-b border-[hsl(var(--table-border))];
+    background-color: #FFFFFF;
   }
   
   .data-table tbody tr {
@@ -299,7 +302,8 @@
 
   /* Filter panel */
   .filter-panel {
-    @apply bg-card rounded-xl p-5;
+    @apply rounded-xl p-5;
+    background-color: #FFFFFF;
   }
   
   .filter-section {
@@ -357,7 +361,8 @@
 
   /* Cards */
   .metric-card {
-    @apply bg-card rounded-xl p-5;
+    @apply rounded-xl p-5;
+    background-color: #FFFFFF;
   }
   
   /* === Buttons === */

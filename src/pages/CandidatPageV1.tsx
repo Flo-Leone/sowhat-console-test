@@ -259,7 +259,7 @@ const StatusDropdown = ({
       <PopoverTrigger asChild>
         <button className={cn(
           "inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-          "border border-current cursor-pointer",
+          "border-[0.5px] border-current cursor-pointer",
           config.className,
           "bg-opacity-15 hover:bg-opacity-25"
         )}>

@@ -70,6 +70,9 @@
     --border: 40 15% 88%;
     --input: 40 15% 85%;
     --ring: 44 100% 67%;
+    
+    /* Dropdown hover - Floral White #F8F5ED */
+    --dropdown-hover: 40 39% 95%;
 
     --radius: 0.625rem;
 

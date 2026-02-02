@@ -117,7 +117,7 @@ const ParametresMessagesPage = () => {
               </button>
               <div className="w-px h-5 bg-border mx-1" />
               <Select onValueChange={(value) => setMessageContent(prev => prev + value)}>
-                <SelectTrigger className="w-48 h-8">
+                <SelectTrigger className="w-48">
                   <SelectValue placeholder="Insérer variable" />
                 </SelectTrigger>
                 <SelectContent>

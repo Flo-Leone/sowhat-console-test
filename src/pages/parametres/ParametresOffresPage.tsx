@@ -108,19 +108,16 @@ const ParametresOffresPage = () => {
                 <Redo className="h-4 w-4 text-muted-foreground" />
               </button>
               <div className="w-px h-5 bg-border mx-1" />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-1.5 h-8">
-                    Insérer variable
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem className="font-mono text-sm">{"{{profession}}"}</DropdownMenuItem>
-                  <DropdownMenuItem className="font-mono text-sm">{"{{store}}"}</DropdownMenuItem>
-                  <DropdownMenuItem className="font-mono text-sm">{"{{company}}"}</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Select onValueChange={(value) => setMessageAccueil(prev => prev + value)}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Insérer variable" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="{{profession}}">{"{{profession}}"}</SelectItem>
+                  <SelectItem value="{{store}}">{"{{store}}"}</SelectItem>
+                  <SelectItem value="{{company}}">{"{{company}}"}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Textarea */}

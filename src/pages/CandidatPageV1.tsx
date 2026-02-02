@@ -426,7 +426,7 @@ const CandidatPageV1 = () => {
               </button>
               {isScrolled && (
                 <div className="flex items-center gap-3 pl-4 border-l border-border">
-                  <span className="text-sm font-bold text-foreground">
+                  <span className="text-base font-bold text-foreground">
                     {candidate.firstName} {candidate.lastName}
                   </span>
                   <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />

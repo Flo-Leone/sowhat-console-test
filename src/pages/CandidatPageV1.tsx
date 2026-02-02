@@ -257,12 +257,7 @@ const StatusDropdown = ({
   const config = statusConfig[status];
   return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className={cn(
-          "inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-          "border-[0.5px] border-current cursor-pointer",
-          config.className,
-          "bg-opacity-15 hover:bg-opacity-25"
-        )}>
+        <button className={cn("inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all", "border-[0.5px] border-current cursor-pointer", config.className, "bg-opacity-15 hover:bg-opacity-25")}>
           <span className="w-2 h-2 rounded-full bg-current" />
           {config.label}
           <ChevronDown className="h-4 w-4 ml-1 opacity-60" />
@@ -400,20 +395,18 @@ const CandidatPageV1 = () => {
   const handleReassign = () => {
     console.log("Reassigning candidate", id);
   };
-  
+
   // Scroll detection - target the main container
   const [isScrolled, setIsScrolled] = useState(false);
   useEffect(() => {
     const mainElement = document.querySelector('main');
     if (!mainElement) return;
-    
     const handleScroll = () => {
       setIsScrolled(mainElement.scrollTop > 100);
     };
     mainElement.addEventListener("scroll", handleScroll);
     return () => mainElement.removeEventListener("scroll", handleScroll);
   }, []);
-  
   return <ConsoleLayout>
       <div className="relative">
         {/* Sticky Action Bar */}
@@ -424,18 +417,13 @@ const CandidatPageV1 = () => {
                 <ArrowLeft className="h-4 w-4" />
                 <span className="text-sm">Retour aux candidatures</span>
               </button>
-              {isScrolled && (
-                <div className="flex items-center gap-3 pl-4 border-l border-border">
-                  <span className="text-sm font-medium text-foreground">
-                    {candidate.firstName} {candidate.lastName}
-                  </span>
+              {isScrolled && <div className="flex items-center gap-3 pl-4 border-l border-border">
+                  
                   <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
-                </div>
-              )}
+                </div>}
             </div>
             <div className="flex items-center gap-2">
-              {isScrolled && (
-                <>
+              {isScrolled && <>
                   <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
                     <Calendar className="h-4 w-4" />
                     Planifier un entretien
@@ -444,8 +432,7 @@ const CandidatPageV1 = () => {
                     <RefreshCw className="h-4 w-4" />
                     Réassigner
                   </Button>
-                </>
-              )}
+                </>}
               <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]" onClick={handleArchive}>
                 <Archive className="h-4 w-4" />
                 Archiver
@@ -577,8 +564,8 @@ const CandidatPageV1 = () => {
                         <div className="flex items-center gap-3">
                           <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
                             <div className={cn("h-full rounded-full transition-all", store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-destructive")} style={{
-                          width: `${store.score}%`
-                        }} />
+                            width: `${store.score}%`
+                          }} />
                           </div>
                           <span className={cn("text-sm font-semibold min-w-[40px] text-right", store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive")}>
                             {store.score}%

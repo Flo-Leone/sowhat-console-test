@@ -345,7 +345,7 @@ const ReassignStoreDropdown = ({
   const [open, setOpen] = useState(false);
   return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
           <RefreshCw className="h-4 w-4" />
           Réassigner
         </Button>

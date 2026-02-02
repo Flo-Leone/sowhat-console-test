@@ -419,10 +419,20 @@ const CandidatPageV1 = () => {
         {/* Sticky Action Bar */}
         <div className="sticky top-0 z-20 bg-transparent backdrop-blur-xl px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between">
-            <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="text-sm">Retour aux candidatures</span>
-            </button>
+            <div className="flex items-center gap-4">
+              <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="h-4 w-4" />
+                <span className="text-sm">Retour aux candidatures</span>
+              </button>
+              {isScrolled && (
+                <div className="flex items-center gap-3 pl-4 border-l border-border">
+                  <span className="text-sm font-medium text-foreground">
+                    {candidate.firstName} {candidate.lastName}
+                  </span>
+                  <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
+                </div>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               {isScrolled && (
                 <>

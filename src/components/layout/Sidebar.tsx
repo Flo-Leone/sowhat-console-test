@@ -107,7 +107,7 @@ const NavItem = ({ to, icon: Icon, label, badge, children, collapsed, theme }: N
           "nav-item",
           isActive && themeConfig.navActiveClass,
           isActive && "nav-item-active-no-hover",
-          !isActive && themeConfig.navHoverClass && "nav-item-coral-hover"
+          !isActive && themeConfig.navHoverClass && "nav-item-golden-hover"
         )
       }
       style={({ isActive }) => isActive ? { boxShadow: themeConfig.navActiveGlow } : undefined}

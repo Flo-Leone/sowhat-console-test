@@ -245,7 +245,7 @@ const UtilisateursPage = () => {
             <Button
               variant="outline"
               className={cn(
-                "gap-2 shrink-0 hover:border-[hsl(18_100%_50%)] hover:text-[hsl(18_100%_50%)] hover:bg-[hsl(18_100%_50%/0.12)]",
+                "gap-2 shrink-0 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]",
                 activeFilters.length > 0 && "border-primary bg-primary/5"
               )}
               onClick={() => setFilterPanelOpen(true)}

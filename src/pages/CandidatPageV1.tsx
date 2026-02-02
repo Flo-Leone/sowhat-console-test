@@ -1,5 +1,5 @@
 // Variante 1 - Design actuel (classique avec cards)
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, Clock, Building2, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, RefreshCw, ChevronDown, X, Plus } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
@@ -391,6 +391,20 @@ const CandidatPageV1 = () => {
   const handleArchive = () => {
     console.log("Archiving candidate", id);
   };
+  const handleReassign = () => {
+    console.log("Reassigning candidate", id);
+  };
+  
+  // Scroll detection
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 100);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+  
   return <ConsoleLayout>
       <div className="relative">
         {/* Sticky Action Bar */}
@@ -401,10 +415,18 @@ const CandidatPageV1 = () => {
               <span className="text-sm">Retour aux candidatures</span>
             </button>
             <div className="flex items-center gap-2">
-              <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
-                <Calendar className="h-4 w-4" />
-                Planifier un entretien
-              </Button>
+              {isScrolled && (
+                <>
+                  <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                    <Calendar className="h-4 w-4" />
+                    Planifier un entretien
+                  </Button>
+                  <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]" onClick={handleReassign}>
+                    <RefreshCw className="h-4 w-4" />
+                    Réassigner
+                  </Button>
+                </>
+              )}
               <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]" onClick={handleArchive}>
                 <Archive className="h-4 w-4" />
                 Archiver

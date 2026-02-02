@@ -191,63 +191,11 @@ const EmployesPage = () => {
     <ConsoleLayout>
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div>
-              <h1 className="text-foreground">Employés</h1>
-              <p className="text-muted-foreground mt-1">
-                Gérez vos {mockEmployes.length} employés recrutés
-              </p>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-foreground gap-1.5"
-              onClick={() => setStatusInfoOpen(true)}
-            >
-              <Info className="h-4 w-4" />
-              <span className="text-xs">Statuts</span>
-            </Button>
-          </div>
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            {/* Actions Button - appears when rows are selected */}
-            {selectedRows.length > 0 && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="gap-2 bg-[hsl(var(--coral-glow))] hover:bg-[hsl(18_100%_75%)] text-white">
-                    Actions ({selectedRows.length})
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 bg-card border-border shadow-elevated"
-                >
-                  <DropdownMenuItem className="gap-3 py-2.5">
-                    <RefreshCw className="h-4 w-4" />
-                    Mettre à jour le statut
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="gap-3 py-2.5">
-                    <Send className="h-4 w-4" />
-                    Envoyer rappel
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="gap-3 py-2.5">
-                    <Mail className="h-4 w-4" />
-                    Envoyer documents
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="gap-3 py-2.5 text-muted-foreground">
-                    <Archive className="h-4 w-4" />
-                    Archiver
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            <Button variant="outline" className="gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">Exporter</span>
-            </Button>
-          </div>
+        <div>
+          <h1 className="text-foreground">Employés</h1>
+          <p className="text-muted-foreground mt-1">
+            Gérez vos {mockEmployes.length} employés recrutés
+          </p>
         </div>
 
         {/* Search and Filters */}
@@ -281,6 +229,49 @@ const EmployesPage = () => {
                   {activeFilters.length}
                 </Badge>
               )}
+            </Button>
+
+            {/* Spacer to push right-side buttons */}
+            <div className="flex-1 hidden sm:block" />
+
+            {/* Actions Button - appears when rows are selected */}
+            {selectedRows.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="gap-2 bg-[hsl(var(--coral-glow))] hover:bg-[hsl(18_100%_75%)] text-white">
+                    Actions ({selectedRows.length})
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-card border-border shadow-elevated"
+                >
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <RefreshCw className="h-4 w-4" />
+                    Mettre à jour le statut
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Send className="h-4 w-4" />
+                    Envoyer rappel
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Mail className="h-4 w-4" />
+                    Envoyer documents
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="gap-3 py-2.5 text-muted-foreground">
+                    <Archive className="h-4 w-4" />
+                    Archiver
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {/* Export Button */}
+            <Button variant="outline" className="gap-2 shrink-0 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Exporter</span>
             </Button>
           </div>
 

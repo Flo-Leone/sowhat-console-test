@@ -362,14 +362,14 @@
   
   /* === Buttons === */
   
-  /* Primary Button - Coral CTA */
+  /* Primary Button - Golden CTA */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2;
     @apply h-10 px-4 rounded-lg;
-    @apply bg-[hsl(var(--coral-glow))] text-white;
+    @apply bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))];
     @apply text-sm font-medium;
     @apply transition-all duration-150;
-    @apply hover:bg-[hsl(18_100%_76%)] active:bg-[hsl(18_100%_62%)];
+    @apply hover:bg-[hsl(44_100%_75%)] active:bg-[hsl(44_100%_60%)];
   }
   
   /* Secondary Button - Outline style with coral hover */

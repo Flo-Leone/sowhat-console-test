@@ -13,7 +13,7 @@ import {
   PanelLeftClose,
   PanelLeft,
 } from "lucide-react";
-import sowhatLogoDark from "@/assets/sowhat-logo-dark.png";
+import sowhatLogo from "@/assets/sowhat-logo.png";
 import sowhatBubble from "@/assets/sowhat-bubble.png";
 import { cn } from "@/lib/utils";
 import { sidebarStyles, getSidebarCssVars } from "./SidebarThemes";
@@ -210,7 +210,7 @@ export const Sidebar = () => {
             <span className="text-xs">
               Powered by
             </span>
-            <img src={sowhatLogoDark} alt="SoWhat AI" className="h-3.5" />
+            <img src={sowhatLogo} alt="SoWhat AI" className="h-3.5" />
           </div>
         )}
       </div>

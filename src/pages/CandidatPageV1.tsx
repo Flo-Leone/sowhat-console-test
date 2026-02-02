@@ -395,14 +395,17 @@ const CandidatPageV1 = () => {
     console.log("Reassigning candidate", id);
   };
   
-  // Scroll detection
+  // Scroll detection - target the main container
   const [isScrolled, setIsScrolled] = useState(false);
   useEffect(() => {
+    const mainElement = document.querySelector('main');
+    if (!mainElement) return;
+    
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
+      setIsScrolled(mainElement.scrollTop > 100);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    mainElement.addEventListener("scroll", handleScroll);
+    return () => mainElement.removeEventListener("scroll", handleScroll);
   }, []);
   
   return <ConsoleLayout>

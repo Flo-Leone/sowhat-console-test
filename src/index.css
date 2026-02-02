@@ -380,8 +380,8 @@
   }
   
   .btn-secondary:hover {
-    @apply border-[hsl(18_100%_55%)] bg-[hsl(18_100%_55%/0.12)];
-    color: hsl(18 100% 55%);
+    @apply border-[hsl(18_100%_45%)] bg-[hsl(18_100%_45%/0.12)];
+    color: hsl(18 100% 45%);
   }
   
   /* Tertiary Button - Coral accent style */

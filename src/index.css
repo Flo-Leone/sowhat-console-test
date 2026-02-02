@@ -299,7 +299,7 @@
 
   /* Filter panel */
   .filter-panel {
-    @apply bg-card rounded-xl p-5 shadow-card;
+    @apply bg-card rounded-xl p-5;
   }
   
   .filter-section {
@@ -357,8 +357,7 @@
 
   /* Cards */
   .metric-card {
-    @apply bg-card rounded-xl p-5 shadow-card;
-    @apply border border-border/50;
+    @apply bg-card rounded-xl p-5;
   }
   
   /* === Buttons === */

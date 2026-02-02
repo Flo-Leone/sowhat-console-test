@@ -194,7 +194,7 @@ const CreateOffrePage = () => {
         </div>
 
         {/* Content */}
-        <div className="bg-card rounded-xl shadow-card border border-border p-6">
+        <div className="bg-card rounded-xl p-6">
           {/* Step 1: Choose creation method */}
           {step === 1 && (
             <div className="space-y-6">
@@ -303,7 +303,7 @@ const CreateOffrePage = () => {
                 </Button>
               </div>
 
-              <div className="border border-border rounded-lg overflow-hidden">
+              <div className="rounded-lg overflow-hidden">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50">
                     <tr>

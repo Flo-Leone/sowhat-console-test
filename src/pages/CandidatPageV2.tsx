@@ -346,7 +346,7 @@ const CandidatPageV2 = () => {
         </button>
 
         {/* Hero Header with gradient background */}
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-lavender/10 via-coral/5 to-primary/10 border border-border p-6">
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-lavender/10 via-coral/5 to-primary/10 p-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex items-center gap-5">
               <div className="w-20 h-20 rounded-2xl bg-lavender flex items-center justify-center text-3xl font-bold text-white shadow-lg">
@@ -609,7 +609,7 @@ const CandidatPageV2 = () => {
                   <div className="space-y-6 pl-10">
                     {candidate.history.map((event, index) => <div key={index} className="relative">
                         <div className={cn("absolute -left-6 w-4 h-4 rounded-full border-2", event.type === "internal" ? "bg-lavender/20 border-lavender" : "bg-coral/20 border-coral")} />
-                        <div className="bg-card p-4 rounded-xl border border-border">
+                        <div className="bg-card p-4 rounded-xl">
                           <p className="text-xs text-muted-foreground mb-1">{event.date}</p>
                           <p className="text-sm">
                             {event.action}

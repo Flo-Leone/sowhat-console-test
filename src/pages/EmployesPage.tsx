@@ -601,7 +601,7 @@ const EmployesPage = () => {
                 Candidat ayant signé un contrat de travail et officiellement embauché (action manuelle d'un recruteur)
               </p>
             </div>
-            <div className="p-4 rounded-lg bg-muted border border-border">
+            <div className="p-4 rounded-lg bg-muted">
               <p className="font-semibold text-muted-foreground mb-1">Archivé</p>
               <p className="text-muted-foreground">
                 Candidat n'ayant pas fourni les documents et/ou ne s'étant jamais présenté

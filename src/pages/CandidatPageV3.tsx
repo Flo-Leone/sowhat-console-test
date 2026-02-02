@@ -325,7 +325,7 @@ const CandidatPageV3 = () => {
             <div className="space-y-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center text-xl font-bold text-success border border-success/20">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center text-xl font-bold text-success">
                     {candidate.firstName[0]}{candidate.lastName[0]}
                   </div>
                   <div>
@@ -455,7 +455,7 @@ const CandidatPageV3 = () => {
                   <CardTitle className="text-base">Questions ouvertes</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {candidate.openQuestions.map((q, i) => <div key={i} className="p-3 rounded-lg bg-info/5 border border-info/10">
+                  {candidate.openQuestions.map((q, i) => <div key={i} className="p-3 rounded-lg bg-info/5">
                       <p className="text-xs text-muted-foreground mb-1">{q.question}</p>
                       <p className="text-sm font-medium">{q.answer}</p>
                     </div>)}

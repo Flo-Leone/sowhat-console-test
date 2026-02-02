@@ -105,8 +105,8 @@ const ParametresPreembauchePage = () => {
           {/* Configuration générale */}
           <TabsContent value="config" className="mt-6 space-y-6">
             {/* Paramètres généraux */}
-            <div className="bg-card rounded-xl border border-border overflow-hidden">
-              <div className="px-6 py-4 border-b border-border">
+            <div className="bg-card rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-border/50">
                 <h2>Paramètres généraux</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">
                   Activation et limites du module
@@ -137,8 +137,8 @@ const ParametresPreembauchePage = () => {
             </div>
 
             {/* Types de documents */}
-            <div className="bg-card rounded-xl border border-border overflow-hidden">
-              <div className="px-6 py-4 border-b border-border">
+            <div className="bg-card rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-border/50">
                 <h2>Types de documents</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">
                   Documents pouvant être demandés aux employés
@@ -163,8 +163,8 @@ const ParametresPreembauchePage = () => {
             </div>
 
             {/* Critères */}
-            <div className="bg-card rounded-xl border border-border overflow-hidden">
-              <div className="px-6 py-4 border-b border-border">
+            <div className="bg-card rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-border/50">
                 <h2>Critères de sélection</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">
                   Critères attribuables aux employés par les recruteurs
@@ -258,7 +258,7 @@ const ParametresPreembauchePage = () => {
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-4 border-t border-border bg-muted/30 flex justify-end">
+              <div className="px-6 py-4 border-t border-border/50 bg-muted/30 flex justify-end">
                 <Button className="btn-primary gap-2">
                   <Save className="h-4 w-4" />
                   Sauvegarder
@@ -269,8 +269,8 @@ const ParametresPreembauchePage = () => {
 
           {/* Documents demandés aux employés */}
           <TabsContent value="documents-employes" className="mt-6">
-            <div className="bg-card rounded-xl border border-border overflow-hidden">
-              <div className="px-6 py-4 border-b border-border">
+            <div className="bg-card rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-border/50">
                 <h2>Documents demandés aux employés</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">
                   Configurez les critères associés à chaque type de document
@@ -293,7 +293,7 @@ const ParametresPreembauchePage = () => {
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-4 border-t border-border bg-muted/30 flex justify-end">
+              <div className="px-6 py-4 border-t border-border/50 bg-muted/30 flex justify-end">
                 <Button className="btn-primary gap-2">
                   <Save className="h-4 w-4" />
                   Sauvegarder
@@ -304,8 +304,8 @@ const ParametresPreembauchePage = () => {
 
           {/* Documents de l'entreprise */}
           <TabsContent value="documents-entreprise" className="mt-6">
-            <div className="bg-card rounded-xl border border-border overflow-hidden">
-              <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+            <div className="bg-card rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-border/50 flex items-center justify-between">
                 <div>
                   <h2>Documents de l'entreprise</h2>
                   <p className="text-sm text-muted-foreground mt-0.5">
@@ -334,7 +334,7 @@ const ParametresPreembauchePage = () => {
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-4 border-t border-border bg-muted/30 flex justify-end">
+              <div className="px-6 py-4 border-t border-border/50 bg-muted/30 flex justify-end">
                 <Button className="btn-primary gap-2">
                   <Save className="h-4 w-4" />
                   Sauvegarder

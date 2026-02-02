@@ -312,10 +312,10 @@ const ParametresPreembauchePage = () => {
                     0 / {maxDocuments} documents
                   </p>
                 </div>
-                <Button className="btn-secondary gap-2">
+                <button className="btn-secondary gap-2">
                   <Upload className="h-4 w-4" />
                   Ajouter un document
-                </Button>
+                </button>
               </div>
 
               <div className="p-6">

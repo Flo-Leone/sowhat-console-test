@@ -66,6 +66,46 @@ const ParametresCSSPage = () => {
           </Button>
         </div>
 
+        {/* Bulk Actions Bar */}
+        {selectedRows.length > 0 && (
+          <div className="flex items-center gap-3 px-4 py-3 bg-coral/10 rounded-lg border border-coral/20 animate-fade-in">
+            <span className="text-sm font-medium text-foreground">
+              {selectedRows.length} élément{selectedRows.length > 1 ? 's' : ''} sélectionné{selectedRows.length > 1 ? 's' : ''}
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="btn-secondary btn-sm gap-2">
+                  Actions
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="bg-card border-border">
+                <DropdownMenuItem className="gap-2">
+                  <Eye className="h-4 w-4" />
+                  Prévisualiser
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-2">
+                  <Edit className="h-4 w-4" />
+                  Modifier
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="gap-2 text-destructive">
+                  <Trash2 className="h-4 w-4" />
+                  Supprimer
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setSelectedRows([])}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Annuler
+            </Button>
+          </div>
+        )}
+
         {/* Main Content Card */}
         <div className="bg-card rounded-xl overflow-hidden">
           {/* Section Header */}

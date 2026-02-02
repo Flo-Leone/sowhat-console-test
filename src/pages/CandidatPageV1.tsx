@@ -394,7 +394,7 @@ const CandidatPageV1 = () => {
   return <ConsoleLayout>
       <div className="relative">
         {/* Sticky Action Bar */}
-        <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border px-6 lg:px-8 py-3">
+        <div className="sticky top-0 z-20 bg-white/60 backdrop-blur-xl border-b border-border/50 px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between">
             <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="h-4 w-4" />

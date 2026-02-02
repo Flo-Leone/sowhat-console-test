@@ -217,7 +217,7 @@ const UtilisateursPage = () => {
               </DropdownMenu>
             )}
             <Button 
-              className="gap-2 bg-[hsl(18_100%_69%)] hover:bg-[hsl(18_100%_76%)] text-white" 
+              className="btn-primary" 
               onClick={() => navigate("/utilisateurs/nouveau")}
             >
               <Plus className="h-4 w-4" />

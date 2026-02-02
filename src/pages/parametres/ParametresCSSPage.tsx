@@ -53,22 +53,24 @@ const ParametresCSSPage = () => {
     <ConsoleLayout>
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         {/* Page Header */}
-        <div>
-          <h1>Paramètres CSS</h1>
-          <p className="text-muted-foreground mt-1">
-            Gestion des styles de marque
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1>Paramètres CSS</h1>
+            <p className="text-muted-foreground mt-1">
+              Gestion des styles de marque
+            </p>
+          </div>
+          <Button className="btn-primary btn-sm gap-2">
+            <Plus className="h-4 w-4" />
+            Créer CSS
+          </Button>
         </div>
 
         {/* Main Content Card */}
         <div className="bg-card rounded-xl overflow-hidden">
           {/* Section Header */}
-          <div className="px-6 py-4 border-b border-border/50 flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-border/50">
             <h2>Configurations CSS</h2>
-            <Button className="btn-primary btn-sm gap-2">
-              <Plus className="h-4 w-4" />
-              Créer CSS
-            </Button>
           </div>
 
           {/* CSS Table */}

@@ -499,15 +499,15 @@ const CandidatPageV1 = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-info/10 border border-info/20">
-                    <Calendar className="h-5 w-5 text-info" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-lavender/10 border border-lavender/20">
+                    <Calendar className="h-5 w-5 text-lavender" />
                     <div>
                       <p className="text-xs text-muted-foreground">Entretien planifié</p>
                       <p className="text-sm font-medium">{candidate.interviewDate}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-info/10 border border-info/20">
-                    <Phone className="h-5 w-5 text-info" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-lavender/10 border border-lavender/20">
+                    <Phone className="h-5 w-5 text-lavender" />
                     <div>
                       <p className="text-xs text-muted-foreground">Dernier appel</p>
                       <p className="text-sm font-medium">{candidate.phoneCallDate}</p>
@@ -528,15 +528,15 @@ const CandidatPageV1 = () => {
                 <div>
                   <h4 className="text-sm font-semibold text-muted-foreground mb-3">Préférences du candidat</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-coral/10 border border-coral/20">
-                      <MapPin className="h-5 w-5 text-coral mt-0.5" />
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-lavender/10 border border-lavender/20">
+                      <MapPin className="h-5 w-5 text-lavender mt-0.5" />
                       <div>
                         <p className="text-xs text-muted-foreground">Point de vente préféré</p>
                         <p className="text-sm font-medium">{candidate.preferredStore}</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-coral/10 border border-coral/20">
-                      <FileText className="h-5 w-5 text-coral mt-0.5" />
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-lavender/10 border border-lavender/20">
+                      <FileText className="h-5 w-5 text-lavender mt-0.5" />
                       <div>
                         <p className="text-xs text-muted-foreground">Contrat préféré</p>
                         <p className="text-sm font-medium">{candidate.preferredContract}</p>

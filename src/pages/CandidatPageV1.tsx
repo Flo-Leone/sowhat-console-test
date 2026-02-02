@@ -464,15 +464,15 @@ const CandidatPageV1 = () => {
                 {/* Compact profile info */}
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm">
                   <a href={`mailto:${candidate.email}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
-                    <Mail className="h-4 w-4 text-info" />
+                    <Mail className="h-4 w-4 text-coral" />
                     <span>{candidate.email}</span>
                   </a>
                   <a href={`tel:${candidate.phone}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
-                    <Phone className="h-4 w-4 text-success" />
+                    <Phone className="h-4 w-4 text-coral" />
                     <span>{candidate.phone}</span>
                   </a>
                   <span className="flex items-center gap-1.5 text-muted-foreground">
-                    <Calendar className="h-4 w-4 text-warning" />
+                    <Calendar className="h-4 w-4 text-coral" />
                     <span>{candidate.applicationDate}</span>
                   </span>
                   <Button variant="link" className="h-auto p-0 text-sm text-lavender hover:text-lavender/80">

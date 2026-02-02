@@ -459,8 +459,8 @@ const CandidatPageV1 = () => {
                   <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
                   <ConversionTagsEditor tags={candidate.conversionTags} onTagsChange={handleTagsChange} />
                 </div>
-                <p className="text-muted-foreground mt-1">
-                  Candidature pour: <span className="text-foreground font-medium">{candidate.titreOffre}</span>
+                <p className="text-foreground mt-1">
+                  Candidature pour: <span className="font-medium">{candidate.titreOffre}</span>
                 </p>
                 {candidate.assignedStore && <p className="text-sm text-coral mt-1 flex items-center gap-1">
                     <MapPin className="h-3.5 w-3.5" />
@@ -469,15 +469,15 @@ const CandidatPageV1 = () => {
                 
                 {/* Compact profile info */}
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm">
-                  <a href={`mailto:${candidate.email}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                  <a href={`mailto:${candidate.email}`} className="flex items-center gap-1.5 text-foreground hover:text-foreground/80 transition-colors">
                     <Mail className="h-4 w-4 text-coral" />
                     <span>{candidate.email}</span>
                   </a>
-                  <a href={`tel:${candidate.phone}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+                  <a href={`tel:${candidate.phone}`} className="flex items-center gap-1.5 text-foreground hover:text-foreground/80 transition-colors">
                     <Phone className="h-4 w-4 text-coral" />
                     <span>{candidate.phone}</span>
                   </a>
-                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="flex items-center gap-1.5 text-foreground">
                     <Calendar className="h-4 w-4 text-coral" />
                     <span>{candidate.applicationDate}</span>
                   </span>

@@ -1,5 +1,5 @@
 // Variante 2 - Design avec tabs pour organiser le contenu
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, RefreshCw, ChevronDown, X, Plus, Briefcase, Clock, Star } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
@@ -255,13 +255,19 @@ const StatusDropdown = ({
   const config = statusConfig[status];
   return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className={cn("status-badge cursor-pointer hover:opacity-80 transition-opacity", config.className)}>
-          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+        <button className={cn(
+          "inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+          "border-[0.5px] border-current cursor-pointer",
+          config.className,
+          "bg-opacity-15 hover:bg-opacity-25"
+        )}>
+          <span className="w-2 h-2 rounded-full bg-current" />
           {config.label}
-          <ChevronDown className="h-3 w-3 ml-1" />
+          <ChevronDown className="h-4 w-4 ml-1 opacity-60" />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1" align="start">
+        <p className="text-xs font-medium text-muted-foreground px-3 py-2">Changer le statut</p>
         <div className="space-y-0.5">
           {Object.entries(statusConfig).map(([key, value]) => <button key={key} onClick={() => {
           onStatusChange(key as CandidateStatus);
@@ -315,6 +321,7 @@ const ConversionTagsEditor = ({
         </Popover>}
     </div>;
 };
+
 const CandidatPageV2 = () => {
   const {
     id
@@ -322,6 +329,8 @@ const CandidatPageV2 = () => {
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(candidateData);
   const [activeTab, setActiveTab] = useState("profil");
+  const [newComment, setNewComment] = useState("");
+  
   const handleStatusChange = (newStatus: CandidateStatus) => {
     setCandidate(prev => ({
       ...prev,
@@ -334,296 +343,351 @@ const CandidatPageV2 = () => {
       conversionTags: newTags
     }));
   };
+
+  // Scroll detection
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const mainElement = document.querySelector('main');
+    if (!mainElement) return;
+    
+    const handleScroll = () => {
+      setIsScrolled(mainElement.scrollTop > 100);
+    };
+    mainElement.addEventListener("scroll", handleScroll);
+    return () => mainElement.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return <ConsoleLayout>
-      <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-        {/* Version indicator */}
-        
-
-        {/* Back Navigation */}
-        <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="h-4 w-4" />
-          <span className="text-sm">Retour aux candidatures</span>
-        </button>
-
-        {/* Hero Header with gradient background */}
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-lavender/10 via-coral/5 to-primary/10 p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="flex items-center gap-5">
-              <div className="w-20 h-20 rounded-2xl bg-lavender flex items-center justify-center text-3xl font-bold text-white shadow-lg">
-                {candidate.firstName[0]}{candidate.lastName[0]}
-              </div>
-              <div>
-                <div className="flex items-center gap-3 flex-wrap">
-                  <h1 className="text-2xl font-bold text-foreground">
+      <div className="relative">
+        {/* Sticky Action Bar */}
+        <div className="sticky top-0 z-20 bg-transparent backdrop-blur-xl px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="h-4 w-4" />
+                <span className="text-sm">Retour aux candidatures</span>
+              </button>
+              {isScrolled && (
+                <div className="flex items-center gap-3 pl-4 border-l border-border">
+                  <span className="text-base font-bold text-foreground">
                     {candidate.firstName} {candidate.lastName}
-                  </h1>
+                  </span>
                   <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
                 </div>
-                <p className="text-muted-foreground mt-1 flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  {candidate.titreOffre}
-                </p>
-                <div className="flex items-center gap-3 mt-2">
-                  <ConversionTagsEditor tags={candidate.conversionTags} onTagsChange={handleTagsChange} />
-                </div>
-              </div>
+              )}
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" className="gap-2 bg-white/50">
+            <div className="flex items-center gap-2">
+              {isScrolled && (
+                <>
+                  <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                    <Calendar className="h-4 w-4" />
+                    Planifier un entretien
+                  </Button>
+                  <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                    <RefreshCw className="h-4 w-4" />
+                    Réassigner
+                  </Button>
+                </>
+              )}
+              <Button variant="outline" className="gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
                 <Download className="h-4 w-4" />
                 CV
               </Button>
-              <Button variant="outline" className="gap-2 bg-white/50">
+              <Button variant="outline" className="gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
                 <Archive className="h-4 w-4" />
                 Archiver
               </Button>
             </div>
           </div>
-
-          {/* Quick info bar */}
-          <div className="flex flex-wrap items-center gap-6 mt-6 pt-4 border-t border-border/50">
-            <a href={`mailto:${candidate.email}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-              <Mail className="h-4 w-4 text-info" />
-              {candidate.email}
-            </a>
-            <a href={`tel:${candidate.phone}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-              <Phone className="h-4 w-4 text-success" />
-              {candidate.phone}
-            </a>
-            <span className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4 text-warning" />
-              {candidate.applicationDate}
-            </span>
-          </div>
         </div>
 
-        {/* Tabs Navigation */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full justify-start h-auto p-1 bg-muted/50">
-            <TabsTrigger value="profil" className="gap-2 data-[state=active]:bg-white">
-              <User className="h-4 w-4" />
-              Profil
-            </TabsTrigger>
-            <TabsTrigger value="matching" className="gap-2 data-[state=active]:bg-white">
-              <Star className="h-4 w-4" />
-              Matching
-            </TabsTrigger>
-            <TabsTrigger value="disponibilites" className="gap-2 data-[state=active]:bg-white">
-              <Clock className="h-4 w-4" />
-              Disponibilités
-            </TabsTrigger>
-            <TabsTrigger value="commentaires" className="gap-2 data-[state=active]:bg-white">
-              <MessageSquare className="h-4 w-4" />
-              Commentaires ({candidate.comments.length})
-            </TabsTrigger>
-            <TabsTrigger value="historique" className="gap-2 data-[state=active]:bg-white">
-              <History className="h-4 w-4" />
-              Historique
-            </TabsTrigger>
-          </TabsList>
+        <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+          {/* Hero Header with gradient background - only visible when not scrolled */}
+          {!isScrolled && (
+            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-lavender/10 via-coral/5 to-primary/10 p-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div className="flex items-center gap-5">
+                  <div className="w-20 h-20 rounded-2xl bg-lavender flex items-center justify-center text-3xl font-bold text-white shadow-lg">
+                    {candidate.firstName[0]}{candidate.lastName[0]}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h1 className="text-2xl font-bold text-foreground">
+                        {candidate.firstName} {candidate.lastName}
+                      </h1>
+                      <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
+                    </div>
+                    <p className="text-muted-foreground mt-1 flex items-center gap-2">
+                      <Briefcase className="h-4 w-4" />
+                      {candidate.titreOffre}
+                    </p>
+                    <div className="flex items-center gap-3 mt-2">
+                      <ConversionTagsEditor tags={candidate.conversionTags} onTagsChange={handleTagsChange} />
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-          <TabsContent value="profil" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                  <CardTitle className="text-base">Entretiens</CardTitle>
-                  <Button size="sm" className="gap-2 h-8">
-                    <Calendar className="h-4 w-4" />
-                    Planifier un entretien
-                  </Button>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-info/10 border border-info/20">
-                    <Calendar className="h-5 w-5 text-info" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Entretien planifié</p>
-                      <p className="text-sm font-medium">{candidate.interviewDate}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-info/10 border border-info/20">
-                    <Phone className="h-5 w-5 text-info" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Dernier appel</p>
-                      <p className="text-sm font-medium">{candidate.phoneCallDate}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                  <CardTitle className="text-base">Préférences & Matching</CardTitle>
-                  <Button variant="outline" size="sm" className="gap-2 h-8">
-                    <RefreshCw className="h-4 w-4" />
-                    Réassigner
-                  </Button>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-coral/10 border border-coral/20">
-                    <MapPin className="h-5 w-5 text-coral" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Point de vente préféré</p>
-                      <p className="text-sm font-medium">{candidate.preferredStore}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-coral/10 border border-coral/20">
-                    <FileText className="h-5 w-5 text-coral" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Contrat préféré</p>
-                      <p className="text-sm font-medium">{candidate.preferredContract}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle className="text-base">Questions ouvertes</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {candidate.openQuestions.map((q, index) => <div key={index} className="p-4 rounded-lg bg-info/5 border border-info/10">
-                      <p className="text-sm font-medium mb-2">{q.question}</p>
-                      <p className="text-sm text-info">{q.answer}</p>
-                    </div>)}
-                </CardContent>
-              </Card>
+              {/* Quick info bar */}
+              <div className="flex flex-wrap items-center gap-6 mt-6 pt-4 border-t border-border/50">
+                <a href={`mailto:${candidate.email}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                  <Mail className="h-4 w-4 text-info" />
+                  {candidate.email}
+                </a>
+                <a href={`tel:${candidate.phone}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                  <Phone className="h-4 w-4 text-success" />
+                  {candidate.phone}
+                </a>
+                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4 text-warning" />
+                  {candidate.applicationDate}
+                </span>
+              </div>
             </div>
-          </TabsContent>
+          )}
 
-          <TabsContent value="matching" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Matching dynamique des points de vente</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {candidate.storesMatching.map((store, index) => <div key={store.name} className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold", index === 0 ? "bg-success/20 text-success" : "bg-muted text-muted-foreground")}>
+          {/* Tabs Navigation */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full justify-start h-auto p-1 bg-muted/50">
+              <TabsTrigger value="profil" className="gap-2 data-[state=active]:bg-white">
+                <User className="h-4 w-4" />
+                Profil
+              </TabsTrigger>
+              <TabsTrigger value="matching" className="gap-2 data-[state=active]:bg-white">
+                <Star className="h-4 w-4" />
+                Matching
+              </TabsTrigger>
+              <TabsTrigger value="disponibilites" className="gap-2 data-[state=active]:bg-white">
+                <Clock className="h-4 w-4" />
+                Disponibilités
+              </TabsTrigger>
+              <TabsTrigger value="commentaires" className="gap-2 data-[state=active]:bg-white">
+                <MessageSquare className="h-4 w-4" />
+                Commentaires ({candidate.comments.length})
+              </TabsTrigger>
+              <TabsTrigger value="historique" className="gap-2 data-[state=active]:bg-white">
+                <History className="h-4 w-4" />
+                Historique
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="profil" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="bg-info/10 border-info/20">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                    <CardTitle className="text-base">Entretiens</CardTitle>
+                    <Button size="sm" className="gap-2 h-8 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                      <Calendar className="h-4 w-4" />
+                      Planifier un entretien
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-white/60 border border-info/20">
+                      <Calendar className="h-5 w-5 text-info" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">Entretien planifié</p>
+                        <p className="text-sm font-medium">{candidate.interviewDate}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-white/60 border border-info/20">
+                      <Phone className="h-5 w-5 text-info" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">Dernier appel</p>
+                        <p className="text-sm font-medium">{candidate.phoneCallDate}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-coral/10 border-coral/20">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                    <CardTitle className="text-base">Préférences & Matching</CardTitle>
+                    <Button variant="outline" size="sm" className="gap-2 h-8 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
+                      <RefreshCw className="h-4 w-4" />
+                      Réassigner
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-white/60 border border-coral/20">
+                      <MapPin className="h-5 w-5 text-coral" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">Point de vente préféré</p>
+                        <p className="text-sm font-medium">{candidate.preferredStore}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-white/60 border border-coral/20">
+                      <FileText className="h-5 w-5 text-coral" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">Contrat préféré</p>
+                        <p className="text-sm font-medium">{candidate.preferredContract}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="md:col-span-2">
+                  <CardHeader>
+                    <CardTitle className="text-base">Questions ouvertes</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {candidate.openQuestions.map((q, i) => (
+                      <div key={i} className="p-4 rounded-lg bg-muted/50">
+                        <p className="text-sm text-muted-foreground mb-2">{q.question}</p>
+                        <p className="font-medium">{q.answer}</p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="matching" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Matching des points de vente</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {candidate.storesMatching.map((store, index) => (
+                    <div key={store.name} className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold",
+                          index === 0 ? "bg-success text-white" : "bg-muted text-muted-foreground"
+                        )}>
                           {index + 1}
                         </div>
-                        <div>
-                          <span className="font-medium">{store.name}</span>
-                          {index === 0 && <Badge className="ml-2 bg-success/10 text-success border-0">Meilleur match</Badge>}
-                        </div>
+                        <span className="font-medium">{store.name}</span>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="w-32 h-3 rounded-full bg-muted overflow-hidden">
-                          <div className={cn("h-full rounded-full transition-all", store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-destructive")} style={{
-                        width: `${store.score}%`
-                      }} />
+                      <div className="flex items-center gap-3">
+                        <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className={cn(
+                              "h-full rounded-full",
+                              store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-coral"
+                            )}
+                            style={{ width: `${store.score}%` }}
+                          />
                         </div>
-                        <span className={cn("text-lg font-bold min-w-[50px] text-right", store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive")}>
+                        <span className={cn(
+                          "text-sm font-bold",
+                          store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-coral"
+                        )}>
                           {store.score}%
                         </span>
                       </div>
-                    </div>)}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          <TabsContent value="disponibilites" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Disponibilités hebdomadaires</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-8 gap-2 text-center">
-                  <div></div>
-                  {Object.keys(candidate.availabilities).map(day => <div key={day} className="text-xs font-medium text-muted-foreground py-2">
-                      {dayLabels[day].slice(0, 3)}
-                    </div>)}
-                  
-                  <div className="text-xs font-medium text-muted-foreground py-3">Matin</div>
-                  {Object.values(candidate.availabilities).map((slots, i) => <div key={`morning-${i}`} className="py-2">
-                      <div className={cn("w-8 h-8 rounded-lg mx-auto flex items-center justify-center", slots.morning ? "bg-success/20" : "bg-muted")}>
-                        {slots.morning && <CheckCircle2 className="h-4 w-4 text-success" />}
-                      </div>
-                    </div>)}
-                  
-                  <div className="text-xs font-medium text-muted-foreground py-3">Midi</div>
-                  {Object.values(candidate.availabilities).map((slots, i) => <div key={`lunch-${i}`} className="py-2">
-                      <div className={cn("w-8 h-8 rounded-lg mx-auto flex items-center justify-center", slots.lunch ? "bg-success/20" : "bg-muted")}>
-                        {slots.lunch && <CheckCircle2 className="h-4 w-4 text-success" />}
-                      </div>
-                    </div>)}
-                  
-                  <div className="text-xs font-medium text-muted-foreground py-3">Après-midi</div>
-                  {Object.values(candidate.availabilities).map((slots, i) => <div key={`afternoon-${i}`} className="py-2">
-                      <div className={cn("w-8 h-8 rounded-lg mx-auto flex items-center justify-center", slots.afternoon ? "bg-success/20" : "bg-muted")}>
-                        {slots.afternoon && <CheckCircle2 className="h-4 w-4 text-success" />}
-                      </div>
-                    </div>)}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="commentaires" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-lavender" />
-                  Commentaires internes
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ScrollArea className="h-[400px]">
-                  <div className="space-y-3 pr-4">
-                    {candidate.comments.map(comment => <div key={comment.id} className="p-4 rounded-xl bg-lavender/5 border border-lavender/10">
-                        <p className="text-sm">{comment.text}</p>
-                        <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-                          <User className="h-3 w-3" />
-                          <span className="font-medium">{comment.author}</span>
-                          <span>·</span>
-                          <span>{comment.date}</span>
+            <TabsContent value="disponibilites" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Disponibilités hebdomadaires</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-7 gap-2">
+                    {Object.entries(candidate.availabilities).map(([day, slots]) => (
+                      <div key={day} className="text-center space-y-2">
+                        <p className="text-sm font-medium text-muted-foreground">{dayLabels[day]}</p>
+                        <div className="space-y-1">
+                          <div className={cn(
+                            "h-8 rounded flex items-center justify-center text-xs",
+                            slots.morning ? "bg-success/20 text-success" : "bg-muted text-muted-foreground"
+                          )}>
+                            Matin
+                          </div>
+                          <div className={cn(
+                            "h-8 rounded flex items-center justify-center text-xs",
+                            slots.lunch ? "bg-success/20 text-success" : "bg-muted text-muted-foreground"
+                          )}>
+                            Midi
+                          </div>
+                          <div className={cn(
+                            "h-8 rounded flex items-center justify-center text-xs",
+                            slots.afternoon ? "bg-success/20 text-success" : "bg-muted text-muted-foreground"
+                          )}>
+                            Après-midi
+                          </div>
                         </div>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
-                </ScrollArea>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                <div className="pt-4 border-t border-border">
-                  <Textarea placeholder="Ajouter un commentaire..." className="min-h-[100px]" />
-                  <Button className="mt-3 gap-2">
-                    <Send className="h-4 w-4" />
-                    Publier
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="historique" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <History className="h-5 w-5 text-coral" />
-                  Historique des actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="relative">
-                  <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
-                  <div className="space-y-6 pl-10">
-                    {candidate.history.map((event, index) => <div key={index} className="relative">
-                        <div className={cn("absolute -left-6 w-4 h-4 rounded-full border-2", event.type === "internal" ? "bg-lavender/20 border-lavender" : "bg-coral/20 border-coral")} />
-                        <div className="bg-card p-4 rounded-xl">
-                          <p className="text-xs text-muted-foreground mb-1">{event.date}</p>
-                          <p className="text-sm">
-                            {event.action}
-                            {event.user && <span className="font-medium text-foreground"> {event.user}</span>}
-                          </p>
+            <TabsContent value="commentaires" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Commentaires internes</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Add comment */}
+                  <div className="flex gap-3">
+                    <Textarea
+                      placeholder="Ajouter un commentaire..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button className="self-end gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  {/* Comments list */}
+                  <ScrollArea className="h-[300px]">
+                    <div className="space-y-3 pr-4">
+                      {candidate.comments.map((comment) => (
+                        <div key={comment.id} className="p-3 rounded-lg bg-muted/30 space-y-2">
+                          <p className="text-sm">{comment.text}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span className="font-medium">{comment.author}</span>
+                            <span>•</span>
+                            <span>{comment.date}</span>
+                          </div>
                         </div>
-                      </div>)}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="historique" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Historique des actions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[400px]">
+                    <div className="space-y-4 pr-4">
+                      {candidate.history.map((event, index) => (
+                        <div key={index} className="flex items-start gap-4">
+                          <div className={cn(
+                            "w-2 h-2 rounded-full mt-2 shrink-0",
+                            event.type === "candidate" ? "bg-success" : "bg-info"
+                          )} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium">{event.action}</p>
+                            {event.user && (
+                              <p className="text-xs text-muted-foreground">{event.user}</p>
+                            )}
+                          </div>
+                          <span className="text-xs text-muted-foreground shrink-0">{event.date}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </ConsoleLayout>;
 };
+
 export default CandidatPageV2;

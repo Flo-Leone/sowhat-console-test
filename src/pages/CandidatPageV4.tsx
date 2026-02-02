@@ -1,7 +1,7 @@
 // Variante 4 - Design minimal et épuré avec focus sur l'essentiel
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, ChevronDown, X, Plus, MoreHorizontal, ExternalLink, Sparkles } from "lucide-react";
+import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, ChevronDown, X, Plus, MoreHorizontal, ExternalLink, Sparkles, RefreshCw } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -259,13 +259,19 @@ const StatusDropdown = ({
   const config = statusConfig[status];
   return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className={cn("status-badge cursor-pointer hover:opacity-80 transition-opacity", config.className)}>
-          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+        <button className={cn(
+          "inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+          "border-[0.5px] border-current cursor-pointer",
+          config.className,
+          "bg-opacity-15 hover:bg-opacity-25"
+        )}>
+          <span className="w-2 h-2 rounded-full bg-current" />
           {config.label}
-          <ChevronDown className="h-3 w-3 ml-1" />
+          <ChevronDown className="h-4 w-4 ml-1 opacity-60" />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1" align="start">
+        <p className="text-xs font-medium text-muted-foreground px-3 py-2">Changer le statut</p>
         <div className="space-y-0.5">
           {Object.entries(statusConfig).map(([key, value]) => <button key={key} onClick={() => {
           onStatusChange(key as CandidateStatus);
@@ -280,6 +286,7 @@ const StatusDropdown = ({
       </PopoverContent>
     </Popover>;
 };
+
 const CandidatPageV4 = () => {
   const {
     id
@@ -287,83 +294,119 @@ const CandidatPageV4 = () => {
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(candidateData);
   const [newComment, setNewComment] = useState("");
+  
   const handleStatusChange = (newStatus: CandidateStatus) => {
     setCandidate(prev => ({
       ...prev,
       status: newStatus
     }));
   };
-  return <ConsoleLayout>
-      <div className="min-h-screen bg-background">
-        {/* Version indicator */}
-        
 
-        {/* Sticky Header */}
-        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border">
-          <div className="px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                  <ArrowLeft className="h-4 w-4" />
-                </button>
-                
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary">
+  // Scroll detection
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const mainElement = document.querySelector('main');
+    if (!mainElement) return;
+    
+    const handleScroll = () => {
+      setIsScrolled(mainElement.scrollTop > 100);
+    };
+    mainElement.addEventListener("scroll", handleScroll);
+    return () => mainElement.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return <ConsoleLayout>
+      <div className="relative min-h-screen bg-background">
+        {/* Sticky Action Bar */}
+        <div className="sticky top-0 z-20 bg-transparent backdrop-blur-xl px-6 lg:px-8 py-3 border-b border-border/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="h-4 w-4" />
+                <span className="text-sm">Retour aux candidatures</span>
+              </button>
+              {isScrolled && (
+                <div className="flex items-center gap-3 pl-4 border-l border-border">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
                     {candidate.firstName[0]}{candidate.lastName[0]}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <h1 className="text-lg font-semibold">
-                        {candidate.firstName} {candidate.lastName}
-                      </h1>
-                      <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {candidate.titreOffre} · {candidate.referenceOffre} · {candidate.assignedStore}
-                    </p>
-                  </div>
+                  <span className="text-base font-bold text-foreground">
+                    {candidate.firstName} {candidate.lastName}
+                  </span>
+                  <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
                 </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="text-muted-foreground">
-                  <Phone className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="text-muted-foreground">
-                  <Mail className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="text-muted-foreground">
-                  <Download className="h-4 w-4" />
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="gap-2">
-                      <Calendar className="h-4 w-4" />
-                      Planifier entretien
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="gap-2">
-                      <ExternalLink className="h-4 w-4" />
-                      Voir l'offre
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="gap-2 text-muted-foreground">
-                      <Archive className="h-4 w-4" />
-                      Archiver
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {isScrolled && (
+                <>
+                  <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                    <Calendar className="h-4 w-4" />
+                    Planifier un entretien
+                  </Button>
+                  <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                    <RefreshCw className="h-4 w-4" />
+                    Réassigner
+                  </Button>
+                </>
+              )}
+              <Button variant="outline" size="icon" className="hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
+                <Phone className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" className="hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
+                <Mail className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" className="hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
+                <Download className="h-4 w-4" />
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" className="hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Planifier entretien
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    Voir l'offre
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="gap-2 text-muted-foreground">
+                    <Archive className="h-4 w-4" />
+                    Archiver
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
 
         {/* Content */}
         <div className="px-6 lg:px-8 py-8 max-w-5xl mx-auto space-y-8 animate-fade-in">
+          {/* Header - only visible when not scrolled */}
+          {!isScrolled && (
+            <div className="flex items-center gap-6">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
+                {candidate.firstName[0]}{candidate.lastName[0]}
+              </div>
+              <div>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl font-semibold">
+                    {candidate.firstName} {candidate.lastName}
+                  </h1>
+                  <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
+                </div>
+                <p className="text-muted-foreground">
+                  {candidate.titreOffre} · {candidate.referenceOffre} · {candidate.assignedStore}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Success Banner for recruited */}
           {candidate.status === "recrute" && <div className="flex items-center gap-3 p-4 rounded-xl bg-success/10 border border-success/20">
               <Sparkles className="h-5 w-5 text-success" />
@@ -470,41 +513,64 @@ const CandidatPageV4 = () => {
             </div>
             
             <div className="space-y-3">
-              {candidate.comments.map(comment => <div key={comment.id} className="p-4 rounded-xl bg-muted/30">
-                  <p className="text-sm">{comment.text}</p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {comment.author} · {comment.date}
-                  </p>
-                </div>)}
-            </div>
+              {/* Add comment */}
+              <div className="flex gap-3">
+                <Textarea
+                  placeholder="Ajouter une note..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="flex-1 min-h-[60px]"
+                />
+                <Button className="self-end gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
 
-            <div className="flex gap-3">
-              <Textarea placeholder="Ajouter une note..." className="min-h-[80px] resize-none bg-card" value={newComment} onChange={e => setNewComment(e.target.value)} />
+              <ScrollArea className="h-[300px]">
+                <div className="space-y-2 pr-4">
+                  {candidate.comments.map((comment) => (
+                    <div key={comment.id} className="p-3 rounded-lg border border-border bg-white">
+                      <p className="text-sm">{comment.text}</p>
+                      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                        <span className="font-medium">{comment.author}</span>
+                        <span>•</span>
+                        <span>{comment.date}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
             </div>
-            <Button className="gap-2" disabled={!newComment.trim()}>
-              <Send className="h-4 w-4" />
-              Publier
-            </Button>
           </section>
 
           <Separator />
 
-          {/* Historique compact */}
+          {/* History */}
           <section className="space-y-4">
-            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Historique</h2>
-            <div className="space-y-2">
-              {candidate.history.map((event, index) => <div key={index} className="flex items-center gap-4 text-sm">
-                  <span className="text-muted-foreground w-24 shrink-0">{event.date}</span>
-                  <div className={cn("w-2 h-2 rounded-full shrink-0", event.type === "internal" ? "bg-lavender" : "bg-coral")} />
-                  <span>
-                    {event.action}
-                    {event.user && <span className="font-medium"> {event.user}</span>}
-                  </span>
-                </div>)}
-            </div>
+            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Historique complet</h2>
+            <ScrollArea className="h-[300px]">
+              <div className="space-y-4 pr-4">
+                {candidate.history.map((event, index) => (
+                  <div key={index} className="flex items-start gap-4">
+                    <div className={cn(
+                      "w-2 h-2 rounded-full mt-2 shrink-0",
+                      event.type === "candidate" ? "bg-success" : "bg-info"
+                    )} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">{event.action}</p>
+                      {event.user && (
+                        <p className="text-xs text-muted-foreground">{event.user}</p>
+                      )}
+                    </div>
+                    <span className="text-xs text-muted-foreground shrink-0">{event.date}</span>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
           </section>
         </div>
       </div>
     </ConsoleLayout>;
 };
+
 export default CandidatPageV4;

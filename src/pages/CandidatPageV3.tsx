@@ -1,7 +1,7 @@
 // Variante 3 - Design dashboard avec sidebar fixe à droite
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, ChevronDown, X, Plus, Briefcase, Clock, TrendingUp, Target, ExternalLink } from "lucide-react";
+import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, ChevronDown, X, Plus, Briefcase, Clock, TrendingUp, Target, ExternalLink, RefreshCw } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -273,13 +273,19 @@ const StatusDropdown = ({
   const config = statusConfig[status];
   return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className={cn("status-badge cursor-pointer hover:opacity-80 transition-opacity", config.className)}>
-          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+        <button className={cn(
+          "inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+          "border-[0.5px] border-current cursor-pointer",
+          config.className,
+          "bg-opacity-15 hover:bg-opacity-25"
+        )}>
+          <span className="w-2 h-2 rounded-full bg-current" />
           {config.label}
-          <ChevronDown className="h-3 w-3 ml-1" />
+          <ChevronDown className="h-4 w-4 ml-1 opacity-60" />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1" align="start">
+        <p className="text-xs font-medium text-muted-foreground px-3 py-2">Changer le statut</p>
         <div className="space-y-0.5">
           {Object.entries(statusConfig).map(([key, value]) => <button key={key} onClick={() => {
           onStatusChange(key as CandidateStatus);
@@ -294,12 +300,15 @@ const StatusDropdown = ({
       </PopoverContent>
     </Popover>;
 };
+
 const CandidatPageV3 = () => {
   const {
     id
   } = useParams();
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(candidateData);
+  const [newComment, setNewComment] = useState("");
+  
   const handleStatusChange = (newStatus: CandidateStatus) => {
     setCandidate(prev => ({
       ...prev,
@@ -307,56 +316,105 @@ const CandidatPageV3 = () => {
     }));
   };
   const currentStep = statusConfig[candidate.status].step;
+
+  // Scroll detection
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const mainElement = document.querySelector('main');
+    if (!mainElement) return;
+    
+    const handleScroll = () => {
+      setIsScrolled(mainElement.scrollTop > 100);
+    };
+    mainElement.addEventListener("scroll", handleScroll);
+    return () => mainElement.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return <ConsoleLayout>
-      <div className="animate-fade-in">
-        {/* Version indicator */}
-        
+      <div className="relative animate-fade-in">
+        {/* Sticky Action Bar */}
+        <div className="sticky top-0 z-20 bg-transparent backdrop-blur-xl px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="h-4 w-4" />
+                <span className="text-sm">Retour aux candidatures</span>
+              </button>
+              {isScrolled && (
+                <div className="flex items-center gap-3 pl-4 border-l border-border">
+                  <span className="text-base font-bold text-foreground">
+                    {candidate.firstName} {candidate.lastName}
+                  </span>
+                  <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {isScrolled && (
+                <>
+                  <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                    <Calendar className="h-4 w-4" />
+                    Planifier un entretien
+                  </Button>
+                  <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                    <RefreshCw className="h-4 w-4" />
+                    Réassigner
+                  </Button>
+                </>
+              )}
+              <Button variant="outline" className="gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
+                <Download className="h-4 w-4" />
+                CV
+              </Button>
+              <Button variant="outline" className="gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
+                <Archive className="h-4 w-4" />
+                Archiver
+              </Button>
+            </div>
+          </div>
+        </div>
 
         <div className="flex">
           {/* Main Content */}
           <div className="flex-1 p-6 lg:p-8 space-y-6">
-            {/* Back Navigation */}
-            <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="text-sm">Retour</span>
-            </button>
-
-            {/* Header with Progress Pipeline */}
-            <div className="space-y-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center text-xl font-bold text-success">
-                    {candidate.firstName[0]}{candidate.lastName[0]}
-                  </div>
-                  <div>
-                    <h1 className="text-xl font-bold">{candidate.firstName} {candidate.lastName}</h1>
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                      <Briefcase className="h-3.5 w-3.5" />
-                      {candidate.titreOffre}
-                      {candidate.assignedStore && <>
-                          <span className="text-border">•</span>
-                          <MapPin className="h-3.5 w-3.5 text-coral" />
-                          {candidate.assignedStore}
-                        </>}
-                    </p>
-                  </div>
-                </div>
-                <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
-              </div>
-
-              {/* Progress Steps */}
-              <div className="flex items-center gap-2 p-4 rounded-xl bg-muted/30">
-                {["CV reçu", "Appel", "Entretien", "Décision"].map((step, index) => <div key={step} className="flex-1 flex items-center">
-                    <div className="flex-1">
-                      <div className={cn("h-2 rounded-full transition-all", index + 1 <= currentStep ? "bg-success" : "bg-muted")} />
-                      <p className={cn("text-xs mt-1 text-center", index + 1 <= currentStep ? "text-success font-medium" : "text-muted-foreground")}>
-                        {step}
+            {/* Header with Progress Pipeline - only visible when not scrolled */}
+            {!isScrolled && (
+              <div className="space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center text-xl font-bold text-success">
+                      {candidate.firstName[0]}{candidate.lastName[0]}
+                    </div>
+                    <div>
+                      <h1 className="text-xl font-bold">{candidate.firstName} {candidate.lastName}</h1>
+                      <p className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Briefcase className="h-3.5 w-3.5" />
+                        {candidate.titreOffre}
+                        {candidate.assignedStore && <>
+                            <span className="text-border">•</span>
+                            <MapPin className="h-3.5 w-3.5 text-coral" />
+                            {candidate.assignedStore}
+                          </>}
                       </p>
                     </div>
-                    {index < 3 && <div className="w-4" />}
-                  </div>)}
+                  </div>
+                  <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
+                </div>
+
+                {/* Progress Steps */}
+                <div className="flex items-center gap-2 p-4 rounded-xl bg-muted/30">
+                  {["CV reçu", "Appel", "Entretien", "Décision"].map((step, index) => <div key={step} className="flex-1 flex items-center">
+                      <div className="flex-1">
+                        <div className={cn("h-2 rounded-full transition-all", index + 1 <= currentStep ? "bg-success" : "bg-muted")} />
+                        <p className={cn("text-xs mt-1 text-center", index + 1 <= currentStep ? "text-success font-medium" : "text-muted-foreground")}>
+                          {step}
+                        </p>
+                      </div>
+                      {index < 3 && <div className="w-4" />}
+                    </div>)}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Scores Dashboard */}
             <div className="grid grid-cols-4 gap-4">
@@ -469,79 +527,73 @@ const CandidatPageV3 = () => {
             {/* Quick Actions */}
             <div className="space-y-2">
               <h3 className="text-sm font-semibold text-muted-foreground mb-3">Actions rapides</h3>
-              <Button variant="outline" className="w-full justify-start gap-2">
+              <Button variant="outline" className="w-full justify-start gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
                 <Phone className="h-4 w-4 text-info" />
                 Appeler
               </Button>
-              <Button variant="outline" className="w-full justify-start gap-2">
-                <Calendar className="h-4 w-4 text-success" />
+              <Button className="w-full justify-start gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                <Calendar className="h-4 w-4" />
                 Planifier entretien
               </Button>
-              <Button variant="outline" className="w-full justify-start gap-2">
-                <Download className="h-4 w-4 text-lavender" />
-                Télécharger CV
-              </Button>
-              <Button variant="outline" className="w-full justify-start gap-2 text-muted-foreground">
-                <Archive className="h-4 w-4" />
-                Archiver
+              <Button variant="outline" className="w-full justify-start gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
+                <Mail className="h-4 w-4 text-warning" />
+                Envoyer email
               </Button>
             </div>
 
-            {/* Contact */}
+            {/* Contact Info */}
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground">Contact</h3>
-              <a href={`mailto:${candidate.email}`} className="flex items-center gap-2 text-sm text-foreground hover:text-info transition-colors">
-                <Mail className="h-4 w-4 text-info" />
+              <a href={`mailto:${candidate.email}`} className="flex items-center gap-2 text-sm hover:text-info transition-colors">
+                <Mail className="h-4 w-4 text-muted-foreground" />
                 {candidate.email}
               </a>
-              <a href={`tel:${candidate.phone}`} className="flex items-center gap-2 text-sm text-foreground hover:text-success transition-colors">
-                <Phone className="h-4 w-4 text-success" />
+              <a href={`tel:${candidate.phone}`} className="flex items-center gap-2 text-sm hover:text-success transition-colors">
+                <Phone className="h-4 w-4 text-muted-foreground" />
                 {candidate.phone}
               </a>
             </div>
 
-            {/* Dates clés */}
+            {/* Comments */}
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground">Dates clés</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Candidature</span>
-                  <span>{candidate.applicationDate}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Appel</span>
-                  <span>{candidate.phoneCallDate}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Entretien</span>
-                  <span>{candidate.interviewDate}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Comments Mini */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-muted-foreground">Commentaires</h3>
-                <Badge variant="secondary">{candidate.comments.length}</Badge>
-              </div>
-              <ScrollArea className="h-[200px]">
+              <h3 className="text-sm font-semibold text-muted-foreground">Commentaires récents</h3>
+              <ScrollArea className="h-[300px]">
                 <div className="space-y-2 pr-2">
-                  {candidate.comments.map(comment => <div key={comment.id} className="p-2 rounded-lg bg-card text-xs">
+                  {candidate.comments.slice(0, 5).map((comment) => (
+                    <div key={comment.id} className="p-2 rounded bg-white/50 text-xs">
                       <p className="line-clamp-2">{comment.text}</p>
-                      <p className="text-muted-foreground mt-1">{comment.author} · {comment.date}</p>
-                    </div>)}
+                      <p className="text-muted-foreground mt-1">{comment.author} • {comment.date}</p>
+                    </div>
+                  ))}
                 </div>
               </ScrollArea>
-              <Textarea placeholder="Ajouter..." className="min-h-[60px] text-sm" />
-              <Button size="sm" className="w-full gap-1">
-                <Send className="h-3 w-3" />
-                Envoyer
-              </Button>
+            </div>
+
+            {/* History Timeline */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-muted-foreground">Historique</h3>
+              <ScrollArea className="h-[200px]">
+                <div className="space-y-3 pr-2">
+                  {candidate.history.slice(0, 5).map((event, index) => (
+                    <div key={index} className="flex items-start gap-2 text-xs">
+                      <div className={cn(
+                        "w-1.5 h-1.5 rounded-full mt-1.5 shrink-0",
+                        event.type === "candidate" ? "bg-success" : "bg-info"
+                      )} />
+                      <div>
+                        <p className="font-medium">{event.action}</p>
+                        {event.user && <p className="text-muted-foreground">{event.user}</p>}
+                        <p className="text-muted-foreground">{event.date}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
             </div>
           </div>
         </div>
       </div>
     </ConsoleLayout>;
 };
+
 export default CandidatPageV3;

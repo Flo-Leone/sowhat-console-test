@@ -13,7 +13,7 @@ import {
   PanelLeftClose,
   PanelLeft,
 } from "lucide-react";
-import sowhatLogo from "@/assets/sowhat-logo.png";
+import sowhatLogo from "@/assets/sowhat-logo-new.png";
 import sowhatBubble from "@/assets/sowhat-bubble.png";
 import { cn } from "@/lib/utils";
 import { sidebarStyles, getSidebarCssVars } from "./SidebarThemes";

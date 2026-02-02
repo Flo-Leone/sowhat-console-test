@@ -313,7 +313,7 @@ const CandidaturesPage = () => {
                       />
                     </th>
                     <th className="sticky left-12 bg-white z-10 min-w-[180px]">
-                      <div className="flex items-center gap-1.5 cursor-pointer hover:text-[hsl(var(--coral-glow))]">
+                      <div className="flex items-center gap-1.5 cursor-pointer hover:text-[hsl(var(--golden-pollen))]">
                         Candidat
                         <ArrowUpDown className="h-3 w-3" />
                       </div>
@@ -332,7 +332,7 @@ const CandidaturesPage = () => {
                     <th className="min-w-[90px]">
                       <Tooltip>
                         <TooltipTrigger className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
-                          Score Exp.
+                          Score exp.
                           <ArrowUpDown className="h-3 w-3" />
                         </TooltipTrigger>
                         <TooltipContent>Score d'expérience</TooltipContent>
@@ -341,7 +341,7 @@ const CandidaturesPage = () => {
                     <th className="min-w-[90px]">
                       <Tooltip>
                         <TooltipTrigger className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
-                          Score Prof.
+                          Score prof.
                           <ArrowUpDown className="h-3 w-3" />
                         </TooltipTrigger>
                         <TooltipContent>Score de profession</TooltipContent>
@@ -350,7 +350,7 @@ const CandidaturesPage = () => {
                     <th className="min-w-[90px]">
                       <Tooltip>
                         <TooltipTrigger className="flex items-center gap-1.5 cursor-pointer hover:text-foreground">
-                          Score Dispo.
+                          Score dispo.
                           <ArrowUpDown className="h-3 w-3" />
                         </TooltipTrigger>
                         <TooltipContent>Score de disponibilité</TooltipContent>
@@ -389,7 +389,7 @@ const CandidaturesPage = () => {
                       </td>
                       <td className="sticky left-12 bg-white z-10">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-[hsl(18_100%_45%)]">
+                          <span className="font-bold text-foreground">
                             {candidate.firstName} {candidate.lastName}
                           </span>
                           {candidate.tags.length > 0 && (

@@ -281,7 +281,7 @@
   }
   
   .data-table th {
-    @apply text-left text-xs font-bold uppercase tracking-wider text-foreground;
+    @apply text-left text-xs font-bold tracking-wider text-foreground;
     @apply px-4 py-3 bg-white border-b border-[hsl(var(--table-border))];
   }
   

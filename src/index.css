@@ -317,12 +317,13 @@
   }
   
   .nav-item:hover:not(.nav-item-active-no-hover) {
-    @apply bg-sidebar-accent text-sidebar-accent-foreground;
+    @apply bg-sidebar-accent;
   }
 
-  /* Coral hover for light themes */
-  .nav-item-coral-hover:hover {
-    color: hsl(var(--coral-glow)) !important;
+  /* Golden hover for porcelain theme - dark golden text */
+  .nav-item-golden-hover:hover {
+    @apply bg-sidebar-accent;
+    color: hsl(38 100% 40%) !important;
   }
 
   /* Active state - no hover change */

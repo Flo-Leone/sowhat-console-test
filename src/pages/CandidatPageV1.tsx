@@ -661,7 +661,7 @@ const CandidatPageV1 = () => {
 
                 <div className="pt-2 border-t border-border">
                   <Textarea placeholder="Ajouter un commentaire..." className="min-h-[80px] resize-none" />
-                  <Button className="mt-2 w-full gap-2" variant="outline">
+                  <Button className="mt-2 w-full gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]" variant="outline">
                     <Send className="h-4 w-4" />
                     Ajouter
                   </Button>

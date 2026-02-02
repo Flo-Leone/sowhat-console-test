@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Eye, MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { Plus, Eye, MoreHorizontal, Edit, Trash2, ChevronDown, RefreshCw } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -60,51 +60,46 @@ const ParametresCSSPage = () => {
               Gestion des styles de marque
             </p>
           </div>
-          <Button className="btn-primary btn-sm gap-2">
-            <Plus className="h-4 w-4" />
-            Créer CSS
-          </Button>
-        </div>
-
-        {/* Bulk Actions Bar */}
-        {selectedRows.length > 0 && (
-          <div className="flex items-center gap-3 px-4 py-3 bg-coral/10 rounded-lg border border-coral/20 animate-fade-in">
-            <span className="text-sm font-medium text-foreground">
-              {selectedRows.length} élément{selectedRows.length > 1 ? 's' : ''} sélectionné{selectedRows.length > 1 ? 's' : ''}
-            </span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="btn-secondary btn-sm gap-2">
-                  Actions
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card border-border">
-                <DropdownMenuItem className="gap-2">
-                  <Eye className="h-4 w-4" />
-                  Prévisualiser
-                </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2">
-                  <Edit className="h-4 w-4" />
-                  Modifier
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="gap-2 text-destructive">
-                  <Trash2 className="h-4 w-4" />
-                  Supprimer
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setSelectedRows([])}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Annuler
+          <div className="flex items-center gap-2">
+            {/* Actions Button - appears when rows are selected */}
+            {selectedRows.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="gap-2 bg-[hsl(var(--coral-glow))] hover:bg-[hsl(18_100%_75%)] text-white">
+                    Actions ({selectedRows.length})
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-card border-border"
+                >
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Eye className="h-4 w-4" />
+                    Prévisualiser
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <Edit className="h-4 w-4" />
+                    Modifier
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-3 py-2.5">
+                    <RefreshCw className="h-4 w-4" />
+                    Activer/Désactiver
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="gap-3 py-2.5 text-destructive">
+                    <Trash2 className="h-4 w-4" />
+                    Supprimer
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            <Button className="btn-primary btn-sm gap-2">
+              <Plus className="h-4 w-4" />
+              Créer CSS
             </Button>
           </div>
-        )}
+        </div>
 
         {/* Main Content Card */}
         <div className="bg-card rounded-xl overflow-hidden">

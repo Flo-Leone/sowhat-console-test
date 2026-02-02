@@ -61,9 +61,9 @@ const ParametresCSSPage = () => {
         </div>
 
         {/* Main Content Card */}
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <div className="bg-card rounded-xl overflow-hidden">
           {/* Section Header */}
-          <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-border/50 flex items-center justify-between">
             <h2>Configurations CSS</h2>
             <Button className="btn-primary btn-sm gap-2">
               <Plus className="h-4 w-4" />

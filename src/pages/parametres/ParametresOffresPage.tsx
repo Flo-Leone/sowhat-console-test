@@ -60,8 +60,8 @@ const ParametresOffresPage = () => {
         </div>
 
         {/* URLs Professions Section */}
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
-          <div className="px-6 py-4 border-b border-border">
+        <div className="bg-card rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-border/50">
             <h2>URLs Professions</h2>
             <p className="text-sm text-muted-foreground mt-0.5">
               URLs par défaut pour chaque profession
@@ -90,8 +90,8 @@ const ParametresOffresPage = () => {
         </div>
 
         {/* Message de bienvenue Section */}
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
-          <div className="px-6 py-4 border-b border-border">
+        <div className="bg-card rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-border/50">
             <h2>Message de bienvenue</h2>
             <p className="text-sm text-muted-foreground mt-0.5">
               Message affiché aux candidats lors de leur première connexion
@@ -100,7 +100,7 @@ const ParametresOffresPage = () => {
 
           <div className="p-6 space-y-4">
             {/* Toolbar */}
-            <div className="flex items-center gap-2 pb-2 border-b border-border">
+            <div className="flex items-center gap-2 pb-2 border-b border-border/50">
               <button className="p-2 rounded-md hover:bg-muted transition-colors" title="Annuler">
                 <Undo className="h-4 w-4 text-muted-foreground" />
               </button>
@@ -138,7 +138,7 @@ const ParametresOffresPage = () => {
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-border bg-muted/30 flex justify-end">
+          <div className="px-6 py-4 border-t border-border/50 bg-muted/30 flex justify-end">
             <Button className="btn-primary gap-2">
               <Save className="h-4 w-4" />
               Sauvegarder

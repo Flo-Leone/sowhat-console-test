@@ -81,21 +81,21 @@ const ParametresPreembauchePage = () => {
           <TabsList className="bg-muted/50 p-1">
             <TabsTrigger
               value="config"
-              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm"
             >
               <Settings className="h-4 w-4" />
               Configuration
             </TabsTrigger>
             <TabsTrigger
               value="documents-employes"
-              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm"
             >
               <FileText className="h-4 w-4" />
               Documents employés
             </TabsTrigger>
             <TabsTrigger
               value="documents-entreprise"
-              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm"
             >
               <Building2 className="h-4 w-4" />
               Documents entreprise

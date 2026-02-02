@@ -232,7 +232,7 @@ const EmployesPage = () => {
             </Button>
 
             {/* Spacer to push right-side buttons */}
-            <div className="flex-1 hidden sm:block" />
+            <div className="hidden sm:block sm:ml-auto" />
 
             {/* Actions Button - appears when rows are selected */}
             {selectedRows.length > 0 && (

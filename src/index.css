@@ -388,8 +388,8 @@
   }
   
   .btn-secondary:hover {
-    @apply border-[hsl(var(--coral-glow))] bg-[hsl(var(--coral-glow)/0.08)];
-    color: hsl(var(--coral-glow));
+    @apply border-[hsl(18_100%_55%)] bg-[hsl(18_100%_55%/0.12)];
+    color: hsl(18 100% 55%);
   }
   
   /* Tertiary Button - Coral accent style */

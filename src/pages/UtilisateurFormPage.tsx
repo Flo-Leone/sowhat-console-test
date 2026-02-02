@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, X, Mail } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
@@ -148,31 +148,64 @@ const UtilisateurFormPage = () => {
     (pv) => !formData.pointsVente.includes(pv)
   );
 
+  // Scroll detection
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const mainElement = document.querySelector('main');
+    if (!mainElement) return;
+    
+    const handleScroll = () => {
+      setIsScrolled(mainElement.scrollTop > 100);
+    };
+    mainElement.addEventListener("scroll", handleScroll);
+    return () => mainElement.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <ConsoleLayout>
-      <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-foreground">
-              {isEditMode ? `${formData.prenom} ${formData.nom}` : "Nouvel utilisateur"}
-            </h1>
-          </div>
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            {isEditMode && (
-              <Button variant="outline" className="gap-2" onClick={handleSendEmails}>
-                <Mail className="h-4 w-4" />
-                Envoyer e-mails
+      <div className="relative">
+        {/* Sticky Action Bar */}
+        <div className="sticky top-0 z-20 bg-transparent backdrop-blur-xl px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button onClick={() => navigate("/utilisateurs")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="h-4 w-4" />
+                <span className="text-sm">Retour aux utilisateurs</span>
+              </button>
+              {isScrolled && (
+                <div className="flex items-center gap-3 pl-4 border-l border-border">
+                  <span className="text-base font-bold text-foreground">
+                    {isEditMode ? `${formData.prenom} ${formData.nom}` : "Nouvel utilisateur"}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {isEditMode && (
+                <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]" onClick={handleSendEmails}>
+                  <Mail className="h-4 w-4" />
+                  Envoyer e-mails
+                </Button>
+              )}
+              <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]" onClick={handleSave}>
+                Sauvegarder
               </Button>
-            )}
-            <Button className="btn-primary" onClick={handleSave}>
-              Sauvegarder
-            </Button>
-            <Button variant="outline" onClick={handleCancel}>
-              Annuler
-            </Button>
+              <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]" onClick={handleCancel}>
+                Annuler
+              </Button>
+            </div>
           </div>
         </div>
+
+        <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+          {/* Header - only visible when not scrolled */}
+          {!isScrolled && (
+            <div>
+              <h1 className="text-foreground">
+                {isEditMode ? `${formData.prenom} ${formData.nom}` : "Nouvel utilisateur"}
+              </h1>
+            </div>
+          )}
 
         {/* Données principales */}
         <Card>
@@ -438,6 +471,7 @@ const UtilisateurFormPage = () => {
             </CardContent>
           </Card>
         )}
+        </div>
       </div>
     </ConsoleLayout>
   );

@@ -1,13 +1,13 @@
-// Variante 4 - Design minimal et épuré avec focus sur l'essentiel
+// Variante 4 - Copie exacte de V1 avec candidat différent
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, ChevronDown, X, Plus, MoreHorizontal, ExternalLink, Sparkles, RefreshCw } from "lucide-react";
+import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, Clock, Building2, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, RefreshCw, ChevronDown, X, Plus } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -17,83 +17,69 @@ type CandidateStatus = "nouveau" | "vivier" | "rejete_cv" | "appel_attente" | "a
 const statusConfig: Record<CandidateStatus, {
   label: string;
   className: string;
-  color: string;
 }> = {
   nouveau: {
     label: "Nouveau",
-    className: "status-new",
-    color: "bg-info"
+    className: "status-new"
   },
   vivier: {
     label: "Vivier",
-    className: "status-vivier",
-    color: "bg-lavender"
+    className: "status-vivier"
   },
   rejete_cv: {
-    label: "Rejeté CV",
-    className: "status-rejected",
-    color: "bg-destructive"
+    label: "Rejeté après CV",
+    className: "status-rejected"
   },
   appel_attente: {
     label: "Appel en attente",
-    className: "status-invited",
-    color: "bg-warning"
+    className: "status-invited"
   },
   appel_confirme: {
     label: "Appel confirmé",
-    className: "status-invited",
-    color: "bg-warning"
+    className: "status-invited"
   },
   rejete_appel: {
-    label: "Rejeté appel",
-    className: "status-rejected",
-    color: "bg-destructive"
+    label: "Rejeté après appel",
+    className: "status-rejected"
   },
   invite_entretien: {
-    label: "Entretien",
-    className: "status-invited",
-    color: "bg-warning"
+    label: "Invité pour entretien",
+    className: "status-invited"
   },
   rejete_entretien: {
-    label: "Rejeté entretien",
-    className: "status-rejected",
-    color: "bg-destructive"
+    label: "Rejeté après entretien",
+    className: "status-rejected"
   },
   recrute: {
     label: "Recruté",
-    className: "status-recruited",
-    color: "bg-success"
+    className: "status-recruited"
   },
   recrute_autre: {
     label: "Recruté ailleurs",
-    className: "bg-muted text-muted-foreground",
-    color: "bg-muted-foreground"
+    className: "bg-muted text-muted-foreground"
   }
 };
 
-// Mock data
+// Conversion tags options
+const conversionTagOptions = ["10H", "25H", "48H"];
+
+// Mock data for candidate
 const candidateData = {
   id: "4",
-  firstName: "Bob",
-  lastName: "Dupont",
-  email: "bob.dupont@email.com",
-  phone: "+33 6 11 22 33 44",
+  firstName: "Pierre",
+  lastName: "Leroy",
+  email: "pierre.leroy@email.com",
+  phone: "+33 6 33 44 55 66",
   status: "recrute" as CandidateStatus,
-  titreOffre: "Equipier polyvalent",
-  referenceOffre: "EQP-043",
-  applicationDate: "13 oct. 2025",
-  phoneCallDate: null as string | null,
-  interviewDate: null as string | null,
-  recruitedDate: "15 jan. 2026",
+  titreOffre: "Manager",
+  applicationDate: "Monday, October 28, 2025",
+  phoneCallDate: "Oct 30, 2025, 10:00 AM",
+  interviewDate: "Nov 05, 2025, 2:00 PM",
   conversionTags: [] as string[],
   preferredStore: "Paris Rivoli",
-  assignedStore: "Paris Rivoli" as string | null,
+  assignedStore: null as string | null,
   preferredContract: "CDI",
-  scores: {
-    experience: 0,
-    profession: null as number | null,
-    disponibilite: null as number | null
-  },
+  cvUrl: "#",
   availabilities: {
     monday: {
       morning: true,
@@ -102,23 +88,23 @@ const candidateData = {
     },
     tuesday: {
       morning: true,
-      lunch: true,
+      lunch: false,
       afternoon: true
     },
     wednesday: {
-      morning: true,
-      lunch: true,
+      morning: false,
+      lunch: false,
       afternoon: true
     },
     thursday: {
       morning: true,
       lunch: true,
-      afternoon: true
+      afternoon: false
     },
     friday: {
       morning: true,
-      lunch: true,
-      afternoon: true
+      lunch: false,
+      afternoon: false
     },
     saturday: {
       morning: false,
@@ -133,121 +119,53 @@ const candidateData = {
   },
   storesMatching: [{
     name: "Paris Rivoli",
-    score: 100
+    score: 95
+  }, {
+    name: "Paris Opéra",
+    score: 82
+  }, {
+    name: "Paris Carrousel Du Louvre",
+    score: 70
   }],
-  openQuestions: [],
+  openQuestions: [{
+    question: "Pourquoi souhaitez-vous rejoindre notre équipe ?",
+    answer: "Je souhaite évoluer vers un poste de management et votre enseigne est reconnue pour sa politique de promotion interne."
+  }],
   comments: [{
     id: "1",
-    text: "Recrutement finalisé, contrat signé",
+    text: "Excellente candidate avec une solide expérience en management.",
     author: "Stephane Boussely",
-    date: "15/01/26"
+    date: "01/19/26, 11:00 AM"
   }, {
     id: "2",
-    text: "Dernier entretien validé à l'unanimité",
+    text: "Entretien très positif.",
     author: "Admin SW.AI",
-    date: "14/01/26"
-  }, {
-    id: "3",
-    text: "Très bonne impression générale",
-    author: "Florian Guerrier",
-    date: "12/01/26"
-  }, {
-    id: "4",
-    text: "Tests de compétences réussis",
-    author: "Julie Martin",
-    date: "10/01/26"
-  }, {
-    id: "5",
-    text: "Présentation impeccable lors de l'entretien",
-    author: "Stephane Boussely",
-    date: "08/01/26"
-  }, {
-    id: "6",
-    text: "Parcours professionnel cohérent",
-    author: "Admin SW.AI",
-    date: "05/01/26"
-  }, {
-    id: "7",
-    text: "Recommandations excellentes",
-    author: "Florian Guerrier",
-    date: "03/01/26"
-  }, {
-    id: "8",
-    text: "Candidat sérieux et ponctuel",
-    author: "Julie Martin",
-    date: "02/01/26"
-  }, {
-    id: "9",
-    text: "Appel initial très positif",
-    author: "Stephane Boussely",
-    date: "20/10/25"
-  }, {
-    id: "10",
-    text: "CV bien structuré, à convoquer rapidement",
-    author: "Admin SW.AI",
-    date: "13/10/25"
+    date: "01/18/26, 4:00 PM"
   }],
   history: [{
-    date: "15 jan. 2026",
-    action: "Recruté par",
+    date: "Jan 19, 2026",
+    action: "Statut changé en Recruté par",
     user: "Stephane Boussely",
     type: "internal" as const
   }, {
-    date: "14 jan. 2026",
-    action: "Contrat signé",
-    user: "",
-    type: "candidate" as const
-  }, {
-    date: "12 jan. 2026",
-    action: "Offre acceptée",
-    user: "",
-    type: "candidate" as const
-  }, {
-    date: "10 jan. 2026",
-    action: "Proposition salariale envoyée",
-    user: "Admin SW.AI",
-    type: "internal" as const
-  }, {
-    date: "08 jan. 2026",
-    action: "Entretien final réalisé",
-    user: "",
-    type: "candidate" as const
-  }, {
-    date: "05 jan. 2026",
-    action: "Entretien technique passé",
-    user: "",
-    type: "candidate" as const
-  }, {
-    date: "02 jan. 2026",
-    action: "Invitation entretien envoyée",
-    user: "Florian Guerrier",
-    type: "internal" as const
-  }, {
-    date: "20 oct. 2025",
-    action: "Appel de présélection",
-    user: "",
-    type: "candidate" as const
-  }, {
-    date: "15 oct. 2025",
-    action: "CV analysé",
-    user: "Julie Martin",
-    type: "internal" as const
-  }, {
-    date: "13 oct. 2025",
+    date: "Oct 28, 2025",
     action: "Candidature reçue",
     user: "",
     type: "candidate" as const
   }]
 };
-const dayLabelsShort: Record<string, string> = {
-  monday: "Lun",
-  tuesday: "Mar",
-  wednesday: "Mer",
-  thursday: "Jeu",
-  friday: "Ven",
-  saturday: "Sam",
-  sunday: "Dim"
+const allStores = ["Paris Carrousel Du Louvre", "Paris Rivoli", "Paris Opéra", "Lyon Part-Dieu", "Marseille Vieux-Port"];
+const dayLabels: Record<string, string> = {
+  monday: "Lundi",
+  tuesday: "Mardi",
+  wednesday: "Mercredi",
+  thursday: "Jeudi",
+  friday: "Vendredi",
+  saturday: "Samedi",
+  sunday: "Dimanche"
 };
+
+// Status Dropdown Component
 const StatusDropdown = ({
   status,
   onStatusChange
@@ -276,7 +194,7 @@ const StatusDropdown = ({
           {Object.entries(statusConfig).map(([key, value]) => <button key={key} onClick={() => {
           onStatusChange(key as CandidateStatus);
           setOpen(false);
-        }} className={cn("w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-muted", status === key && "bg-muted")}>
+        }} className={cn("w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted", status === key && "bg-muted")}>
               <span className={cn("status-badge text-xs", statusConfig[key as CandidateStatus].className)}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
                 {value.label}
@@ -287,22 +205,123 @@ const StatusDropdown = ({
     </Popover>;
 };
 
+// Tag color mapping
+const tagColorMap: Record<string, string> = {
+  "10H": "bg-lavender/20 text-lavender border-lavender/30",
+  "25H": "bg-coral/20 text-coral border-coral/30",
+  "48H": "bg-primary/20 text-primary border-primary/30"
+};
+
+// Conversion Tags Editor Component
+const ConversionTagsEditor = ({
+  tags,
+  onTagsChange
+}: {
+  tags: string[];
+  onTagsChange: (tags: string[]) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const removeTag = (tagToRemove: string) => {
+    onTagsChange(tags.filter(t => t !== tagToRemove));
+  };
+  const addTag = (tag: string) => {
+    if (!tags.includes(tag)) {
+      onTagsChange([...tags, tag]);
+    }
+  };
+  const availableTags = conversionTagOptions.filter(t => !tags.includes(t));
+  return <div className="flex items-center gap-1.5">
+      {tags.map(tag => <Badge key={tag} variant="secondary" className={cn("border group/tag relative pr-6", tagColorMap[tag] || "bg-muted text-muted-foreground")}>
+          {tag}
+          <button onClick={() => removeTag(tag)} className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/tag:opacity-100 transition-opacity hover:text-destructive">
+            <X className="h-3 w-3" />
+          </button>
+        </Badge>)}
+      {availableTags.length > 0 && <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <button className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs text-muted-foreground hover:bg-muted transition-colors">
+              <Plus className="h-3 w-3" />
+              Ajouter un tag
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-48 p-2" align="start">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Tags de conversion</p>
+            <div className="space-y-1">
+              {availableTags.map(tag => <button key={tag} onClick={() => {
+            addTag(tag);
+            setOpen(false);
+          }} className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted">
+                  <span className={cn("w-3 h-3 rounded-full", tag === "10H" && "bg-lavender", tag === "25H" && "bg-coral", tag === "48H" && "bg-primary")} />
+                  {tag}
+                </button>)}
+            </div>
+          </PopoverContent>
+        </Popover>}
+    </div>;
+};
+
+// Reassign Store Component
+const ReassignStoreDropdown = ({
+  currentStore,
+  onStoreChange
+}: {
+  currentStore: string | null;
+  onStoreChange: (store: string) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  return <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
+          <RefreshCw className="h-4 w-4" />
+          Réassigner
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-2" align="end">
+        <p className="text-xs font-medium text-muted-foreground mb-2 px-2">Assigner à un point de vente</p>
+        <div className="space-y-0.5">
+          {allStores.map(store => <button key={store} onClick={() => {
+          onStoreChange(store);
+          setOpen(false);
+        }} className={cn("w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors hover:bg-muted text-left", currentStore === store && "bg-muted")}>
+              <MapPin className="h-4 w-4 text-coral shrink-0" />
+              <span className="truncate">{store}</span>
+            </button>)}
+        </div>
+      </PopoverContent>
+    </Popover>;
+};
 const CandidatPageV4 = () => {
   const {
     id
   } = useParams();
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(candidateData);
-  const [newComment, setNewComment] = useState("");
-  
   const handleStatusChange = (newStatus: CandidateStatus) => {
     setCandidate(prev => ({
       ...prev,
       status: newStatus
     }));
   };
-
-  // Scroll detection
+  const handleTagsChange = (newTags: string[]) => {
+    setCandidate(prev => ({
+      ...prev,
+      conversionTags: newTags
+    }));
+  };
+  const handleStoreChange = (newStore: string) => {
+    setCandidate(prev => ({
+      ...prev,
+      assignedStore: newStore
+    }));
+  };
+  const handleArchive = () => {
+    console.log("Archiving candidate", id);
+  };
+  const handleReassign = () => {
+    console.log("Reassigning candidate", id);
+  };
+  
+  // Scroll detection - target the main container
   const [isScrolled, setIsScrolled] = useState(false);
   useEffect(() => {
     const mainElement = document.querySelector('main');
@@ -314,11 +333,11 @@ const CandidatPageV4 = () => {
     mainElement.addEventListener("scroll", handleScroll);
     return () => mainElement.removeEventListener("scroll", handleScroll);
   }, []);
-
+  
   return <ConsoleLayout>
-      <div className="relative min-h-screen bg-background">
+      <div className="relative">
         {/* Sticky Action Bar */}
-        <div className="sticky top-0 z-20 bg-transparent backdrop-blur-xl px-6 lg:px-8 py-3 border-b border-border/50">
+        <div className="sticky top-0 z-20 bg-transparent backdrop-blur-xl px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button onClick={() => navigate("/candidatures")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
@@ -327,9 +346,6 @@ const CandidatPageV4 = () => {
               </button>
               {isScrolled && (
                 <div className="flex items-center gap-3 pl-4 border-l border-border">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
-                    {candidate.firstName[0]}{candidate.lastName[0]}
-                  </div>
                   <span className="text-base font-bold text-foreground">
                     {candidate.firstName} {candidate.lastName}
                   </span>
@@ -344,233 +360,291 @@ const CandidatPageV4 = () => {
                     <Calendar className="h-4 w-4" />
                     Planifier un entretien
                   </Button>
-                  <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
+                  <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]" onClick={handleReassign}>
                     <RefreshCw className="h-4 w-4" />
                     Réassigner
                   </Button>
                 </>
               )}
-              <Button variant="outline" size="icon" className="hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
-                <Phone className="h-4 w-4" />
+              <Button className="gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]" onClick={handleArchive}>
+                <Archive className="h-4 w-4" />
+                Archiver
               </Button>
-              <Button variant="outline" size="icon" className="hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
-                <Mail className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
-                <Download className="h-4 w-4" />
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Planifier entretien
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="gap-2">
-                    <ExternalLink className="h-4 w-4" />
-                    Voir l'offre
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="gap-2 text-muted-foreground">
-                    <Archive className="h-4 w-4" />
-                    Archiver
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="px-6 lg:px-8 py-8 max-w-5xl mx-auto space-y-8 animate-fade-in">
-          {/* Header - only visible when not scrolled */}
-          {!isScrolled && (
-            <div className="flex items-center gap-6">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
+        <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+          {/* Header */}
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+            <div className="flex items-start gap-4">
+              <div className="w-16 h-16 rounded-md bg-lavender/20 flex items-center justify-center text-2xl font-bold text-lavender">
                 {candidate.firstName[0]}{candidate.lastName[0]}
               </div>
-              <div>
-                <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-semibold">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h1 className="text-foreground">
                     {candidate.firstName} {candidate.lastName}
                   </h1>
                   <StatusDropdown status={candidate.status} onStatusChange={handleStatusChange} />
+                  <ConversionTagsEditor tags={candidate.conversionTags} onTagsChange={handleTagsChange} />
                 </div>
-                <p className="text-muted-foreground">
-                  {candidate.titreOffre} · {candidate.referenceOffre} · {candidate.assignedStore}
+                <p className="text-foreground mt-1">
+                  Candidature pour: <span className="font-medium">{candidate.titreOffre}</span>
                 </p>
-              </div>
-            </div>
-          )}
-
-          {/* Success Banner for recruited */}
-          {candidate.status === "recrute" && <div className="flex items-center gap-3 p-4 rounded-xl bg-success/10 border border-success/20">
-              <Sparkles className="h-5 w-5 text-success" />
-              <div>
-                <p className="font-medium text-success">Candidat recruté !</p>
-                <p className="text-sm text-muted-foreground">
-                  Recrutement finalisé le {candidate.recruitedDate} par {candidate.assignedStore}
-                </p>
-              </div>
-            </div>}
-
-          {/* Contact & Info */}
-          <section className="space-y-4">
-            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Coordonnées</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <a href={`mailto:${candidate.email}`} className="flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors group">
-                <div className="w-10 h-10 rounded-full bg-info/10 flex items-center justify-center">
-                  <Mail className="h-4 w-4 text-info" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-muted-foreground">Email</p>
-                  <p className="text-sm font-medium truncate group-hover:text-info transition-colors">{candidate.email}</p>
-                </div>
-              </a>
-              <a href={`tel:${candidate.phone}`} className="flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors group">
-                <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
-                  <Phone className="h-4 w-4 text-success" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Téléphone</p>
-                  <p className="text-sm font-medium group-hover:text-success transition-colors">{candidate.phone}</p>
-                </div>
-              </a>
-              <div className="flex items-center gap-3 p-4 rounded-xl border border-border">
-                <div className="w-10 h-10 rounded-full bg-coral/10 flex items-center justify-center">
-                  <MapPin className="h-4 w-4 text-coral" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Point de vente</p>
-                  <p className="text-sm font-medium">{candidate.preferredStore}</p>
+                {candidate.assignedStore && <p className="text-sm text-coral mt-1 flex items-center gap-1">
+                    <MapPin className="h-3.5 w-3.5" />
+                    Assigné à: {candidate.assignedStore}
+                  </p>}
+                
+                {/* Compact profile info */}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm">
+                  <a href={`mailto:${candidate.email}`} className="flex items-center gap-1.5 text-foreground hover:text-foreground/80 transition-colors">
+                    <Mail className="h-4 w-4 text-coral" />
+                    <span>{candidate.email}</span>
+                  </a>
+                  <a href={`tel:${candidate.phone}`} className="flex items-center gap-1.5 text-foreground hover:text-foreground/80 transition-colors">
+                    <Phone className="h-4 w-4 text-coral" />
+                    <span>{candidate.phone}</span>
+                  </a>
+                  <span className="flex items-center gap-1.5 text-foreground">
+                    <Calendar className="h-4 w-4 text-coral" />
+                    <span>{candidate.applicationDate}</span>
+                  </span>
+                  <Button variant="link" className="h-auto p-0 text-sm text-lavender hover:text-lavender/80">
+                    <Download className="h-3.5 w-3.5 mr-1" />
+                    Télécharger CV
+                  </Button>
                 </div>
               </div>
             </div>
-          </section>
+          </div>
 
-          <Separator />
-
-          {/* Timeline */}
-          <section className="space-y-4">
-            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Parcours</h2>
-            <div className="flex items-center gap-4">
-              <div className="flex-1 text-center p-4 rounded-xl bg-muted/30">
-                <Calendar className="h-5 w-5 mx-auto text-muted-foreground mb-2" />
-                <p className="text-xs text-muted-foreground">Candidature</p>
-                <p className="text-sm font-medium">{candidate.applicationDate}</p>
-              </div>
-              <div className="w-8 h-px bg-border" />
-              <div className="flex-1 text-center p-4 rounded-xl bg-muted/30">
-                <Phone className="h-5 w-5 mx-auto text-muted-foreground mb-2" />
-                <p className="text-xs text-muted-foreground">Appel</p>
-                <p className="text-sm font-medium">{candidate.phoneCallDate || "—"}</p>
-              </div>
-              <div className="w-8 h-px bg-border" />
-              <div className="flex-1 text-center p-4 rounded-xl bg-muted/30">
-                <User className="h-5 w-5 mx-auto text-muted-foreground mb-2" />
-                <p className="text-xs text-muted-foreground">Entretien</p>
-                <p className="text-sm font-medium">{candidate.interviewDate || "—"}</p>
-              </div>
-              <div className="w-8 h-px bg-border" />
-              <div className={cn("flex-1 text-center p-4 rounded-xl", candidate.status === "recrute" ? "bg-success/10" : "bg-muted/30")}>
-                <CheckCircle2 className={cn("h-5 w-5 mx-auto mb-2", candidate.status === "recrute" ? "text-success" : "text-muted-foreground")} />
-                <p className="text-xs text-muted-foreground">Décision</p>
-                <p className={cn("text-sm font-medium", candidate.status === "recrute" && "text-success")}>
-                  {candidate.status === "recrute" ? candidate.recruitedDate : "—"}
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <Separator />
-
-          {/* Disponibilités inline */}
-          <section className="space-y-4">
-            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Disponibilités</h2>
-            <div className="flex items-center gap-2">
-              {Object.entries(candidate.availabilities).map(([day, slots]) => {
-              const available = slots.morning || slots.lunch || slots.afternoon;
-              const full = slots.morning && slots.lunch && slots.afternoon;
-              return <div key={day} className={cn("flex-1 text-center py-3 rounded-xl border transition-colors", full ? "bg-success/10 border-success/20 text-success" : available ? "bg-warning/10 border-warning/20 text-warning" : "bg-muted/50 border-border text-muted-foreground")}>
-                    <p className="text-xs font-medium">{dayLabelsShort[day]}</p>
-                    {full && <CheckCircle2 className="h-4 w-4 mx-auto mt-1" />}
-                  </div>;
-            })}
-            </div>
-          </section>
-
-          <Separator />
-
-          {/* Notes */}
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Notes internes</h2>
-              <Badge variant="secondary">{candidate.comments.length}</Badge>
-            </div>
-            
-            <div className="space-y-3">
-              {/* Add comment */}
-              <div className="flex gap-3">
-                <Textarea
-                  placeholder="Ajouter une note..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="flex-1 min-h-[60px]"
-                />
-                <Button className="self-end gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
-                  <Send className="h-4 w-4" />
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Main Info */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Entretiens Card */}
+            <Card className="shadow-card">
+              <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-lg font-display">Entretiens</CardTitle>
+                <Button variant="outline" className="gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
+                  <Calendar className="h-4 w-4" />
+                  Planifier un entretien
                 </Button>
-              </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15">
+                    <Calendar className="h-5 w-5 text-lavender" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Entretien planifié</p>
+                      <p className="text-sm font-medium">{candidate.interviewDate}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15">
+                    <Phone className="h-5 w-5 text-lavender" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Dernier appel</p>
+                      <p className="text-sm font-medium">{candidate.phoneCallDate}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-              <ScrollArea className="h-[300px]">
-                <div className="space-y-2 pr-4">
-                  {candidate.comments.map((comment) => (
-                    <div key={comment.id} className="p-3 rounded-lg border border-border bg-white">
-                      <p className="text-sm">{comment.text}</p>
-                      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                        <span className="font-medium">{comment.author}</span>
-                        <span>•</span>
-                        <span>{comment.date}</span>
+            {/* Preferences & Matching Combined */}
+            <Card className="shadow-card">
+              <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-lg font-display">Préférences & Matching</CardTitle>
+                <ReassignStoreDropdown currentStore={candidate.assignedStore} onStoreChange={handleStoreChange} />
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Preferences Section */}
+                <div>
+                  <h4 className="text-sm font-semibold text-muted-foreground mb-3">Préférences du candidat</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15">
+                      <MapPin className="h-5 w-5 text-lavender mt-0.5" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">Point de vente préféré</p>
+                        <p className="text-sm font-medium">{candidate.preferredStore}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-          </section>
-
-          <Separator />
-
-          {/* History */}
-          <section className="space-y-4">
-            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Historique complet</h2>
-            <ScrollArea className="h-[300px]">
-              <div className="space-y-4 pr-4">
-                {candidate.history.map((event, index) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className={cn(
-                      "w-2 h-2 rounded-full mt-2 shrink-0",
-                      event.type === "candidate" ? "bg-success" : "bg-info"
-                    )} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">{event.action}</p>
-                      {event.user && (
-                        <p className="text-xs text-muted-foreground">{event.user}</p>
-                      )}
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15">
+                      <FileText className="h-5 w-5 text-lavender mt-0.5" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">Contrat préféré</p>
+                        <p className="text-sm font-medium">{candidate.preferredContract}</p>
+                      </div>
                     </div>
-                    <span className="text-xs text-muted-foreground shrink-0">{event.date}</span>
                   </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </section>
+                </div>
+
+                <Separator />
+
+                {/* Matching Section */}
+                <div>
+                  <h4 className="text-sm font-semibold text-muted-foreground mb-3">Matching dynamique des points de vente</h4>
+                  <div className="space-y-3">
+                    {candidate.storesMatching.map((store, index) => <div key={store.name} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                        <div className="flex items-center gap-3">
+                          <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold", index === 0 ? "bg-success/10 text-success" : "bg-muted text-muted-foreground")}>
+                            {index + 1}
+                          </div>
+                          <span className="font-medium">{store.name}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
+                            <div className={cn("h-full rounded-full transition-all", store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-destructive")} style={{
+                          width: `${store.score}%`
+                        }} />
+                          </div>
+                          <span className={cn("text-sm font-semibold min-w-[40px] text-right", store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive")}>
+                            {store.score}%
+                          </span>
+                        </div>
+                      </div>)}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Availabilities */}
+            <Card className="shadow-card">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-display">Disponibilités</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-2 pr-4 text-xs font-medium text-muted-foreground">Jour</th>
+                        <th className="text-center py-2 px-4 text-xs font-medium text-muted-foreground">8h - 12h</th>
+                        <th className="text-center py-2 px-4 text-xs font-medium text-muted-foreground">12h - 13h</th>
+                        <th className="text-center py-2 px-4 text-xs font-medium text-muted-foreground">13h - 18h</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(candidate.availabilities).map(([day, slots]) => <tr key={day} className="border-b border-border last:border-0">
+                          <td className="py-3 pr-4 font-medium">{dayLabels[day]}</td>
+                          <td className="py-3 px-4 text-center">
+                            {slots.morning ? <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
+                                <CheckCircle2 className="h-4 w-4 text-success" />
+                              </div> : <div className="w-6 h-6 rounded-full bg-muted mx-auto" />}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            {slots.lunch ? <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
+                                <CheckCircle2 className="h-4 w-4 text-success" />
+                              </div> : <div className="w-6 h-6 rounded-full bg-muted mx-auto" />}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            {slots.afternoon ? <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
+                                <CheckCircle2 className="h-4 w-4 text-success" />
+                              </div> : <div className="w-6 h-6 rounded-full bg-muted mx-auto" />}
+                          </td>
+                        </tr>)}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Open Questions */}
+            <Card className="shadow-card">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-display">Questions ouvertes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {candidate.openQuestions.map((q, index) => <div key={index} className="p-4 rounded-lg bg-lavender/5 border border-lavender/15">
+                      <p className="text-sm font-medium text-foreground mb-2">{q.question}</p>
+                      <p className="text-sm text-lavender font-medium">{q.answer}</p>
+                    </div>)}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Comments & History */}
+          <div className="space-y-6">
+            {/* Internal Comments */}
+            <Card className="shadow-card">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-display flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-lavender" />
+                  Commentaires internes
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {candidate.comments.length} commentaires
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ScrollArea className="h-[300px] pr-4">
+                  <div className="space-y-3">
+                    {candidate.comments.map(comment => <div key={comment.id} className="p-3 rounded-lg bg-lavender/5 border border-lavender/15">
+                        <p className="text-sm">{comment.text}</p>
+                        <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                          <User className="h-3 w-3" />
+                          <span>{comment.author}</span>
+                          <span>·</span>
+                          <span>{comment.date}</span>
+                        </div>
+                      </div>)}
+                  </div>
+                </ScrollArea>
+
+                <div className="pt-2 border-t border-border">
+                  <Textarea placeholder="Ajouter un commentaire..." className="min-h-[80px] resize-none" />
+                  <Button className="mt-2 w-full gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]" variant="outline">
+                    <Send className="h-4 w-4" />
+                    Ajouter
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Action History */}
+            <Card className="shadow-card">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-display flex items-center gap-2">
+                  <History className="h-5 w-5 text-coral" />
+                  Historique des actions
+                </CardTitle>
+                <div className="flex gap-4 mt-2">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <div className="w-3 h-3 rounded-full bg-lavender/50 border-2 border-lavender" />
+                    <span>Interne</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <div className="w-3 h-3 rounded-full bg-coral/50 border-2 border-coral" />
+                    <span>Candidat</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="relative">
+                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border" />
+                  <div className="space-y-4">
+                    {candidate.history.map((event, index) => <div key={index} className="flex gap-4 relative">
+                        <div className={cn("w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 z-10", event.type === "internal" ? "bg-lavender/20 border-lavender" : "bg-coral/20 border-coral")} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground">{event.date}</p>
+                          <p className="text-sm mt-0.5">
+                            {event.action}
+                            {event.user && <span className="font-medium text-foreground"> {event.user}</span>}
+                          </p>
+                        </div>
+                      </div>)}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
         </div>
       </div>
     </ConsoleLayout>;
 };
-
 export default CandidatPageV4;

@@ -532,10 +532,6 @@ const CandidatPageV1 = () => {
               <CardTitle className="text-base font-semibold uppercase tracking-wide text-muted-foreground">Profil candidat</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <a href={`tel:${candidate.phone}`} className="flex items-center gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15 hover:bg-lavender/10 transition-colors">
-                <Phone className="h-4 w-4 text-coral" />
-                <span className="text-sm">{candidate.phone}</span>
-              </a>
               <div className="flex items-center justify-between p-3 rounded-lg bg-lavender/5 border border-lavender/15">
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-lavender" />

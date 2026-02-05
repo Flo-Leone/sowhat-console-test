@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 type CandidateStatus = "nouveau" | "vivier" | "rejete_cv" | "appel_attente" | "appel_confirme" | "rejete_appel" | "invite_entretien" | "rejete_entretien" | "recrute" | "recrute_autre";
+type HistoryEventType = "candidate" | "internal";
 const statusConfig: Record<CandidateStatus, { label: string; className: string; }> = {
   nouveau: { label: "Nouveau", className: "status-new" },
   vivier: { label: "Vivier", className: "status-vivier" },
@@ -60,7 +61,7 @@ const candidateData = {
   ],
   openQuestions: [{ question: "Pourquoi souhaitez-vous rejoindre notre équipe ?", answer: "J'ai une expérience de 3 ans en caisse et je cherche à évoluer vers un poste de responsable." }],
   comments: [{ id: "1", text: "CV très complet, profil intéressant.", author: "Julie Martin", date: "01/20/26, 09:00 AM" }],
-  history: [{ date: "Nov 20, 2025", action: "Candidature reçue", user: "", type: "candidate" as const }],
+  history: [{ date: "Nov 20, 2025", action: "Candidature reçue", user: "", type: "candidate" as HistoryEventType }],
   otherConversations: [{ date: "Jan 26, 2026", status: "En attente", preferredLocation: "Lyon Part-Dieu", link: "#" }],
   moreInfo: "La candidate a une solide expérience en gestion de caisse et souhaite évoluer vers un poste de responsable."
 };

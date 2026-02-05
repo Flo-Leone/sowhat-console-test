@@ -1,7 +1,7 @@
 // Variante 1 - Design actuel (classique avec cards)
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, Clock, Building2, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, RefreshCw, ChevronDown, X, Plus } from "lucide-react";
+ import { ArrowLeft, Mail, Phone, Calendar, FileText, MapPin, Clock, Building2, User, MessageSquare, Send, History, CheckCircle2, Download, Archive, RefreshCw, ChevronDown, X, Plus, ExternalLink, MoreHorizontal } from "lucide-react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -232,7 +232,14 @@ const candidateData = {
     action: "Candidature reçue",
     user: "",
     type: "candidate" as const
-  }]
+   }],
+   otherConversations: [{
+     date: "Jan 26, 2026",
+     status: "Appel planifié - en cours",
+     preferredLocation: "Paris Rivoli",
+     link: "#"
+   }],
+   moreInfo: "La candidate a mentionné qu'elle était très motivée par l'opportunité de travailler dans un environnement retail dynamique. Elle a une expérience significative en gestion d'équipe et souhaite évoluer vers un poste de management."
 };
 const allStores = ["Paris Carrousel Du Louvre", "Paris Rivoli", "Paris Opéra", "Lyon Part-Dieu", "Marseille Vieux-Port"];
 const dayLabels: Record<string, string> = {
@@ -501,169 +508,63 @@ const CandidatPageV1 = () => {
           </div>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Main Info */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Entretiens Card */}
-            <Card className="shadow-card">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column - Application Follow-up & Profile */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* SUIVI DE CANDIDATURE */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold uppercase tracking-wide text-muted-foreground">Suivi de candidature</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-lavender/5 border border-lavender/15">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-lavender" />
+                    <span className="text-sm text-muted-foreground">Date de candidature</span>
+                  </div>
+                  <span className="text-sm font-medium">{candidate.applicationDate}</span>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-lavender/5 border border-lavender/15">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-lavender" />
+                    <span className="text-sm text-muted-foreground">CV</span>
+                  </div>
+                  <Button variant="link" className="h-auto p-0 text-sm text-lavender hover:text-lavender/80">
+                    <Download className="h-3.5 w-3.5 mr-1" />
+                    Télécharger
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* PROFIL CANDIDAT */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold uppercase tracking-wide text-muted-foreground">Profil candidat</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <a href={`mailto:${candidate.email}`} className="flex items-center gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15 hover:bg-lavender/10 transition-colors">
+                  <Mail className="h-4 w-4 text-coral" />
+                  <span className="text-sm">{candidate.email}</span>
+                </a>
+                <a href={`tel:${candidate.phone}`} className="flex items-center gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15 hover:bg-lavender/10 transition-colors">
+                  <Phone className="h-4 w-4 text-coral" />
+                  <span className="text-sm">{candidate.phone}</span>
+                </a>
+              </CardContent>
+            </Card>
+
+            {/* COMMENTAIRES INTERNES */}
+            <Card>
               <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="text-lg font-display">Entretiens</CardTitle>
-                <Button variant="outline" className="gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]">
-                  <Calendar className="h-4 w-4" />
-                  Planifier un entretien
-                </Button>
+                <CardTitle className="text-base font-semibold uppercase tracking-wide text-muted-foreground">Commentaires internes</CardTitle>
+                <span className="text-xs text-muted-foreground">{candidate.comments.length}</span>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15">
-                    <Calendar className="h-5 w-5 text-lavender" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Entretien planifié</p>
-                      <p className="text-sm font-medium">{candidate.interviewDate}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15">
-                    <Phone className="h-5 w-5 text-lavender" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Dernier appel</p>
-                      <p className="text-sm font-medium">{candidate.phoneCallDate}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Preferences & Matching Combined */}
-            <Card className="shadow-card">
-              <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="text-lg font-display">Préférences & Matching</CardTitle>
-                <ReassignStoreDropdown currentStore={candidate.assignedStore} onStoreChange={handleStoreChange} />
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Preferences Section */}
-                <div>
-                  <h4 className="text-sm font-semibold text-muted-foreground mb-3">Préférences du candidat</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15">
-                      <MapPin className="h-5 w-5 text-lavender mt-0.5" />
-                      <div>
-                        <p className="text-xs text-muted-foreground">Point de vente préféré</p>
-                        <p className="text-sm font-medium">{candidate.preferredStore}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15">
-                      <FileText className="h-5 w-5 text-lavender mt-0.5" />
-                      <div>
-                        <p className="text-xs text-muted-foreground">Contrat préféré</p>
-                        <p className="text-sm font-medium">{candidate.preferredContract}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Matching Section */}
-                <div>
-                  <h4 className="text-sm font-semibold text-muted-foreground mb-3">Matching dynamique des points de vente</h4>
+              <CardContent className="space-y-3">
+                <ScrollArea className="h-[250px] pr-2">
                   <div className="space-y-3">
-                    {candidate.storesMatching.map((store, index) => <div key={store.name} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                        <div className="flex items-center gap-3">
-                          <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold", index === 0 ? "bg-success/10 text-success" : "bg-muted text-muted-foreground")}>
-                            {index + 1}
-                          </div>
-                          <span className="font-medium">{store.name}</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
-                            <div className={cn("h-full rounded-full transition-all", store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-destructive")} style={{
-                          width: `${store.score}%`
-                        }} />
-                          </div>
-                          <span className={cn("text-sm font-semibold min-w-[40px] text-right", store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive")}>
-                            {store.score}%
-                          </span>
-                        </div>
-                      </div>)}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Availabilities */}
-            <Card className="shadow-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-display">Disponibilités</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left py-2 pr-4 text-xs font-medium text-muted-foreground">Jour</th>
-                        <th className="text-center py-2 px-4 text-xs font-medium text-muted-foreground">8h - 12h</th>
-                        <th className="text-center py-2 px-4 text-xs font-medium text-muted-foreground">12h - 13h</th>
-                        <th className="text-center py-2 px-4 text-xs font-medium text-muted-foreground">13h - 18h</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(candidate.availabilities).map(([day, slots]) => <tr key={day} className="border-b border-border last:border-0">
-                          <td className="py-3 pr-4 font-medium">{dayLabels[day]}</td>
-                          <td className="py-3 px-4 text-center">
-                            {slots.morning ? <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
-                                <CheckCircle2 className="h-4 w-4 text-success" />
-                              </div> : <div className="w-6 h-6 rounded-full bg-muted mx-auto" />}
-                          </td>
-                          <td className="py-3 px-4 text-center">
-                            {slots.lunch ? <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
-                                <CheckCircle2 className="h-4 w-4 text-success" />
-                              </div> : <div className="w-6 h-6 rounded-full bg-muted mx-auto" />}
-                          </td>
-                          <td className="py-3 px-4 text-center">
-                            {slots.afternoon ? <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center mx-auto">
-                                <CheckCircle2 className="h-4 w-4 text-success" />
-                              </div> : <div className="w-6 h-6 rounded-full bg-muted mx-auto" />}
-                          </td>
-                        </tr>)}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Open Questions */}
-            <Card className="shadow-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-display">Questions ouvertes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {candidate.openQuestions.map((q, index) => <div key={index} className="p-4 rounded-lg bg-lavender/5 border border-lavender/15">
-                      <p className="text-sm font-medium text-foreground mb-2">{q.question}</p>
-                      <p className="text-sm text-lavender font-medium">{q.answer}</p>
-                    </div>)}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column - Comments & History */}
-          <div className="space-y-6">
-            {/* Internal Comments */}
-            <Card className="shadow-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-display flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-lavender" />
-                  Commentaires internes
-                </CardTitle>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {candidate.comments.length} commentaires
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ScrollArea className="h-[300px] pr-4">
-                  <div className="space-y-3">
-                    {candidate.comments.map(comment => <div key={comment.id} className="p-3 rounded-lg bg-lavender/5 border border-lavender/15">
+                    {candidate.comments.map(comment => (
+                      <div key={comment.id} className="p-3 rounded-lg bg-lavender/5 border border-lavender/15">
                         <p className="text-sm">{comment.text}</p>
                         <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                           <User className="h-3 w-3" />
@@ -671,54 +572,263 @@ const CandidatPageV1 = () => {
                           <span>·</span>
                           <span>{comment.date}</span>
                         </div>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                 </ScrollArea>
-
-                <div className="pt-2 border-t border-border">
-                  <Textarea placeholder="Ajouter un commentaire..." className="min-h-[80px] resize-none" />
-                  <Button className="mt-2 w-full gap-2 hover:border-[hsl(18_100%_45%)] hover:text-[hsl(18_100%_45%)] hover:bg-[hsl(18_100%_45%/0.12)]" variant="outline">
+                <div className="pt-3 border-t border-border">
+                  <Textarea placeholder="Ajouter un commentaire..." className="min-h-[60px] resize-none text-sm" />
+                  <Button className="mt-2 w-full gap-2 bg-[hsl(var(--golden-pollen))] text-[hsl(var(--carbon-black))] hover:bg-[hsl(44_100%_80%)]">
                     <Send className="h-4 w-4" />
                     Ajouter
                   </Button>
                 </div>
               </CardContent>
             </Card>
+          </div>
 
-            {/* Action History */}
-            <Card className="shadow-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-display flex items-center gap-2">
-                  <History className="h-5 w-5 text-coral" />
-                  Historique des actions
-                </CardTitle>
+          {/* Middle Column - Availabilities */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* DISPONIBILITÉS */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold uppercase tracking-wide text-muted-foreground">Disponibilités</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-2 pr-2 text-xs font-medium text-muted-foreground">Jour</th>
+                        <th className="text-center py-2 px-1 text-xs font-medium text-muted-foreground">6h-11h</th>
+                        <th className="text-center py-2 px-1 text-xs font-medium text-muted-foreground">11h-15h</th>
+                        <th className="text-center py-2 px-1 text-xs font-medium text-muted-foreground">15h-18h</th>
+                        <th className="text-center py-2 px-1 text-xs font-medium text-muted-foreground">18h-22h</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(candidate.availabilities).map(([day, slots]) => (
+                        <tr key={day} className="border-b border-border last:border-0">
+                          <td className="py-2 pr-2 font-medium text-sm">{dayLabels[day]}</td>
+                          <td className="py-2 px-1 text-center">
+                            {slots.morning ? (
+                              <div className="w-5 h-5 rounded-full bg-success/20 flex items-center justify-center mx-auto">
+                                <CheckCircle2 className="h-3 w-3 text-success" />
+                              </div>
+                            ) : (
+                              <div className="w-5 h-5 rounded-full bg-muted mx-auto" />
+                            )}
+                          </td>
+                          <td className="py-2 px-1 text-center">
+                            {slots.lunch ? (
+                              <div className="w-5 h-5 rounded-full bg-success/20 flex items-center justify-center mx-auto">
+                                <CheckCircle2 className="h-3 w-3 text-success" />
+                              </div>
+                            ) : (
+                              <div className="w-5 h-5 rounded-full bg-muted mx-auto" />
+                            )}
+                          </td>
+                          <td className="py-2 px-1 text-center">
+                            {slots.afternoon ? (
+                              <div className="w-5 h-5 rounded-full bg-success/20 flex items-center justify-center mx-auto">
+                                <CheckCircle2 className="h-3 w-3 text-success" />
+                              </div>
+                            ) : (
+                              <div className="w-5 h-5 rounded-full bg-muted mx-auto" />
+                            )}
+                          </td>
+                          <td className="py-2 px-1 text-center">
+                            <div className="w-5 h-5 rounded-full bg-muted mx-auto" />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* MATCHING DYNAMIQUE DES POINTS DE VENTE */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold uppercase tracking-wide text-muted-foreground">Matching dynamique des points de vente</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-2 pr-2 text-xs font-medium text-muted-foreground">Point de vente</th>
+                        <th className="text-center py-2 px-2 text-xs font-medium text-muted-foreground">Score dispo.</th>
+                        <th className="text-center py-2 px-2 text-xs font-medium text-muted-foreground">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {candidate.storesMatching.map((store) => (
+                        <tr key={store.name} className="border-b border-border last:border-0">
+                          <td className="py-3 pr-2">
+                            <span className="font-medium">{store.name}</span>
+                          </td>
+                          <td className="py-3 px-2">
+                            <div className="flex items-center justify-center gap-2">
+                              <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+                                <div 
+                                  className={cn(
+                                    "h-full rounded-full transition-all",
+                                    store.score >= 80 ? "bg-success" : store.score >= 60 ? "bg-warning" : "bg-destructive"
+                                  )} 
+                                  style={{ width: `${store.score}%` }}
+                                />
+                              </div>
+                              <span className={cn(
+                                "text-xs font-semibold",
+                                store.score >= 80 ? "text-success" : store.score >= 60 ? "text-warning" : "text-destructive"
+                              )}>
+                                {store.score}%
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-2 text-center">
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Preferences, More Info, Questions, Other Conversations, History */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* PRÉFÉRENCES DU CANDIDAT */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold uppercase tracking-wide text-muted-foreground">Préférences du candidat</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15">
+                  <MapPin className="h-4 w-4 text-lavender mt-0.5" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Point de vente préféré</p>
+                    <p className="text-sm font-medium">{candidate.preferredStore}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-lavender/5 border border-lavender/15">
+                  <FileText className="h-4 w-4 text-lavender mt-0.5" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Contrat préféré</p>
+                    <p className="text-sm font-medium">{candidate.preferredContract}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* PLUS D'INFORMATIONS */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold uppercase tracking-wide text-muted-foreground">Plus d'informations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">{candidate.moreInfo}</p>
+              </CardContent>
+            </Card>
+
+            {/* QUESTIONS OUVERTES */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold uppercase tracking-wide text-muted-foreground">Questions ouvertes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {candidate.openQuestions.map((q, index) => (
+                    <div key={index} className="p-3 rounded-lg bg-lavender/5 border border-lavender/15">
+                      <p className="text-sm font-medium text-foreground mb-2">{q.question}</p>
+                      <p className="text-sm text-lavender">{q.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* AUTRES CONVERSATIONS */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold uppercase tracking-wide text-muted-foreground">Autres conversations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-2 pr-2 text-xs font-medium text-muted-foreground">Date</th>
+                        <th className="text-left py-2 px-2 text-xs font-medium text-muted-foreground">Statut</th>
+                        <th className="text-left py-2 px-2 text-xs font-medium text-muted-foreground">Lieu préféré</th>
+                        <th className="text-center py-2 px-2 text-xs font-medium text-muted-foreground">Lien</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {candidate.otherConversations.map((conv, index) => (
+                        <tr key={index} className="border-b border-border last:border-0">
+                          <td className="py-2 pr-2 text-sm">{conv.date}</td>
+                          <td className="py-2 px-2 text-sm text-muted-foreground">{conv.status}</td>
+                          <td className="py-2 px-2 text-sm">{conv.preferredLocation}</td>
+                          <td className="py-2 px-2 text-center">
+                            <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                              <a href={conv.link}>
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </a>
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* HISTORIQUE DES ACTIONS */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold uppercase tracking-wide text-muted-foreground">Historique des actions</CardTitle>
                 <div className="flex gap-4 mt-2">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <div className="w-3 h-3 rounded-full bg-lavender/50 border-2 border-lavender" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-lavender/50 border-2 border-lavender" />
                     <span>Interne</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <div className="w-3 h-3 rounded-full bg-coral/50 border-2 border-coral" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-coral/50 border-2 border-coral" />
                     <span>Candidat</span>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="relative">
-                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border" />
-                  <div className="space-y-4">
-                    {candidate.history.map((event, index) => <div key={index} className="flex gap-4 relative">
-                        <div className={cn("w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 z-10", event.type === "internal" ? "bg-lavender/20 border-lavender" : "bg-coral/20 border-coral")} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-muted-foreground">{event.date}</p>
-                          <p className="text-sm mt-0.5">
-                            {event.action}
-                            {event.user && <span className="font-medium text-foreground"> {event.user}</span>}
-                          </p>
+                <ScrollArea className="h-[200px] pr-2">
+                  <div className="relative">
+                    <div className="absolute left-[5px] top-2 bottom-2 w-px bg-border" />
+                    <div className="space-y-3">
+                      {candidate.history.map((event, index) => (
+                        <div key={index} className="flex gap-3 relative">
+                          <div className={cn(
+                            "w-3 h-3 rounded-full border-2 flex-shrink-0 mt-0.5 z-10",
+                            event.type === "internal" ? "bg-lavender/20 border-lavender" : "bg-coral/20 border-coral"
+                          )} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-muted-foreground">{event.date}</p>
+                            <p className="text-sm mt-0.5">
+                              {event.action}
+                              {event.user && <span className="font-medium text-foreground"> {event.user}</span>}
+                            </p>
+                          </div>
                         </div>
-                      </div>)}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                </ScrollArea>
               </CardContent>
             </Card>
           </div>

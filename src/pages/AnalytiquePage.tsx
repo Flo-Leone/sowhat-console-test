@@ -22,16 +22,14 @@ import {
 // Mock data: each question in the chat funnel with candidate counts
 const funnelData = [
   { question: "Situation actuelle", candidats: 11200, shortLabel: "Q1" },
-  { question: "Type de contrat", candidats: 10800, shortLabel: "Q2" },
-  { question: "Montant souhaité", candidats: 9950, shortLabel: "Q3" },
-  { question: "Apport personnel", candidats: 9900, shortLabel: "Q4" },
-  { question: "Disponibilité", candidats: 9850, shortLabel: "Q5" },
-  { question: "Localisation souhaitée", candidats: 9700, shortLabel: "Q6" },
-  { question: "Expérience secteur", candidats: 4800, shortLabel: "Q7" },
-  { question: "Formation", candidats: 9300, shortLabel: "Q8" },
-  { question: "Motivation", candidats: 9200, shortLabel: "Q9" },
-  { question: "Coordonnées", candidats: 8900, shortLabel: "Q10" },
-  { question: "Fin du chat", candidats: 9100, shortLabel: "Q11" },
+  { question: "Motivations", candidats: 10800, shortLabel: "Q2" },
+  { question: "Compétences", candidats: 9950, shortLabel: "Q3" },
+  { question: "Type de contrat", candidats: 9900, shortLabel: "Q4" },
+  { question: "Rémunération souhaitée", candidats: 9850, shortLabel: "Q5" },
+  { question: "Localisation", candidats: 9700, shortLabel: "Q6" },
+  { question: "Temps de trajet", candidats: 4800, shortLabel: "Q7" },
+  { question: "Disponibilités", candidats: 9300, shortLabel: "Q8" },
+  { question: "Coordonnées", candidats: 8900, shortLabel: "Q9" },
 ];
 
 // Color palette from the design system
@@ -65,10 +63,12 @@ const AnalytiquePage = () => {
   const totalEnd = funnelData[funnelData.length - 1].candidats;
   const totalDropoffRate = (((totalStart - totalEnd) / totalStart) * 100).toFixed(1);
 
-  // Find worst drop-off question
-  const worstDropoff = dataWithDropoff.reduce((max, item) =>
-    item.dropoffRate > max.dropoffRate ? item : max
-  , dataWithDropoff[0]);
+  const conversionRate = (((totalEnd) / totalStart) * 100).toFixed(1);
+
+  // Find best question (lowest drop-off rate, excluding first)
+  const bestQuestion = dataWithDropoff.filter(d => d.dropoffRate > 0).reduce((min, item) =>
+    item.dropoffRate < min.dropoffRate ? item : min
+  , dataWithDropoff[1]);
 
   return (
     <ConsoleLayout>
@@ -119,13 +119,13 @@ const AnalytiquePage = () => {
             <p className="text-2xl font-semibold mt-1">{totalStart.toLocaleString("fr-FR")}</p>
           </div>
           <div className="bg-card rounded-xl p-5">
-            <p className="text-sm text-muted-foreground">Drop-off global</p>
-            <p className="text-2xl font-semibold mt-1 text-[hsl(var(--destructive))]">{totalDropoffRate}%</p>
+            <p className="text-sm text-muted-foreground">Taux de conversion</p>
+            <p className="text-2xl font-semibold mt-1 text-[hsl(var(--success))]">{conversionRate}%</p>
           </div>
           <div className="bg-card rounded-xl p-5">
-            <p className="text-sm text-muted-foreground">Pire question</p>
-            <p className="text-2xl font-semibold mt-1">{worstDropoff.question}</p>
-            <p className="text-sm text-[hsl(var(--destructive))]">-{worstDropoff.dropoffRate}% de perte</p>
+            <p className="text-sm text-muted-foreground">Question la plus performante</p>
+            <p className="text-2xl font-semibold mt-1">{bestQuestion.question}</p>
+            <p className="text-sm text-[hsl(var(--success))]">Seulement {bestQuestion.dropoffRate}% de perte</p>
           </div>
         </div>
 

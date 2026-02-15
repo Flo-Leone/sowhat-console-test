@@ -124,8 +124,7 @@ const SortableItem = ({
       style={style}
       className={cn(
         "flex items-center gap-3 px-4 py-3 bg-card rounded-lg border border-border/50 transition-all",
-        isDragging && "opacity-50 shadow-lg z-10",
-        tier > 0 && "ml-6"
+        isDragging && "opacity-50 shadow-lg z-10"
       )}
     >
       <button
@@ -143,23 +142,25 @@ const SortableItem = ({
           <span className="text-xs text-muted-foreground mr-2">
             Niveau {tier + 1}
           </span>
+          <button
+            onClick={onTierUp}
+            disabled={tier === 0}
+            className={cn(
+              "p-1 rounded transition-colors",
+              tier === 0 ? "opacity-0 pointer-events-none" : "hover:bg-muted"
+            )}
+            title="Monter d'un niveau"
+          >
+            <ArrowUp className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
           {!isFirst && (
-            <>
-              <button
-                onClick={onTierUp}
-                className="p-1 rounded hover:bg-muted transition-colors"
-                title="Monter d'un niveau"
-              >
-                <ArrowUp className="h-3.5 w-3.5 text-muted-foreground" />
-              </button>
-              <button
-                onClick={onTierSame}
-                className="p-1 rounded hover:bg-muted transition-colors"
-                title="Même niveau que le précédent"
-              >
-                <Equal className="h-3.5 w-3.5 text-muted-foreground" />
-              </button>
-            </>
+            <button
+              onClick={onTierSame}
+              className="p-1 rounded hover:bg-muted transition-colors"
+              title="Même niveau que le précédent"
+            >
+              <Equal className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
           )}
           {tier < maxTier && (
             <button

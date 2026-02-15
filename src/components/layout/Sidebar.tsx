@@ -128,6 +128,7 @@ const navItems = [
       { to: "/parametres/offres", label: "Offres d'emploi" },
       { to: "/parametres/messages", label: "Messages" },
       { to: "/parametres/pre-embauche", label: "Pré-embauche" },
+      { to: "/parametres/ponderation", label: "Pondération" },
     ],
   },
 ];

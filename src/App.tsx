@@ -17,6 +17,7 @@ import ParametresCSSPage from "./pages/parametres/ParametresCSSPage";
 import ParametresOffresPage from "./pages/parametres/ParametresOffresPage";
 import ParametresMessagesPage from "./pages/parametres/ParametresMessagesPage";
 import ParametresPreembauchePage from "./pages/parametres/ParametresPreembauchePage";
+import PonderationPage from "./pages/parametres/PonderationPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/parametres/offres" element={<ParametresOffresPage />} />
           <Route path="/parametres/messages" element={<ParametresMessagesPage />} />
           <Route path="/parametres/pre-embauche" element={<ParametresPreembauchePage />} />
+          <Route path="/parametres/ponderation" element={<PonderationPage />} />
           <Route path="/employes" element={<EmployesPage />} />
           <Route path="/utilisateurs" element={<UtilisateursPage />} />
           <Route path="/utilisateurs/nouveau" element={<UtilisateurFormPage />} />

@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronRight, GripVertical, Equal, ArrowUp, ArrowDown } from "lucide-react";
+import { Check, ChevronRight, GripVertical, Equal, ArrowUp, ArrowDown, RotateCcw, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DndContext,
@@ -215,6 +215,73 @@ function computeWeights(questions: Question[]): { questionId: string; answerId: 
   return results;
 }
 
+// --- Editable Weight Row ---
+interface EditableWeightRowProps {
+  label: string;
+  tier: number;
+  weight: number;
+  isCustom: boolean;
+  onChange: (value: number) => void;
+  onReset: () => void;
+}
+
+const EditableWeightRow = ({ label, tier, weight, isCustom, onChange, onReset }: EditableWeightRowProps) => {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(String(weight));
+
+  const handleSubmit = () => {
+    const parsed = parseInt(draft, 10);
+    if (!isNaN(parsed) && parsed >= 0) {
+      onChange(parsed);
+    }
+    setEditing(false);
+  };
+
+  return (
+    <div className="px-6 py-3 flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <span className="text-sm">{label}</span>
+        <span className="text-xs text-muted-foreground">(Niveau {tier + 1})</span>
+      </div>
+      <div className="flex items-center gap-2">
+        {editing ? (
+          <input
+            type="number"
+            min={0}
+            className="w-16 h-8 text-sm font-bold tabular-nums text-center border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={handleSubmit}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            autoFocus
+          />
+        ) : (
+          <button
+            onClick={() => { setDraft(String(weight)); setEditing(true); }}
+            className={cn(
+              "text-sm font-bold tabular-nums px-3 py-1 rounded-md flex items-center gap-1.5 transition-colors hover:bg-accent",
+              isCustom ? "bg-[hsl(var(--golden-pollen)/0.15)] text-[hsl(38_100%_35%)]" : "bg-muted text-foreground"
+            )}
+            title="Cliquez pour modifier"
+          >
+            {weight}
+            <Pencil className="h-3 w-3 text-muted-foreground" />
+          </button>
+        )}
+        {isCustom && !editing && (
+          <button
+            onClick={onReset}
+            className="p-1 rounded hover:bg-muted transition-colors"
+            title="Réinitialiser à la valeur calculée"
+          >
+            <RotateCcw className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // --- Steps ---
 const steps = [
   { id: 1, label: "Hiérarchiser les questions" },
@@ -227,6 +294,7 @@ const PonderationPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
+  const [customWeights, setCustomWeights] = useState<Record<string, number>>({});
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -306,9 +374,35 @@ const PonderationPage = () => {
   };
 
   // --- Step 3: Computed weights ---
-  const weights = computeWeights(questions);
-  const getWeight = (qId: string, aId: string) =>
-    weights.find((w) => w.questionId === qId && w.answerId === aId)?.weight ?? 0;
+  const computedWeights = computeWeights(questions);
+  const getComputedWeight = (qId: string, aId: string) =>
+    computedWeights.find((w) => w.questionId === qId && w.answerId === aId)?.weight ?? 0;
+
+  const getWeight = (qId: string, aId: string) => {
+    const key = `${qId}_${aId}`;
+    return customWeights[key] ?? getComputedWeight(qId, aId);
+  };
+
+  const isCustom = (qId: string, aId: string) => {
+    const key = `${qId}_${aId}`;
+    return key in customWeights;
+  };
+
+  const setWeight = (qId: string, aId: string, value: number) => {
+    const key = `${qId}_${aId}`;
+    setCustomWeights((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const resetWeight = (qId: string, aId: string) => {
+    const key = `${qId}_${aId}`;
+    setCustomWeights((prev) => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  };
+
+  const resetAllWeights = () => setCustomWeights({});
 
   const maxQuestionTier = Math.max(...questions.map((q) => q.tier), 0);
 
@@ -455,6 +549,17 @@ const PonderationPage = () => {
         {/* Step 3: Results */}
         {currentStep === 3 && (
           <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                Vous pouvez ajuster manuellement les pondérations en cliquant sur les valeurs.
+              </p>
+              {Object.keys(customWeights).length > 0 && (
+                <Button variant="outline" size="sm" onClick={resetAllWeights}>
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Réinitialiser tout
+                </Button>
+              )}
+            </div>
             {questions.map((q) => {
               const qTiers = [...new Set(questions.map((qq) => qq.tier))].sort((a, b) => a - b);
               const qTierIndex = qTiers.indexOf(q.tier);
@@ -473,21 +578,17 @@ const PonderationPage = () => {
                   <div className="divide-y divide-border/50">
                     {q.answers.map((a) => {
                       const w = getWeight(q.id, a.id);
+                      const custom = isCustom(q.id, a.id);
                       return (
-                        <div
+                        <EditableWeightRow
                           key={a.id}
-                          className="px-6 py-3 flex items-center justify-between"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm">{a.label}</span>
-                            <span className="text-xs text-muted-foreground">
-                              (Niveau {a.tier + 1})
-                            </span>
-                          </div>
-                          <span className="text-sm font-bold tabular-nums text-foreground bg-muted px-3 py-1 rounded-md">
-                            {w}
-                          </span>
-                        </div>
+                          label={a.label}
+                          tier={a.tier}
+                          weight={w}
+                          isCustom={custom}
+                          onChange={(v) => setWeight(q.id, a.id, v)}
+                          onReset={() => resetWeight(q.id, a.id)}
+                        />
                       );
                     })}
                   </div>

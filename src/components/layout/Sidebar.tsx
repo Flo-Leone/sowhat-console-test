@@ -12,6 +12,7 @@ import {
   ChevronRight,
   PanelLeftClose,
   PanelLeft,
+  BarChart3,
 } from "lucide-react";
 import sowhatLogo from "@/assets/sowhat-logo-new.png";
 import sowhatBubble from "@/assets/sowhat-bubble.png";
@@ -119,6 +120,7 @@ const navItems = [
   { to: "/points-de-vente", icon: Store, label: "Points de vente" },
   { to: "/statistiques", icon: TrendingUp, label: "Statistiques" },
   { to: "/offres-emploi", icon: Briefcase, label: "Offres d'emploi" },
+  { to: "/analytique", icon: BarChart3, label: "Analytique" },
   { 
     to: "/parametres", 
     icon: Settings, 

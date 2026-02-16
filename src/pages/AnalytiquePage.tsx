@@ -27,7 +27,7 @@ const funnelData = [
   { question: "Type de contrat", candidats: 9900, shortLabel: "Q4" },
   { question: "Rémunération souhaitée", candidats: 9850, shortLabel: "Q5" },
   { question: "Localisation", candidats: 9700, shortLabel: "Q6" },
-  { question: "Temps de trajet", candidats: 4800, shortLabel: "Q7" },
+  { question: "Temps de trajet", candidats: 4800, shortLabel: "Q7", excludeFromChart: true },
   { question: "Disponibilités", candidats: 9300, shortLabel: "Q8" },
   { question: "Coordonnées", candidats: 8900, shortLabel: "Q9" },
 ];
@@ -125,7 +125,7 @@ const AnalytiquePage = () => {
           <div className="bg-card rounded-xl p-5">
             <p className="text-sm text-muted-foreground">Question la plus performante</p>
             <p className="text-2xl font-semibold mt-1">{bestQuestion.question}</p>
-            <p className="text-sm text-[hsl(var(--success))]">Seulement {bestQuestion.dropoffRate}% de perte</p>
+            <p className="text-sm text-[hsl(var(--success))]">{(100 - bestQuestion.dropoffRate).toFixed(1)}% de conversion</p>
           </div>
         </div>
 
@@ -141,7 +141,7 @@ const AnalytiquePage = () => {
             <div className="h-[420px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={dataWithDropoff}
+                  data={dataWithDropoff.filter(d => !d.excludeFromChart)}
                   margin={{ top: 20, right: 20, bottom: 60, left: 20 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(40 15% 88%)" vertical={false} />
@@ -199,31 +199,34 @@ const AnalytiquePage = () => {
                   <th>Question</th>
                   <th className="text-right">Candidats</th>
                   <th className="text-right">Perdus</th>
-                  <th className="text-right">Taux d'abandon</th>
+                  <th className="text-right">Taux de conversion</th>
                 </tr>
               </thead>
               <tbody>
-                {dataWithDropoff.map((item, index) => (
-                  <tr key={index}>
-                    <td className="font-medium text-muted-foreground">{item.shortLabel}</td>
-                    <td className="font-medium">{item.question}</td>
-                    <td className="text-right">{item.candidats.toLocaleString("fr-FR")}</td>
-                    <td className="text-right">
-                      {index === 0 ? "—" : (
-                        <span className="text-[hsl(var(--destructive))]">
-                          -{item.dropoff.toLocaleString("fr-FR")}
-                        </span>
-                      )}
-                    </td>
-                    <td className="text-right">
-                      {index === 0 ? "—" : (
-                        <span className={item.dropoffRate > 5 ? "text-[hsl(var(--destructive))] font-semibold" : "text-muted-foreground"}>
-                          {item.dropoffRate}%
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {dataWithDropoff.filter(d => !d.excludeFromChart).map((item, index) => {
+                  const convRate = (100 - item.dropoffRate).toFixed(1);
+                  return (
+                    <tr key={index}>
+                      <td className="font-medium text-muted-foreground">{item.shortLabel}</td>
+                      <td className="font-medium">{item.question}</td>
+                      <td className="text-right">{item.candidats.toLocaleString("fr-FR")}</td>
+                      <td className="text-right">
+                        {index === 0 ? "—" : (
+                          <span className="text-[hsl(var(--destructive))]">
+                            -{item.dropoff.toLocaleString("fr-FR")}
+                          </span>
+                        )}
+                      </td>
+                      <td className="text-right">
+                        {index === 0 ? "—" : (
+                          <span className={Number(convRate) >= 95 ? "text-[hsl(var(--success))] font-semibold" : "text-muted-foreground"}>
+                            {convRate}%
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

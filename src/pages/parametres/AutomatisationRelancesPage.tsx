@@ -8,8 +8,8 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  SelectValue } from
+"@/components/ui/select";
 
 interface Condition {
   id: string;
@@ -24,7 +24,7 @@ const createCondition = (): Condition => ({
   type: "volume",
   volumeType: "candidatures",
   comparison: "plus_grand",
-  quantity: 30,
+  quantity: 30
 });
 
 const AutomatisationRelancesPage = () => {
@@ -46,7 +46,7 @@ const AutomatisationRelancesPage = () => {
 
   const updateCondition = (id: string, field: keyof Condition, value: string | number) => {
     setConditions((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, [field]: value } : c))
+    prev.map((c) => c.id === id ? { ...c, [field]: value } : c)
     );
   };
 
@@ -100,24 +100,24 @@ const AutomatisationRelancesPage = () => {
             <button
               type="button"
               className="btn-secondary btn-sm gap-1.5"
-              onClick={addCondition}
-            >
+              onClick={addCondition}>
+
               <Plus className="h-4 w-4" />
               Ajouter condition
             </button>
           </div>
           <div className="p-6 space-y-4">
-            {conditions.map((condition) => (
-              <div
-                key={condition.id}
-                className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-4 items-end"
-              >
+            {conditions.map((condition) =>
+            <div
+              key={condition.id}
+              className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-4 items-end">
+
                 <div className="space-y-1.5">
                   <label className="form-label">Type</label>
                   <Select
-                    value={condition.type}
-                    onValueChange={(v) => updateCondition(condition.id, "type", v)}
-                  >
+                  value={condition.type}
+                  onValueChange={(v) => updateCondition(condition.id, "type", v)}>
+
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -132,9 +132,9 @@ const AutomatisationRelancesPage = () => {
                 <div className="space-y-1.5">
                   <label className="form-label">Type de volume</label>
                   <Select
-                    value={condition.volumeType}
-                    onValueChange={(v) => updateCondition(condition.id, "volumeType", v)}
-                  >
+                  value={condition.volumeType}
+                  onValueChange={(v) => updateCondition(condition.id, "volumeType", v)}>
+
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -149,9 +149,9 @@ const AutomatisationRelancesPage = () => {
                 <div className="space-y-1.5">
                   <label className="form-label">Comparaison</label>
                   <Select
-                    value={condition.comparison}
-                    onValueChange={(v) => updateCondition(condition.id, "comparison", v)}
-                  >
+                  value={condition.comparison}
+                  onValueChange={(v) => updateCondition(condition.id, "comparison", v)}>
+
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -168,24 +168,24 @@ const AutomatisationRelancesPage = () => {
                 <div className="space-y-1.5">
                   <label className="form-label text-[hsl(var(--golden-pollen))]">Quantité</label>
                   <Input
-                    type="number"
-                    value={condition.quantity}
-                    onChange={(e) =>
-                      updateCondition(condition.id, "quantity", parseInt(e.target.value) || 0)
-                    }
-                    className="border-b-2 border-b-[hsl(var(--golden-pollen))]"
-                  />
+                  type="number"
+                  value={condition.quantity}
+                  onChange={(e) =>
+                  updateCondition(condition.id, "quantity", parseInt(e.target.value) || 0)
+                  }
+                  className="border-b-2 border-b-[hsl(var(--golden-pollen))]" />
+
                 </div>
 
                 <button
-                  onClick={() => removeCondition(condition.id)}
-                  className="h-10 w-10 flex items-center justify-center rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                  title="Supprimer la condition"
-                >
+                onClick={() => removeCondition(condition.id)}
+                className="h-10 w-10 flex items-center justify-center rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                title="Supprimer la condition">
+
                   <Minus className="h-5 w-5" />
                 </button>
               </div>
-            ))}
+            )}
           </div>
         </div>
 
@@ -257,7 +257,7 @@ const AutomatisationRelancesPage = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="form-label">Action Messenger</label>
+                <label className="form-label">Action RCS</label>
                 <Select value={actionMessenger} onValueChange={setActionMessenger}>
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner" />
@@ -281,8 +281,8 @@ const AutomatisationRelancesPage = () => {
           </div>
         </div>
       </div>
-    </ConsoleLayout>
-  );
+    </ConsoleLayout>);
+
 };
 
 export default AutomatisationRelancesPage;

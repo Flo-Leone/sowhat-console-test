@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Plus, Minus, Save } from "lucide-react";
+import { Plus, Minus, Save, Check } from "lucide-react";
+import { toast } from "sonner";
 import { ConsoleLayout } from "@/components/layout/ConsoleLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -274,7 +275,7 @@ const AutomatisationRelancesPage = () => {
 
           {/* Footer */}
           <div className="px-6 py-4 border-t border-border/50 bg-muted/30 flex justify-end">
-            <Button className="btn-primary gap-2">
+            <Button className="btn-primary gap-2" onClick={() => toast.success("Configuration sauvegardée avec succès", { icon: <Check className="h-4 w-4" /> })}>
               <Save className="h-4 w-4" />
               Sauvegarder
             </Button>

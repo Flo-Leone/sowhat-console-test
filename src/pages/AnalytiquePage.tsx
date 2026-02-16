@@ -186,7 +186,7 @@ const AnalytiquePage = () => {
         {/* Drop-off Detail Table */}
         <div className="bg-card rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-border/50">
-            <h2>Détail du drop-off par question</h2>
+            <h2>Détail taux de conversion par question</h2>
             <p className="text-sm text-muted-foreground mt-0.5">
               Taux d'abandon entre chaque étape du tunnel
             </p>

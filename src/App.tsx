@@ -20,6 +20,9 @@ import ParametresPreembauchePage from "./pages/parametres/ParametresPreembaucheP
 import PonderationPage from "./pages/parametres/PonderationPage";
 import AutomatisationRelancesPage from "./pages/parametres/AutomatisationRelancesPage";
 import AnalytiquePage from "./pages/AnalytiquePage";
+import EmbedAnalytiquePage from "./pages/embed/EmbedAnalytiquePage";
+import EmbedRelancesPage from "./pages/embed/EmbedRelancesPage";
+import EmbedPonderationPage from "./pages/embed/EmbedPonderationPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +54,9 @@ const App = () => (
           <Route path="/utilisateurs/nouveau" element={<UtilisateurFormPage />} />
           <Route path="/utilisateurs/:id/modifier" element={<UtilisateurFormPage />} />
           <Route path="/utilisateurs/roles" element={<RolesPage />} />
+          <Route path="/embed/analytique" element={<EmbedAnalytiquePage />} />
+          <Route path="/embed/relances" element={<EmbedRelancesPage />} />
+          <Route path="/embed/ponderation" element={<EmbedPonderationPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
